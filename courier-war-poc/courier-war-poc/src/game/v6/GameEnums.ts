@@ -21,7 +21,8 @@ export const TileType = {
     Tunnel: "tunnel",
     Shortcut: "shortcut",
     Park: "park",
-    Water: "water",
+  Water: "water",
+  Avenue: "avenue",  //NEW COZ BIG ROADS ARE AVENUE
 } as const;
   
 export type TileType = (typeof TileType)[keyof typeof TileType];

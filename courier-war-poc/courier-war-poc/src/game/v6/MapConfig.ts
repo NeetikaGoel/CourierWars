@@ -84,7 +84,9 @@ export const MAP_CONFIG =
   //divide the map into a 10 x 10 invisible grid for smaller features like traffic lights, tunnels, shortcuts, construction zones
   featureGridColumns: 10,
   featureGridRows: 10,
-  featureCellStride: 37, //to skip how many
+    featureCellStride: 37, //to skip how many
+  
+    trafficLightMinJunctionDistance: 1,
 
   //deterministic random-like nos
   seedA: 73856093,

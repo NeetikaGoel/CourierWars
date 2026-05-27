@@ -50,6 +50,7 @@ export const GAME_CONFIG = {
   {
     //my god no this is more pathetic now
     baseDurationMs: 120,
+    trafficLightStopMs: 4000,  //for the traffic light stop time
     costs:
     {
       //how much movt time
@@ -57,13 +58,14 @@ export const GAME_CONFIG = {
       [TileType.Road]: 1, //hehe simple sober cute
       [TileType.Start]: 1, //hehe simple sober cute
       [TileType.Delivery]: 1, //hehe simple sober cute
-      [TileType.TrafficLight]: 7, //bad traffic lights
+      [TileType.TrafficLight]: 1, //bad traffic lights
       [TileType.Construction]: 5.5, //its there for good so okayyy little bad only
       [TileType.Bridge]: 0.9, //speeedddddd
       [TileType.Tunnel]: 0.7,  ///sppeeedddd
-      [TileType.Shortcut]: 0.5, ///omg wowwwww
+      [TileType.Shortcut]: 1.5, ///omg wowwwww
       [TileType.Park]: 999, //no means no
       [TileType.Water]: 999, //no means no
+      [TileType.Avenue]: 0.85, // less cost so high speed
     },
 
     //what else
@@ -82,6 +84,7 @@ export const GAME_CONFIG = {
       [TileType.Shortcut]: true,
       [TileType.Park]: false,
       [TileType.Water]: false,
+      [TileType.Avenue]: true,
     },
   },
 
@@ -99,8 +102,9 @@ export const GAME_CONFIG = {
     [TileType.Shortcut]: "#0cb048",
     [TileType.Park]: "#15803d",
     [TileType.Water]: "#00c8ff",
+    [TileType.Avenue]: "#fff7b3",
 
-    courier: "#ff0000",
+    courier: "#291e6e",
     border: "#ffffff",
     uiText: "#ffffff",
     uiBackground: "#000000",
@@ -169,10 +173,10 @@ export const GAME_CONFIG = {
     enabled: true,
     durationMs: 900,
     normalText: "",
-    trafficText: "Red Traffic Light! Courier slowed ....",
+    trafficText: "Red Traffic Light! Courier stopped ....",
     constructionText: "Construction Zone! Courier slowed ....",
     bridgeText: "Bridge Route! Slightly faster !!!!",
     tunnelText: "Tunnel Route! Faster hidden path !!!!",
-    shortcutText: "Shortcut Route! Fast path !!!",
+    shortcutText: "Narrow Shortcut! Shorter path but slower ....",
   },
 } as const;

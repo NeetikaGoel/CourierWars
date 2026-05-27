@@ -62,8 +62,9 @@ export class MapGenerator {
       MAP_CONFIG.shortcutSalt,
       "shortcut"
     );
-    this.addTrafficLights(map);
+
     this.addConstruction(map);
+    this.addTrafficLights(map);
     this.addHurdleCandidates(map);
     this.connectStartAndDelivery(map);
 
@@ -138,23 +139,41 @@ export class MapGenerator {
     }
   }
 
-  private addAvenues(map: GameMap) {
-    this.addVerticalRoads(map, MAP_CONFIG.avenueSpacingA, "avenue-a");
-    this.addHorizontalRoads(map, MAP_CONFIG.avenueSpacingB, "avenue-b");
-    this.addVerticalRoads(map, MAP_CONFIG.avenueSpacingC, "avenue-c");
-  }
+  private addAvenues(map: GameMap)
+{
+  //big city roads should be avenues, not normal small roads
+  this.addVerticalRoads(map, MAP_CONFIG.avenueSpacingA, "avenue-a", TileType.Avenue);
+  this.addHorizontalRoads(map, MAP_CONFIG.avenueSpacingB, "avenue-b", TileType.Avenue);
+  this.addVerticalRoads(map, MAP_CONFIG.avenueSpacingC, "avenue-c", TileType.Avenue);
+}
 
-  private addVerticalRoads(map: GameMap, spacing: number, routeId: string) {
-    for (let x = MAP_CONFIG.safeBorder + spacing; x < MAP_CONFIG.width - MAP_CONFIG.safeBorder; x += spacing) {
-      this.drawLine(map, { x, y: MAP_CONFIG.safeBorder }, { x, y: MAP_CONFIG.height - MAP_CONFIG.safeBorder }, TileType.Road, routeId);
-    }
+private addVerticalRoads(map: GameMap, spacing: number, routeId: string, type: TileType)
+{
+  for (let x = MAP_CONFIG.safeBorder + spacing; x < MAP_CONFIG.width - MAP_CONFIG.safeBorder; x += spacing)
+  {
+    this.drawLine(
+      map,
+      { x, y: MAP_CONFIG.safeBorder },
+      { x, y: MAP_CONFIG.height - MAP_CONFIG.safeBorder },
+      type,
+      routeId
+    );
   }
+}
 
-  private addHorizontalRoads(map: GameMap, spacing: number, routeId: string) {
-    for (let y = MAP_CONFIG.safeBorder + spacing; y < MAP_CONFIG.height - MAP_CONFIG.safeBorder; y += spacing) {
-      this.drawLine(map, { x: MAP_CONFIG.safeBorder, y }, { x: MAP_CONFIG.width - MAP_CONFIG.safeBorder, y }, TileType.Road, routeId);
-    }
+private addHorizontalRoads(map: GameMap, spacing: number, routeId: string, type: TileType)
+{
+  for (let y = MAP_CONFIG.safeBorder + spacing; y < MAP_CONFIG.height - MAP_CONFIG.safeBorder; y += spacing)
+  {
+    this.drawLine(
+      map,
+      { x: MAP_CONFIG.safeBorder, y },
+      { x: MAP_CONFIG.width - MAP_CONFIG.safeBorder, y },
+      type,
+      routeId
+    );
   }
+}
 
   private addRandomConnectors(map: GameMap) {
     for (let index = 0; index < MAP_CONFIG.connectorRoadCount; index++) {
@@ -240,20 +259,186 @@ export class MapGenerator {
     });
   }
 
+  private distributedJunctionPoints(map: GameMap, count: number, salt: number): Point[] {
+    const junctions = this.collectJunctionPoints(map);
+    const result: Point[] = [];
+  
+    const step = Math.max(
+      GAME_CONSTANTS.math.one,
+      Math.floor(junctions.length / count)
+    );
+  
+    for (
+      let index = GAME_CONSTANTS.math.zero;
+      index < junctions.length && result.length < count;
+      index += step
+    ) {
+      const selectedIndex =
+        Math.abs(index * MAP_CONFIG.featureCellStride + salt) % junctions.length;
+  
+      const point = junctions[selectedIndex];
+  
+      if (!result.some((item) => item.x === point.x && item.y === point.y)) {
+        result.push(point);
+      }
+    }
+  
+    return result;
+  }
+
+  private collectJunctionPoints(map: GameMap): Point[] {
+    const junctions: Point[] = [];
+  
+    for (let y = MAP_CONFIG.safeBorder; y < MAP_CONFIG.height - MAP_CONFIG.safeBorder; y++) {
+      for (let x = MAP_CONFIG.safeBorder; x < MAP_CONFIG.width - MAP_CONFIG.safeBorder; x++) {
+        const point = { x, y };
+  
+        if (this.isTrafficLightJunction(map, point)) {
+          junctions.push(point);
+        }
+      }
+    }
+  
+    return junctions;
+  }
+
+  private isTrafficLightJunction(map: GameMap, point: Point): boolean {
+    if (!this.isInside(point)) return false;
+  
+    const tile = map[point.y][point.x];
+  
+    if (tile.type !== TileType.Road && tile.type !== TileType.Avenue) {
+      return false;
+    }
+  
+    const hasHorizontalRoad =
+      this.isTrafficRoad(map, { x: point.x - GAME_CONSTANTS.math.one, y: point.y }) ||
+      this.isTrafficRoad(map, { x: point.x + GAME_CONSTANTS.math.one, y: point.y });
+  
+    const hasVerticalRoad =
+      this.isTrafficRoad(map, { x: point.x, y: point.y - GAME_CONSTANTS.math.one }) ||
+      this.isTrafficRoad(map, { x: point.x, y: point.y + GAME_CONSTANTS.math.one });
+  
+    return hasHorizontalRoad && hasVerticalRoad;
+  }
+
+
+  private isTrafficRoad(map: GameMap, point: Point): boolean {
+    if (!this.isInside(point)) return false;
+  
+    const tile = map[point.y][point.x];
+  
+    return tile.type === TileType.Road || tile.type === TileType.Avenue;
+  }
+
+
   private addTrafficLights(map: GameMap) {
-    for (const point of this.distributedRoadPoints(map, MAP_CONFIG.trafficLightCount, MAP_CONFIG.trafficSalt)) {
+    const junctions = this.distributedJunctionPoints(
+      map,
+      MAP_CONFIG.trafficLightCount,
+      MAP_CONFIG.trafficSalt
+    );
+  
+    for (const point of junctions) {
       this.setTile(map, point, TileType.TrafficLight);
+      this.addRoute(map, point, "traffic-light");
     }
   }
 
-  private addConstruction(map: GameMap) {
-    const points = this.distributedRoadPoints(map, MAP_CONFIG.constructionZoneCount, MAP_CONFIG.constructionSalt);
+  // private addConstruction(map: GameMap) {
+  //   const points = this.distributedRoadPoints(map, MAP_CONFIG.constructionZoneCount, MAP_CONFIG.constructionSalt);
 
+  //   points.forEach((point, index) => {
+  //     const length = this.range(index, MAP_CONFIG.constructionMinLength, MAP_CONFIG.constructionMaxLength);
+  //     this.drawLine(map, point, { x: point.x + length, y: point.y }, TileType.Construction, "construction");
+  //   });
+  // }
+
+  private addConstruction(map: GameMap) {
+    const points = this.distributedPlainRoadPoints(
+      map,
+      MAP_CONFIG.constructionZoneCount,
+      MAP_CONFIG.constructionSalt
+    );
+  
     points.forEach((point, index) => {
-      const length = this.range(index, MAP_CONFIG.constructionMinLength, MAP_CONFIG.constructionMaxLength);
-      this.drawLine(map, point, { x: point.x + length, y: point.y }, TileType.Construction, "construction");
+      const length = this.range(
+        index,
+        MAP_CONFIG.constructionMinLength,
+        MAP_CONFIG.constructionMaxLength
+      );
+  
+      this.drawLine(
+        map,
+        point,
+        { x: point.x + length, y: point.y },
+        TileType.Construction,
+        "construction"
+      );
     });
   }
+
+
+  private distributedPlainRoadPoints(map: GameMap, count: number, salt: number): Point[] {
+    const result: Point[] = [];
+  
+    const totalCells =
+      MAP_CONFIG.featureGridColumns * MAP_CONFIG.featureGridRows;
+  
+    for (let index = GAME_CONSTANTS.math.zero; result.length < count; index++) {
+      const cellIndex =
+        Math.abs(index * MAP_CONFIG.featureCellStride + salt) % totalCells;
+  
+      const point = this.findPlainRoadPointInsideCell(map, cellIndex, salt + index);
+  
+      if (point && !result.some((item) => item.x === point.x && item.y === point.y)) {
+        result.push(point);
+      }
+    }
+  
+    return result;
+  }
+
+
+  private findPlainRoadPointInsideCell(
+    map: GameMap,
+    cellIndex: number,
+    salt: number
+  ): Point | undefined {
+    const cellColumn = cellIndex % MAP_CONFIG.featureGridColumns;
+    const cellRow = Math.floor(cellIndex / MAP_CONFIG.featureGridColumns);
+  
+    const cellWidth = Math.floor(MAP_CONFIG.width / MAP_CONFIG.featureGridColumns);
+    const cellHeight = Math.floor(MAP_CONFIG.height / MAP_CONFIG.featureGridRows);
+  
+    const minX = cellColumn * cellWidth;
+    const minY = cellRow * cellHeight;
+    const maxX = minX + cellWidth;
+    const maxY = minY + cellHeight;
+  
+    const candidates: Point[] = [];
+  
+    for (let y = minY; y < maxY; y++) {
+      for (let x = minX; x < maxX; x++) {
+        if (!this.isInside({ x, y })) continue;
+  
+        const tile = map[y][x];
+  
+        if (tile.type === TileType.Road || tile.type === TileType.Avenue) {
+          candidates.push({ x, y });
+        }
+      }
+    }
+  
+    if (candidates.length === GAME_CONSTANTS.math.zero) {
+      return undefined;
+    }
+  
+    const selectedIndex = Math.abs(salt) % candidates.length;
+  
+    return candidates[selectedIndex];
+  }
+
 
   private addHurdleCandidates(map: GameMap) {
     const hurdleTypes = [

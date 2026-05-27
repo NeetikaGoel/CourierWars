@@ -213,13 +213,29 @@ export class GameScene extends Phaser.Scene
       duration: GAME_CONFIG.movement.baseDurationMs * tile.movementCost,
       ease: GAME_CONFIG.camera.ease,
       onComplete: () => {
-        this.isMoving = false;
-        this.checkWin(tile);
+        this.handleTileAfterMovement(tile);
       },
     });
 
     //bool willbe false till now
   }
+
+  private handleTileAfterMovement(tile: MapTile)
+  {
+    if (tile.type === TileType.TrafficLight)
+    {
+      this.time.delayedCall(GAME_CONFIG.movement.trafficLightStopMs, () => {
+        this.isMoving = false;
+        this.checkWin(tile);
+      });
+
+      return;
+    }
+
+    this.isMoving = false;
+    this.checkWin(tile);
+  }
+
 
   //this func for creating that courier circle hehe
   private createCourier()
