@@ -41,3 +41,10 @@ MapRenderer draws only from data hehe
 
 
 now it might work perfectly!!!
+
+
+MapConfig gives settings!
+MapGenerator creates the map!!
+MapData exports the generated map!!!
+GameScene uses mapTiles to play!!!!
+MapRenderer uses mapTiles to draw!!!!!

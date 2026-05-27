@@ -19,7 +19,6 @@ src/assets/typescript.svg
 src/assets/vite.svg
 
 
-
 node_modules
 dist
 dist-ssr

@@ -1,11 +1,32 @@
 
 // This is the only file where the map is generated
 
+
+//yeah so what u r doing 
 import { GAME_CONFIG } from "./GameConfig";
 import { GAME_CONSTANTS } from "./GameConstants";
 import { MAP_CONFIG } from "./MapConfig";
 import { TileType, HurdleType } from "./GameEnums";
 import type { Area, GameMap, MapTile, Point } from "./GameShapeTypes";
+
+
+// this is having lets see
+// 1. create full building map
+// 2. add district roads - creates small city-block roads!
+// 3. add big avenues - creates big city-wide roads!!
+// 4. add connector roads
+// 5. add main routes from start to delivery
+// 6. add parks and lakes
+// 7. add roads around parks/lakes
+// 8. add bridges on lakes
+// 9. add tunnels and shortcuts
+// 10. add traffic lights
+// 11. add construction zones
+// 12. add hurdle candidate points
+// 13. set start and delivery tiles
+
+
+//will create random-looking but stable positions!!! Same config = same map every refresh
 
 export class MapGenerator {
   generate(): GameMap {
@@ -22,8 +43,25 @@ export class MapGenerator {
     this.addRings(map, parks, "park-ring");
     this.addRings(map, lakes, "lake-ring");
     this.addLakeBridges(map, lakes);
-    this.addSpecialSegments(map, TileType.Tunnel, MAP_CONFIG.tunnelCount, MAP_CONFIG.tunnelLength, MAP_CONFIG.tunnelSalt, "tunnel");
-    this.addSpecialSegments(map, TileType.Shortcut, MAP_CONFIG.shortcutCount, MAP_CONFIG.shortcutLength, MAP_CONFIG.shortcutSalt, "shortcut");
+    this.addSpecialSegments(
+      map,
+      TileType.Tunnel,
+      MAP_CONFIG.tunnelCount,
+      MAP_CONFIG.tunnelMinLength,
+      MAP_CONFIG.tunnelMaxLength,
+      MAP_CONFIG.tunnelSalt,
+      "tunnel"
+    );
+    
+    this.addSpecialSegments(
+      map,
+      TileType.Shortcut,
+      MAP_CONFIG.shortcutCount,
+      MAP_CONFIG.shortcutMinLength,
+      MAP_CONFIG.shortcutMaxLength,
+      MAP_CONFIG.shortcutSalt,
+      "shortcut"
+    );
     this.addTrafficLights(map);
     this.addConstruction(map);
     this.addHurdleCandidates(map);
@@ -38,10 +76,13 @@ export class MapGenerator {
   private createBaseMap(): GameMap {
     const map: GameMap = [];
 
-    for (let y = GAME_CONSTANTS.array.firstIndex; y < MAP_CONFIG.height; y++) {
+    for (let y = 0; y < MAP_CONFIG.height; y++)
+    {
       const row: MapTile[] = [];
 
-      for (let x = GAME_CONSTANTS.array.firstIndex; x < MAP_CONFIG.width; x++) {
+      for (let x = 0; x < MAP_CONFIG.width; x++)
+      {
+        //a function new lets see what u do
         row.push(this.createTile(x, y, TileType.Building));
       }
 
@@ -116,19 +157,19 @@ export class MapGenerator {
   }
 
   private addRandomConnectors(map: GameMap) {
-    for (let index = GAME_CONSTANTS.array.firstIndex; index < MAP_CONFIG.connectorRoadCount; index++) {
+    for (let index = 0; index < MAP_CONFIG.connectorRoadCount; index++) {
       this.drawLine(map, this.spreadPoint(index, MAP_CONFIG.roadSalt), this.spreadPoint(index + MAP_CONFIG.connectorRoadCount, MAP_CONFIG.roadSalt), TileType.Road, "connector");
     }
   }
 
   private addMainRoutes(map: GameMap) {
-    for (let routeIndex = GAME_CONSTANTS.array.firstIndex; routeIndex < MAP_CONFIG.routeCount; routeIndex++) {
+    for (let routeIndex = 0; routeIndex < MAP_CONFIG.routeCount; routeIndex++) {
         let previous: Point = {
             x: MAP_CONFIG.startPoint.x,
             y: MAP_CONFIG.startPoint.y,
           };
 
-      for (let index = GAME_CONSTANTS.array.firstIndex; index < MAP_CONFIG.routeWaypointCount; index++) {
+      for (let index = 0; index < MAP_CONFIG.routeWaypointCount; index++) {
         const next = this.spreadPoint(routeIndex * MAP_CONFIG.routeWaypointCount + index, MAP_CONFIG.seedA + routeIndex);
         this.drawLine(map, previous, next, TileType.Road, `route-${routeIndex}`);
         previous = next;
@@ -141,7 +182,7 @@ export class MapGenerator {
   private addAreas(map: GameMap, type: TileType, count: number, minSize: number, maxSize: number, salt: number): Area[] {
     const areas: Area[] = [];
 
-    for (let index = GAME_CONSTANTS.array.firstIndex; index < count; index++) {
+    for (let index = 0; index < count; index++) {
       const area = this.areaInCell(index, count, minSize, maxSize, salt);
       this.fillArea(map, area, type);
       areas.push(area);
@@ -165,7 +206,7 @@ export class MapGenerator {
   }
 
   private addLakeBridges(map: GameMap, lakes: Area[]) {
-    for (let index = GAME_CONSTANTS.array.firstIndex; index < MAP_CONFIG.bridgeCount; index++) {
+    for (let index = 0; index < MAP_CONFIG.bridgeCount; index++) {
       const lake = lakes[index % lakes.length];
       const bridgeY = lake.startY + Math.floor(lake.height / GAME_CONSTANTS.math.half);
 
@@ -176,14 +217,25 @@ export class MapGenerator {
     }
   }
 
-  private addSpecialSegments(map: GameMap, type: TileType, count: number, length: number, salt: number, routeId: string) {
+  private addSpecialSegments(
+    map: GameMap,
+    type: TileType,
+    count: number,
+    minLength: number,
+    maxLength: number,
+    salt: number,
+    routeId: string
+  ) {
     const points = this.distributedRoadPoints(map, count, salt);
-
+  
     points.forEach((point, index) => {
-      const end = index % GAME_CONSTANTS.math.half === GAME_CONSTANTS.math.zero
-        ? { x: point.x + length, y: point.y }
-        : { x: point.x, y: point.y + length };
-
+      const length = this.range(index + salt, minLength, maxLength);
+  
+      const end =
+        index % GAME_CONSTANTS.math.half === GAME_CONSTANTS.math.zero
+          ? { x: point.x + length, y: point.y }
+          : { x: point.x, y: point.y + length };
+  
       this.drawLine(map, point, end, type, routeId);
     });
   }
@@ -277,7 +329,7 @@ export class MapGenerator {
     const totalCells =
       MAP_CONFIG.featureGridColumns * MAP_CONFIG.featureGridRows;
   
-    for (let index = GAME_CONSTANTS.array.firstIndex; result.length < count; index++) {
+    for (let index = 0; result.length < count; index++) {
       const cellIndex =
         Math.abs(index * MAP_CONFIG.featureCellStride + salt) % totalCells;
   

@@ -2,7 +2,14 @@
 // These will be all the fixed names used across the game!!!
 // enums not available
 // DAMNNNNNN
-//so first of all tiles type
+// have to create types from these values now
+
+// how to do that???
+
+// lets see oki we can put them in form of either  ors like |||| or we can also add 1 line which does that which is 
+//down 
+//
+// so first of all tiles type
 export const TileType = {
     Building: "building",
     Road: "road",
@@ -42,4 +49,5 @@ export const DirectionName = {
     Down: "down",
   } as const;
   
-  export type DirectionName = (typeof DirectionName)[keyof typeof DirectionName];
+
+export type DirectionName = (typeof DirectionName)[keyof typeof DirectionName]; //so now this line will convert this to DirectionName = "left" | "right" | "up" | "down" !!! good good, now next file
