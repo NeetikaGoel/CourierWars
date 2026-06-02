@@ -1,21 +1,72 @@
-
-// main.ts
-// Starts Courier War V5
-
+// Imports Phaser game engine
 import Phaser from "phaser";
-import { GAME_CONFIG } from "./game/v6/GameConfig";
-import { GameScene } from "./game/v6/GameScene";
 
+// Imports Phaser level config for Courier War V7
+import { phaserGameConfig } from "./game/v7/config/PhaserGameConfig";
+
+// Imports debug display config for side panel width
+import { debugDisplayConfig } from "./game/v7/config/DebugDisplayConfig";
+
+// Imports Courier War V7 map prototype scene
+import { MapPrototypeScene } from "./game/v7/scene/MapPrototypeScene";
+
+// Stores side panel width
+const sidePanelWidthPixels = debugDisplayConfig.sidePanel.visible
+  ? debugDisplayConfig.sidePanel.widthPixels
+  : 0;
+
+// Stores game canvas width
+const gameCanvasWidth = phaserGameConfig.canvas.windowSizeEnabled
+  ? Math.max(640, window.innerWidth - sidePanelWidthPixels)
+  : phaserGameConfig.canvas.widthPixelsDefault;
+
+// Stores game canvas height
+const gameCanvasHeight = phaserGameConfig.canvas.windowSizeEnabled
+  ? window.innerHeight
+  : phaserGameConfig.canvas.heightPixelsDefault;
+
+// Defines Phaser game configuration
 const config: Phaser.Types.Core.GameConfig = {
+  // Uses WebGL when available and Canvas otherwise
   type: Phaser.AUTO,
-  width: window.innerWidth,
-  height: window.innerHeight,
-  backgroundColor: GAME_CONFIG.canvas.backgroundColor,
-  parent: GAME_CONFIG.canvas.parentElementId,
-  scene: [GameScene],
+
+  // Stores canvas width
+  width: gameCanvasWidth,
+
+  // Stores canvas height
+  height: gameCanvasHeight,
+
+  // Stores canvas background color
+  backgroundColor: phaserGameConfig.canvas.backgroundColorHex,
+
+  // Stores parent HTML element id
+  parent: phaserGameConfig.canvas.parentElementId,
+
+  // Registers Courier War V7 prototype scene
+  scene: [MapPrototypeScene],
 };
 
+// Starts Phaser game
 new Phaser.Game(config);
+
+// Starts Courier War V5
+
+// import Phaser from "phaser";
+// import { GAME_CONFIG } from "./game/v6/GameConfig";
+// import { GameScene } from "./game/v6/GameScene";
+
+
+// const config: Phaser.Types.Core.GameConfig =
+// {
+//   type: Phaser.AUTO,
+//   width: window.innerWidth,
+//   height: window.innerHeight,
+//   backgroundColor: GAME_CONFIG.canvas.backgroundColor,
+//   parent: GAME_CONFIG.canvas.parentElementId,
+//   scene: [GameScene],
+// };
+
+// new Phaser.Game(config);
 
 // import Phaser from "phaser";  //importing game engine
 // import { GameSceneV3 } from "./game/GameSceneV3"; //importing file
