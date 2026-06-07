@@ -1,0 +1,42 @@
+<section class="register-page">
+    <form class="register-card" data-register-form>
+      <button class="register-back" type="button" data-back-button>← Back</button>
+  
+      <h1>Register</h1>
+      <p>Create your Courier War profile</p>
+  
+      <label>
+        Username
+        <input data-register-username name="username" autocomplete="username" />
+      </label>
+  
+      <label>
+        Email
+        <input data-register-email name="email" type="email" autocomplete="email" />
+      </label>
+  
+      <label>
+        Password
+        <input data-register-password name="password" type="password" autocomplete="new-password" />
+      </label>
+  
+      <label>
+        Display Name
+        <input data-register-name name="name" autocomplete="name" />
+      </label>
+  
+      <label>
+        Preferred Role
+        <select data-register-role name="preferredRole">
+          <option value="any">Any</option>
+          <option value="courier">Courier</option>
+          <option value="saboteur">Saboteur</option>
+        </select>
+      </label>
+  
+      <div class="register-error" data-page-error hidden></div>
+      <div class="register-loading" data-page-loading hidden></div>
+  
+      <button class="register-submit" type="submit">Create Account</button>
+    </form>
+  </section>

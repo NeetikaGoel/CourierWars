@@ -1,0 +1,98 @@
+.home-page {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: minmax(260px, 340px) 1fr;
+    gap: 24px;
+    padding: 24px;
+    background: #020617;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+  }
+  
+  .home-profile,
+  .home-card {
+    border-radius: 22px;
+    background: #111827;
+    padding: 24px;
+  }
+  
+  .home-profile {
+    align-self: start;
+  }
+  
+  .home-profile h2,
+  .home-card h1 {
+    margin: 0 0 8px;
+  }
+  
+  .home-profile p,
+  .home-card p {
+    color: #94a3b8;
+    margin: 0 0 20px;
+  }
+  
+  .home-card {
+    max-width: 620px;
+    align-self: center;
+    justify-self: center;
+    width: 100%;
+    display: grid;
+    gap: 18px;
+  }
+  
+  .home-card label {
+    display: grid;
+    gap: 8px;
+    color: #cbd5e1;
+  }
+  
+  .home-card select {
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #334155;
+    background: #020617;
+    color: #ffffff;
+  }
+  
+  .home-start,
+  .home-profile button {
+    padding: 12px;
+    border: 0;
+    border-radius: 12px;
+    cursor: pointer;
+  }
+  
+  .home-start {
+    background: #facc15;
+    color: #111827;
+    font-weight: 700;
+  }
+  
+  .home-profile button {
+    width: 100%;
+    margin-top: 10px;
+    background: #1e293b;
+    color: #dbeafe;
+  }
+  
+  .home-error {
+    padding: 10px;
+    border-radius: 10px;
+    background: #7f1d1d;
+    color: #fee2e2;
+  }
+  
+  .home-loading {
+    color: #fde68a;
+  }
+  
+  .page-stats-grid {
+    display: grid;
+    gap: 8px;
+  }
+  
+  .page-stats-grid div {
+    display: flex;
+    justify-content: space-between;
+    color: #cbd5e1;
+  }
