@@ -1,8 +1,146 @@
 <section class="auth-loading-page">
-    <div class="auth-loading-card">
-      <div class="auth-loading-spinner"></div>
-      <h1>Checking Session</h1>
-      <p data-auth-loading-message>Loading your Courier War profile...</p>
-      <div class="auth-loading-error" data-page-error hidden></div>
-    </div>
-  </section>
+  <div class="auth-loading-shell">
+    <img
+      class="auth-loading-background-image"
+      src="/assets/landing/landing-characters-bg.png"
+      alt=""
+      aria-hidden="true"
+    />
+
+    <div class="auth-loading-grid" aria-hidden="true"></div>
+    <div class="auth-loading-vignette" aria-hidden="true"></div>
+    <div class="auth-loading-scanline" aria-hidden="true"></div>
+    <div class="auth-loading-center-focus" aria-hidden="true"></div>
+
+    <header class="auth-loading-title-bar">
+      <div class="auth-loading-title-line">
+        <span></span>
+
+        <h1>
+          <span>Courier</span>
+          <strong>War</strong>
+        </h1>
+
+        <span></span>
+      </div>
+
+      <p>Deliver. Outthink. Outmaneuver.</p>
+    </header>
+
+    <main class="auth-loading-card">
+      <div class="auth-loading-card-border" aria-hidden="true"></div>
+
+      <section class="auth-loading-card-top">
+        <span class="auth-loading-logo-frame" aria-hidden="true">
+          <img
+            class="auth-loading-logo"
+            src="/assets/brand/courier-war-logo.png"
+            alt=""
+          />
+        </span>
+
+        <span class="auth-loading-spinner" aria-hidden="true"></span>
+
+        <h2 data-auth-loading-title>Checking Session...</h2>
+
+        <p data-auth-loading-message>
+          Verifying your login session and preparing your experience.
+        </p>
+      </section>
+
+      <section class="auth-loading-steps" aria-label="Authentication loading steps">
+        <article class="auth-loading-step" data-auth-step="tokens">
+          <span class="auth-loading-step-icon">◈</span>
+
+          <strong>Validating tokens</strong>
+
+          <span class="auth-loading-step-dots" aria-hidden="true">
+            <i></i>
+            <i></i>
+            <i></i>
+            <i></i>
+            <i></i>
+          </span>
+
+          <em data-auth-step-status="tokens">○</em>
+        </article>
+
+        <article class="auth-loading-step" data-auth-step="profile">
+          <span class="auth-loading-step-icon">●</span>
+
+          <strong>Loading profile</strong>
+
+          <span class="auth-loading-step-dots" aria-hidden="true">
+            <i></i>
+            <i></i>
+            <i></i>
+            <i></i>
+            <i></i>
+          </span>
+
+          <em data-auth-step-status="profile">○</em>
+        </article>
+
+        <article class="auth-loading-step" data-auth-step="userData">
+          <span class="auth-loading-step-icon">▣</span>
+
+          <strong>Fetching user data</strong>
+
+          <span class="auth-loading-step-dots" aria-hidden="true">
+            <i></i>
+            <i></i>
+            <i></i>
+            <i></i>
+            <i></i>
+          </span>
+
+          <em data-auth-step-status="userData">○</em>
+        </article>
+
+        <article class="auth-loading-step" data-auth-step="gameData">
+          <span class="auth-loading-step-icon">◆</span>
+
+          <strong>Preparing game data</strong>
+
+          <span class="auth-loading-step-dots" aria-hidden="true">
+            <i></i>
+            <i></i>
+            <i></i>
+            <i></i>
+            <i></i>
+          </span>
+
+          <em data-auth-step-status="gameData">○</em>
+        </article>
+      </section>
+
+      <section class="auth-loading-error" data-auth-loading-error hidden>
+        <strong>Session check failed</strong>
+        <p data-auth-loading-error-message>
+          Something went wrong while checking your session.
+        </p>
+
+        <div>
+          <button type="button" data-auth-loading-retry>Retry</button>
+          <button type="button" data-auth-loading-continue>Continue To Start</button>
+        </div>
+      </section>
+
+      <section class="auth-loading-tip">
+        <span>i</span>
+
+        <p>
+          <strong>TIP:</strong>
+          Plan your route. Predict their moves.
+          <br />
+          Every second counts in the war of delivery.
+        </p>
+      </section>
+    </main>
+
+    <footer class="auth-loading-footer">
+      <span>© 2026 Courier War. All rights reserved.</span>
+      <span>Version 1.0.0</span>
+    </footer>
+  </div>
+</section>

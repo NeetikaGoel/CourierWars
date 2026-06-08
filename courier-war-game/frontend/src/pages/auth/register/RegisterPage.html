@@ -1,42 +1,275 @@
 <section class="register-page">
-    <form class="register-card" data-register-form>
-      <button class="register-back" type="button" data-back-button>← Back</button>
-  
-      <h1>Register</h1>
-      <p>Create your Courier War profile</p>
-  
-      <label>
-        Username
-        <input data-register-username name="username" autocomplete="username" />
-      </label>
-  
-      <label>
-        Email
-        <input data-register-email name="email" type="email" autocomplete="email" />
-      </label>
-  
-      <label>
-        Password
-        <input data-register-password name="password" type="password" autocomplete="new-password" />
-      </label>
-  
-      <label>
-        Display Name
-        <input data-register-name name="name" autocomplete="name" />
-      </label>
-  
-      <label>
-        Preferred Role
-        <select data-register-role name="preferredRole">
-          <option value="any">Any</option>
-          <option value="courier">Courier</option>
-          <option value="saboteur">Saboteur</option>
-        </select>
-      </label>
-  
-      <div class="register-error" data-page-error hidden></div>
-      <div class="register-loading" data-page-loading hidden></div>
-  
-      <button class="register-submit" type="submit">Create Account</button>
-    </form>
-  </section>
+  <div class="register-shell">
+    <header class="register-header">
+      <button class="register-brand" type="button" data-back-button aria-label="Courier War home">
+        <span class="register-brand-logo-frame">
+          <img
+            class="register-brand-logo"
+            src="/assets/brand/courier-war-logo.png"
+            alt=""
+            aria-hidden="true"
+          />
+        </span>
+      
+        <span class="register-brand-text">
+          <span>Courier</span>
+          <strong>War</strong>
+        </span>
+      </button>
+    
+      <nav class="register-auth-nav" aria-label="Authentication navigation">
+        <button class="register-auth-nav-item" type="button" data-login-tab>
+          <span class="register-auth-nav-icon" aria-hidden="true">
+            <img
+              class="register-auth-nav-icon-image register-auth-nav-icon-image-login"
+              src="/assets/login/next.png"
+              alt=""
+            />
+          </span>
+          <span>LOGIN</span>
+        </button>
+    
+        <button class="register-auth-nav-item register-auth-nav-item-active" type="button">
+          <span class="register-auth-nav-icon" aria-hidden="true">
+            <img
+              class="register-auth-nav-icon-image register-auth-nav-icon-image-register"
+              src="/assets/login/register.png"
+              alt=""
+            />
+          </span>
+          <span>REGISTER</span>
+        </button>
+    
+        <button class="register-auth-nav-item" type="button" data-guest-tab>
+          <span class="register-auth-nav-icon" aria-hidden="true">
+            <img
+              class="register-auth-nav-icon-image register-auth-nav-icon-image-guest"
+              src="/assets/login/ghost.png"
+              alt=""
+            />
+          </span>
+          <span>GUEST PLAY</span>
+        </button>
+      </nav>
+    
+      <div class="register-header-login">
+        <span class="register-header-cube" aria-hidden="true">
+          <img class="register-header-cube-image" src="/assets/login/next.png" alt="" />
+        </span>
+    
+        <span class="register-header-login-copy">
+          <small>Already have an account?</small>
+          <button type="button" data-login-link>Login</button>
+          <small>to continue your journey.</small>
+        </span>
+      </div>
+    </header>
+
+    <img
+      class="register-background-image"
+      src="/assets/login/login-bg.png"
+      alt=""
+      aria-hidden="true"
+    />
+
+    <div class="register-grid" aria-hidden="true"></div>
+    <div class="register-vignette" aria-hidden="true"></div>
+    <div class="register-scanline" aria-hidden="true"></div>
+
+    <main class="register-layout">
+      <aside class="register-story">
+        <section class="register-hero-copy">
+          <p class="register-kicker">CREATE YOUR IDENTITY</p>
+
+          <h1>
+            <span>Join The War.</span>
+            <strong>Deliver Victory.</strong>
+          </h1>
+
+          <p class="register-hero-text">
+            Build your profile, enter the city, and prove your route instincts.
+          </p>
+        </section>
+
+        <section class="register-benefits" aria-label="Registration benefits">
+          <article>
+            <span class="register-benefit-icon register-benefit-icon-blue">✚</span>
+
+            <div>
+              <strong>Your Profile</strong>
+              <p>Build your identity and showcase your stats.</p>
+            </div>
+          </article>
+
+          <article>
+            <span class="register-benefit-icon register-benefit-icon-red">↗</span>
+
+            <div>
+              <strong>Track & Improve</strong>
+              <p>Track performance and climb your way to the top.</p>
+            </div>
+          </article>
+
+          <article>
+            <span class="register-benefit-icon register-benefit-icon-blue">♜</span>
+
+            <div>
+              <strong>Compete & Achieve</strong>
+              <p>Win matches, earn glory, and prove your skills.</p>
+            </div>
+          </article>
+        </section>
+
+        <section class="register-secure-card">
+          <span class="register-secure-icon" aria-hidden="true">
+            <img
+              class="register-secure-icon-image"
+              src="/assets/login/cybersecurity.png"
+              alt=""
+            />
+          </span>
+        
+          <div>
+            <strong>Secure & Trusted</strong>
+            <p>Your data is protected with secure authentication and session handling.</p>
+          </div>
+        
+          <span class="register-secure-lock" aria-hidden="true">
+            <img
+              class="register-secure-lock-image"
+              src="/assets/login/commitment.png"
+              alt=""
+            />
+          </span>
+        </section>
+      </aside>
+
+      <form class="register-card" data-register-form>
+        <div class="register-card-border" aria-hidden="true"></div>
+
+        <div class="register-card-heading">
+          <h2>Create Your Account</h2>
+          <p>Fill in the details below to get started</p>
+        </div>
+
+        <div class="register-field-grid">
+          <label class="register-field">
+            <span>Display Name</span>
+
+            <span class="register-input-shell">
+              <i>◆</i>
+              <input data-register-name name="name" autocomplete="name" placeholder="Enter display name" />
+            </span>
+
+            <small>Optional. This is how other players will see you.</small>
+          </label>
+
+          <label class="register-field">
+            <span>Username</span>
+
+            <span class="register-input-shell">
+              <i>♙</i>
+              <input data-register-username name="username" autocomplete="username" placeholder="Choose a username" />
+            </span>
+
+            <small>Username must be unique.</small>
+          </label>
+
+          <label class="register-field register-field-wide">
+            <span>Email Address</span>
+
+            <span class="register-input-shell">
+              <i>✉</i>
+              <input data-register-email name="email" type="email" autocomplete="email" placeholder="Enter your email address" />
+            </span>
+          </label>
+
+          <label class="register-field register-field-wide">
+            <span>Password</span>
+
+            <span class="register-input-shell">
+              <i>⌘</i>
+              <input data-register-password name="password" type="password" autocomplete="new-password" placeholder="Create a password" />
+              <button class="register-password-toggle" type="button" data-password-toggle aria-label="Show password">◎</button>
+            </span>
+
+            <small>At least 8 characters with letters and numbers.</small>
+          </label>
+
+          <label class="register-field register-field-wide">
+            <span>Confirm Password</span>
+
+            <span class="register-input-shell">
+              <i>▣</i>
+              <input data-register-confirm-password name="confirmPassword" type="password" autocomplete="new-password" placeholder="Confirm your password" />
+              <button class="register-password-toggle" type="button" data-confirm-password-toggle aria-label="Show confirm password">◎</button>
+            </span>
+
+            <small>Passwords must match.</small>
+          </label>
+
+          <label class="register-field register-field-role">
+            <span>Preferred Role</span>
+
+            <span class="register-input-shell">
+              <i>⚔</i>
+
+              <select data-register-role name="preferredRole">
+                <option value="any" selected>Any Role</option>
+                <option value="courier">Courier</option>
+                <option value="saboteur">Saboteur</option>
+              </select>
+            </span>
+
+            <small>Optional. Default is Any Role.</small>
+          </label>
+        </div>
+
+        <label class="register-terms">
+          <input type="checkbox" data-register-terms checked />
+
+          <span>
+            I agree to the
+            <a href="#" tabindex="-1">Terms of Service</a>
+            and
+            <a href="#" tabindex="-1">Privacy Policy</a>
+          </span>
+        </label>
+
+        <div class="register-error" data-page-error hidden></div>
+        <div class="register-loading" data-page-loading hidden></div>
+
+        <button class="register-primary-button" type="submit">
+          <span>Create Account</span>
+          <strong>›</strong>
+        </button>
+
+        <div class="register-divider">
+          <span></span>
+          <small>OR</small>
+          <span></span>
+        </div>
+
+        <button class="register-guest-button" type="button" data-guest-button>
+          <span class="register-guest-button-icon" aria-hidden="true">
+            <img class="register-guest-button-icon-image" src="/assets/login/ghost.png" alt="" />
+          </span>
+        
+          <span class="register-guest-copy">
+            <strong>Continue As Guest</strong>
+            <small>Skip account creation for now</small>
+          </span>
+        
+          <i>›</i>
+        </button>
+      </form>
+    </main>
+
+    <!-- <footer class="register-footer">
+      <span>●</span>
+      <span>▶</span>
+      <span>◆</span>
+      <span>⚙</span>
+    </footer> -->
+  </div>
+</section>

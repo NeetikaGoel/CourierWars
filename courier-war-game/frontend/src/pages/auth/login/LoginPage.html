@@ -1,27 +1,256 @@
 <section class="login-page">
-    <form class="login-card" data-login-form>
-      <button class="login-back" type="button" data-back-button>← Back</button>
-  
-      <h1>Login</h1>
-      <p>Continue your Courier War profile</p>
-  
-      <label>
-        Username or Email
-        <input data-login-identifier name="identifier" autocomplete="username" />
-      </label>
-  
-      <label>
-        Password
-        <input data-login-password name="password" type="password" autocomplete="current-password" />
-      </label>
-  
-      <div class="login-error" data-page-error hidden></div>
-      <div class="login-loading" data-page-loading hidden></div>
-  
-      <button class="login-submit" type="submit" data-login-submit>Login</button>
-  
-      <button class="login-link" type="button" data-register-button>
-        Create a new account
+  <div class="login-shell">
+    <header class="login-header">
+      <button class="login-brand" type="button" data-back-button aria-label="Courier War home">
+        <span class="login-brand-logo-frame">
+          <img
+            class="login-brand-logo"
+            src="/assets/brand/courier-war-logo.png"
+            alt=""
+            aria-hidden="true"
+          />
+        </span>
+      
+        <span class="login-brand-text">
+          <span>Courier</span>
+          <strong>War</strong>
+        </span>
       </button>
-    </form>
-  </section>
+
+      <nav class="login-auth-nav" aria-label="Authentication navigation">
+        <button class="login-auth-nav-item login-auth-nav-item-active" type="button">
+          <span class="login-auth-nav-icon" aria-hidden="true">
+            <img class="login-auth-nav-icon-image login-auth-nav-icon-image-login" src="/assets/login/next.png" alt="" />
+          </span>
+          <span>LOGIN</span>
+        </button>
+
+        <button class="login-auth-nav-item" type="button" data-register-tab>
+          <span class="login-auth-nav-icon" aria-hidden="true">
+            <img class="login-auth-nav-icon-image login-auth-nav-icon-image-register" src="/assets/login/register.png" alt="" />
+          </span>
+          <span>REGISTER</span>
+        </button>
+
+        <button class="login-auth-nav-item" type="button" data-guest-tab>
+          <span class="login-auth-nav-icon" aria-hidden="true">
+            <img class="login-auth-nav-icon-image login-auth-nav-icon-image-guest" src="/assets/login/ghost.png" alt="" />
+          </span>
+          <span>GUEST PLAY</span>
+        </button>
+      </nav>
+
+      <div class="login-header-register">
+        <span class="login-header-cube" aria-hidden="true">
+          <img class="login-header-cube-image" src="/assets/login/register.png" alt="" />
+        </span>
+
+        <span class="login-header-register-copy">
+          <small>New to Courier War?</small>
+          <button type="button" data-register-link>Create an account</button>
+          <small>and save your stats!</small>
+        </span>
+      </div>
+    </header>
+
+    <img
+      class="login-background-image"
+      src="/assets/login/login-bg.png"
+      alt=""
+      aria-hidden="true"
+    />
+
+    <div class="login-grid" aria-hidden="true"></div>
+    <div class="login-vignette" aria-hidden="true"></div>
+    <div class="login-scanline" aria-hidden="true"></div>
+
+    <main class="login-layout">
+      <aside class="login-story">
+        <section class="login-hero-copy">
+          <p class="login-kicker">WELCOME BACK</p>
+      
+          <h1>
+            <span>Return To The City.</span>
+            <strong>Resume The Mission.</strong>
+          </h1>
+      
+          <p class="login-hero-text">
+            Your route is waiting. Log in, recover your progress, and continue the fight.
+          </p>
+        </section>
+      
+        <section class="login-benefits" aria-label="Login benefits">
+          <article>
+            <span class="login-benefit-icon login-benefit-icon-blue">➤</span>
+      
+            <div>
+              <strong>Continue Faster</strong>
+              <p>Jump back into your saved Courier War journey.</p>
+            </div>
+          </article>
+      
+          <article>
+            <span class="login-benefit-icon login-benefit-icon-red">↗</span>
+      
+            <div>
+              <strong>Track Your Stats</strong>
+              <p>Keep your wins, roles, and performance history safe.</p>
+            </div>
+          </article>
+      
+          <article>
+            <span class="login-benefit-icon login-benefit-icon-blue">♜</span>
+      
+            <div>
+              <strong>Rejoin The War</strong>
+              <p>Play as Courier or Saboteur and outsmart your rival.</p>
+            </div>
+          </article>
+        </section>
+      </aside>
+
+      <form class="login-card" data-login-form>
+        <div class="login-card-border" aria-hidden="true"></div>
+
+        <div class="login-card-heading">
+          <h2>!!Welcome Back!!</h2>
+          <p>Log in to continue your journey!</p>
+        </div>
+
+        <div class="login-field-grid">
+          <label class="login-field login-field-wide">
+            <span>Email Address</span>
+
+            <span class="login-input-shell">
+              <i>✉</i>
+              <input data-login-identifier name="identifier" autocomplete="username" placeholder="Enter your email or username" />
+            </span>
+          </label>
+
+          <label class="login-field login-field-wide">
+            <span>Password</span>
+
+            <span class="login-input-shell">
+              <i>⌘</i>
+              <input data-login-password name="password" type="password" autocomplete="current-password" placeholder="Enter your password" />
+              <button class="login-password-toggle" type="button" data-password-toggle aria-label="Show password">◎</button>
+            </span>
+          </label>
+        </div>
+
+        <div class="login-options-row">
+          <label class="login-remember">
+            <input type="checkbox" data-login-remember checked />
+            <span>Remember me</span>
+          </label>
+
+          <button class="login-forgot-button" type="button" data-forgot-password>
+            Forgot Password?
+          </button>
+        </div>
+
+        <div class="login-error" data-page-error hidden></div>
+        <div class="login-loading" data-page-loading hidden></div>
+
+        <button class="login-primary-button" type="submit">
+          <span>Login</span>
+          <strong>›</strong>
+        </button>
+
+        <div class="login-divider">
+          <span></span>
+          <small>OR</small>
+          <span></span>
+        </div>
+
+        <div class="login-secondary-actions">
+          <button class="login-register-button" type="button" data-register-button>
+            <span class="login-secondary-icon" aria-hidden="true">
+              <img class="login-secondary-icon-image" src="/assets/login/register.png" alt="" />
+            </span>
+
+            <span class="login-secondary-copy">
+              <strong>Register</strong>
+              <small>Create a new account</small>
+            </span>
+
+            <i>›</i>
+          </button>
+
+          <button class="login-guest-button" type="button" data-guest-button>
+            <span class="login-secondary-icon" aria-hidden="true">
+              <img class="login-secondary-icon-image" src="/assets/login/ghost.png" alt="" />
+            </span>
+
+            <span class="login-secondary-copy">
+              <strong>Skip Login</strong>
+              <small>Play as Guest</small>
+            </span>
+
+            <i>›</i>
+          </button>
+        </div>
+      </form>
+    </main>
+
+    <section class="login-feature-strip" aria-label="Login highlights">
+      <article class="login-feature login-feature-blue">
+        <span class="login-feature-icon" aria-hidden="true">
+          <img class="login-feature-icon-image" src="/assets/login/cybersecurity.png" alt="" />
+        </span>
+
+        <div>
+          <strong>Secure & Safe</strong>
+          <p>Your data is protected with top-level security.</p>
+        </div>
+      </article>
+
+      <article class="login-feature login-feature-red">
+        <span class="login-feature-icon" aria-hidden="true">
+          <img class="login-feature-icon-image" src="/assets/login/commitment.png" alt="" />
+        </span>
+
+        <div>
+          <strong>Save Your Progress</strong>
+          <p>Track stats, match history and achievements.</p>
+        </div>
+      </article>
+
+      <article class="login-feature login-feature-blue">
+        <span class="login-feature-icon" aria-hidden="true">
+          <img
+            class="login-feature-icon-image login-feature-icon-image-devices"
+            src="/assets/login/devices.png"
+            alt=""
+          />
+        </span>
+      
+        <div>
+          <strong>Cross-Device</strong>
+          <p>Play anywhere. Continue everywhere.</p>
+        </div>
+      </article>
+
+      <article class="login-feature login-feature-red">
+        <span class="login-feature-icon" aria-hidden="true">
+          <img
+            class="login-feature-icon-image login-feature-icon-image-trophy"
+            src="/assets/login/trophy.png"
+            alt=""
+          />
+        </span>
+      
+        <div>
+          <strong>Achieve & Compete</strong>
+          <p>Improve. Compete. Become the best.</p>
+        </div>
+      </article>
+    </section>
+
+    <footer class="login-footer">
+      <span>© 2026 Courier War. All rights reserved.</span>
+
+      <span>Version 1.0.0</span>
+    </footer>
+  </div>
+</section>

@@ -1,18 +1,183 @@
 <section class="guest-page">
-    <form class="guest-card" data-guest-form>
-      <button class="guest-back" type="button" data-back-button>← Back</button>
-  
-      <h1>Continue as Guest</h1>
-      <p>Play now without registered login</p>
-  
-      <label>
-        Guest Name Optional
-        <input data-guest-name name="name" maxlength="40" placeholder="Guest Courier" />
-      </label>
-  
-      <div class="guest-error" data-page-error hidden></div>
-      <div class="guest-loading" data-page-loading hidden></div>
-  
-      <button class="guest-submit" type="submit">Start as Guest</button>
-    </form>
-  </section>
+  <div class="guest-shell">
+    <img
+      class="guest-background-image"
+      src="/assets/landing/landing-characters-bg.png"
+      alt=""
+      aria-hidden="true"
+    />
+
+    <div class="guest-grid" aria-hidden="true"></div>
+    <div class="guest-vignette" aria-hidden="true"></div>
+    <div class="guest-scanline" aria-hidden="true"></div>
+    <div class="guest-center-focus" aria-hidden="true"></div>
+
+    <header class="guest-header">
+      <button class="guest-brand" type="button" data-back-button aria-label="Courier War home">
+        <span class="guest-brand-logo-frame">
+          <img
+            class="guest-brand-logo"
+            src="/assets/brand/courier-war-logo.png"
+            alt=""
+            aria-hidden="true"
+          />
+        </span>
+
+        <span class="guest-brand-text">
+          <span>Courier</span>
+          <strong>War</strong>
+        </span>
+      </button>
+
+      <nav class="guest-auth-nav" aria-label="Authentication navigation">
+        <button class="guest-auth-nav-item" type="button" data-login-tab>
+          <span class="guest-auth-nav-icon" aria-hidden="true">
+            <img
+              class="guest-auth-nav-icon-image guest-auth-nav-icon-image-login"
+              src="/assets/login/next.png"
+              alt=""
+            />
+          </span>
+          <span>LOGIN</span>
+        </button>
+
+        <button class="guest-auth-nav-item" type="button" data-register-tab>
+          <span class="guest-auth-nav-icon" aria-hidden="true">
+            <img
+              class="guest-auth-nav-icon-image guest-auth-nav-icon-image-register"
+              src="/assets/login/register.png"
+              alt=""
+            />
+          </span>
+          <span>REGISTER</span>
+        </button>
+
+        <button class="guest-auth-nav-item guest-auth-nav-item-active" type="button">
+          <span class="guest-auth-nav-icon" aria-hidden="true">
+            <img
+              class="guest-auth-nav-icon-image guest-auth-nav-icon-image-guest"
+              src="/assets/login/ghost.png"
+              alt=""
+            />
+          </span>
+          <span>GUEST PLAY</span>
+        </button>
+      </nav>
+
+      <div class="guest-header-info">
+        <span class="guest-header-cube" aria-hidden="true">
+          <img class="guest-header-cube-image" src="/assets/login/ghost.png" alt="" />
+        </span>
+
+        <span class="guest-header-info-copy">
+          <small>No account? No problem.</small>
+          <strong>Play instantly as a guest.</strong>
+        </span>
+      </div>
+    </header>
+
+    <aside class="guest-side-sign guest-side-sign-left">
+      <span class="guest-side-sign-line">Deliver</span>
+      <span class="guest-side-sign-line">On Time</span>
+
+      <span class="guest-side-sign-image-frame" aria-hidden="true">
+        <img
+          class="guest-side-sign-image"
+          src="/assets/features/deliverthepackage.png"
+          alt=""
+        />
+      </span>
+    </aside>
+
+    <aside class="guest-side-sign guest-side-sign-right">
+      <span class="guest-side-sign-line">Disrupt</span>
+      <span class="guest-side-sign-line">The Route</span>
+      <strong>⚠</strong>
+    </aside>
+
+    <main class="guest-layout">
+      <form class="guest-card" data-guest-form>
+        <div class="guest-card-border" aria-hidden="true"></div>
+
+        <div class="guest-card-heading">
+          <span class="guest-card-icon" aria-hidden="true">
+            <img class="guest-card-icon-image" src="/assets/login/ghost.png" alt="" />
+          </span>
+
+          <h1>Play As Guest</h1>
+
+          <p>
+            Jump in and start playing instantly.
+            <br />
+            No account needed.
+          </p>
+        </div>
+
+        <div class="guest-section-title">
+          <span></span>
+          <strong>Enter Display Name</strong>
+          <span></span>
+        </div>
+
+        <label class="guest-field">
+          <span class="guest-input-shell">
+            <i>◆</i>
+            <input
+              data-guest-name
+              name="name"
+              maxlength="20"
+              autocomplete="nickname"
+              placeholder="Enter your display name"
+            />
+          </span>
+
+          <span class="guest-character-count" data-guest-name-count>0/20</span>
+
+          <small>Optional. Choose a name visible to other players in the match.</small>
+        </label>
+
+        <section class="guest-info-box">
+          <span class="guest-info-icon">i</span>
+
+          <div>
+            <strong>Guest Mode Info</strong>
+
+            <ul>
+              <li>Play instantly without creating an account.</li>
+              <li>Guest stats are created for this session.</li>
+              <li>Create an account anytime to keep long-term access.</li>
+            </ul>
+          </div>
+        </section>
+
+        <div class="guest-error" data-page-error hidden></div>
+        <div class="guest-loading" data-page-loading hidden></div>
+
+        <button class="guest-primary-button" type="submit">
+          <span class="guest-primary-icon" aria-hidden="true">
+            <img class="guest-primary-icon-image" src="/assets/login/ghost.png" alt="" />
+          </span>
+
+          <strong>Continue As Guest</strong>
+          <i>›</i>
+        </button>
+
+        <div class="guest-divider">
+          <span></span>
+          <small>OR</small>
+          <span></span>
+        </div>
+
+        <button class="guest-secondary-button" type="button" data-guest-back-button>
+          <span>←</span>
+          <strong>Back</strong>
+        </button>
+      </form>
+    </main>
+
+    <footer class="guest-footer">
+      <span>© 2026 Courier War. All rights reserved.</span>
+      <span>Version 1.0.0</span>
+    </footer>
+  </div>
+</section>

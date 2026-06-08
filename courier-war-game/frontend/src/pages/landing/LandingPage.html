@@ -1,19 +1,272 @@
 <section class="landing-page">
-    <div class="landing-card">
-      <p class="landing-kicker">Two Player Real-Time Strategy</p>
-      <h1>Courier War</h1>
-      <p class="landing-subtitle">
-        Deliver fast as Courier or disrupt smartly as Saboteur
-      </p>
-  
-      <div class="landing-actions">
-        <button type="button" data-login-button>Login</button>
-        <button type="button" data-register-button>Register</button>
-        <button type="button" data-guest-button>Continue as Guest</button>
+  <div class="landing-shell">
+    <img
+      class="landing-character-layer"
+      src="/assets/landing/landing-characters-bg.png"
+      alt=""
+      aria-hidden="true"
+    />
+
+    <div class="landing-grid" aria-hidden="true"></div>
+    <div class="landing-vignette" aria-hidden="true"></div>
+    <div class="landing-scanline" aria-hidden="true"></div>
+    <div class="landing-center-focus" aria-hidden="true"></div>
+
+    <header class="landing-header">
+      <button class="landing-brand" type="button" aria-label="Courier War home">
+        <span class="landing-brand-logo-frame">
+          <img
+            class="landing-brand-logo"
+            src="/assets/brand/courier-war-logo.png"
+            alt=""
+            aria-hidden="true"
+          />
+        </span>
+
+        <span class="landing-brand-text">
+          <span>Courier</span>
+          <strong>War</strong>
+        </span>
+      </button>
+
+      <nav class="landing-nav" aria-label="Landing navigation">
+        <button class="landing-nav-item landing-nav-item-active" type="button">
+          <span class="landing-nav-icon" aria-hidden="true">
+            <img
+              class="landing-nav-icon-image landing-nav-icon-image-home"
+              src="/assets/navbar/home.png"
+              alt=""
+            />
+          </span>
+          <span>HOME</span>
+        </button>
+      
+        <button class="landing-nav-item" type="button">
+          <span class="landing-nav-icon" aria-hidden="true">
+            <img
+              class="landing-nav-icon-image landing-nav-icon-image-gameplay"
+              src="/assets/navbar/gameplay.png"
+              alt=""
+            />
+          </span>
+          <span>GAMEPLAY</span>
+        </button>
+      
+        <button class="landing-nav-item" type="button">
+          <span class="landing-nav-icon" aria-hidden="true">
+            <img
+              class="landing-nav-icon-image landing-nav-icon-image-features"
+              src="/assets/navbar/features.png"
+              alt=""
+            />
+          </span>
+          <span>FEATURES</span>
+        </button>
+      
+        <button class="landing-nav-item" type="button">
+          <span class="landing-nav-icon" aria-hidden="true">
+            <img
+              class="landing-nav-icon-image landing-nav-icon-image-stats"
+              src="/assets/navbar/stats.png"
+              alt=""
+            />
+          </span>
+          <span>STATS</span>
+        </button>
+      
+        <button class="landing-nav-item" type="button">
+          <span class="landing-nav-icon" aria-hidden="true">
+            <img
+              class="landing-nav-icon-image landing-nav-icon-image-support"
+              src="/assets/navbar/support.png"
+              alt=""
+            />
+          </span>
+          <span>SUPPORT</span>
+        </button>
+      </nav>
+    </header>
+
+    <aside class="landing-side-sign landing-side-sign-left">
+      <span class="landing-side-sign-line">Deliver</span>
+      <span class="landing-side-sign-line">On Time</span>
+    
+      <span class="landing-side-sign-image-frame" aria-hidden="true">
+        <img
+          class="landing-side-sign-image landing-side-sign-image-delivery"
+          src="/assets/features/deliverthepackage.png"
+          alt=""
+        />
+      </span>
+    </aside>
+
+    <aside class="landing-side-sign landing-side-sign-right">
+      <span class="landing-side-sign-line">Disrupt</span>
+      <span class="landing-side-sign-line">The Route</span>
+      <strong>⚠</strong>
+    </aside>
+
+    <main class="landing-hero">
+      <div class="landing-title-wrap">
+        <h1 class="landing-title">
+          <span class="landing-title-word landing-title-courier">Courier</span>
+          <span class="landing-title-word landing-title-war">War</span>
+        </h1>
       </div>
-  
-      <p class="landing-note">
-        Keyboard movement, city routes, timed hurdles, and live match polling
+
+      <div class="landing-tagline">
+        <span>DELIVER</span>
+        <i></i>
+        <span>OUTTHINK</span>
+        <i></i>
+        <span>OUTMANEUVER</span>
+      </div>
+
+      <p class="landing-description">
+        A Real-Time Two-Player Battle Of Strategy And Prediction!
+        <br />
+        One Delivers! The Other Disrupts!
       </p>
-    </div>
-  </section>
+
+      <div class="landing-actions">
+        <button class="landing-action landing-action-login" type="button" data-login-button>
+          <span class="landing-action-light"></span>
+          <span class="landing-action-edge"></span>
+
+          <span class="landing-action-icon" aria-hidden="true">
+            <img class="landing-action-icon-image landing-action-icon-image-login" src="/assets/login/next.png" alt="" />
+          </span>
+
+          <span class="landing-action-copy">
+            <strong>LOGIN</strong>
+            <small>Welcome back, Courier</small>
+          </span>
+
+          <span class="landing-action-arrow">›</span>
+        </button>
+
+        <button class="landing-action landing-action-register" type="button" data-register-button>
+          <span class="landing-action-light"></span>
+          <span class="landing-action-edge"></span>
+
+          <span class="landing-action-icon" aria-hidden="true">
+            <img class="landing-action-icon-image landing-action-icon-image-register" src="/assets/login/register.png" alt="" />
+          </span>
+
+          <span class="landing-action-copy">
+            <strong>REGISTER</strong>
+            <small>Create your account</small>
+          </span>
+
+          <span class="landing-action-arrow">›</span>
+        </button>
+
+        <button class="landing-action landing-action-guest" type="button" data-guest-button>
+          <span class="landing-action-light"></span>
+          <span class="landing-action-edge"></span>
+
+          <span class="landing-action-icon" aria-hidden="true">
+            <img class="landing-action-icon-image landing-action-icon-image-guest" src="/assets/login/ghost.png" alt="" />
+          </span>
+
+          <span class="landing-action-copy">
+            <strong>PLAY AS GUEST</strong>
+            <small>Jump in and play instantly</small>
+          </span>
+
+          <span class="landing-action-arrow">›</span>
+        </button>
+      </div>
+    </main>
+
+    <section class="landing-feature-strip" aria-label="Game highlights">
+      <article class="landing-feature landing-feature-blue">
+        <span class="landing-feature-icon" aria-hidden="true">
+          <img
+            class="landing-feature-icon-image landing-feature-icon-image-blue"
+            src="/assets/features/twoplayerstrategy.png"
+            alt=""
+          />
+        </span>
+    
+        <div>
+          <strong>TWO PLAYER STRATEGY</strong>
+          <p>Outsmart your opponent in real time</p>
+        </div>
+      </article>
+    
+      <article class="landing-feature landing-feature-blue">
+        <span class="landing-feature-icon" aria-hidden="true">
+          <img
+            class="landing-feature-icon-image landing-feature-icon-image-blue"
+            src="/assets/features/dynamicroutes.png"
+            alt=""
+          />
+        </span>
+    
+        <div>
+          <strong>DYNAMIC ROUTES</strong>
+          <p>Every match. New route. New challenge.</p>
+        </div>
+      </article>
+    
+      <article class="landing-feature landing-feature-gold">
+        <span class="landing-feature-icon" aria-hidden="true">
+          <img
+            class="landing-feature-icon-image landing-feature-icon-image-gold"
+            src="/assets/features/raceagainsttime.png"
+            alt=""
+          />
+        </span>
+    
+        <div>
+          <strong>RACE AGAINST TIME</strong>
+          <p>Deliver before the timer hits zero.</p>
+        </div>
+      </article>
+    
+      <article class="landing-feature landing-feature-gray">
+        <span class="landing-feature-icon" aria-hidden="true">
+          <img
+            class="landing-feature-icon-image landing-feature-icon-image-gray"
+            src="/assets/features/placehurdles.png"
+            alt=""
+          />
+        </span>
+    
+        <div>
+          <strong>PLACE HURDLES</strong>
+          <p>Predict. Disrupt. Dominate.</p>
+        </div>
+      </article>
+    
+      <article class="landing-feature landing-feature-red">
+        <span class="landing-feature-icon" aria-hidden="true">
+          <img
+            class="landing-feature-icon-image landing-feature-icon-image-red"
+            src="/assets/features/deliverthepackage.png"
+            alt=""
+          />
+        </span>
+    
+        <div>
+          <strong>DELIVER THE PACKAGE</strong>
+          <p>One goal. One chance. Complete the delivery.</p>
+        </div>
+      </article>
+    </section>
+
+    <footer class="landing-footer">
+      <span>© 2026 Courier War. All rights reserved.</span>
+
+      <!-- <div class="landing-footer-icons" aria-hidden="true">
+        <span>●</span>
+        <span>▶</span>
+        <span>◆</span>
+        <span>⚙</span>
+      </div> -->
+
+      <span>Version 1.0.0</span>
+    </footer>
+  </div>
+</section>
