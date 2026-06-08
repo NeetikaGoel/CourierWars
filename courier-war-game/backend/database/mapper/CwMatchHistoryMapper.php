@@ -11,19 +11,18 @@ class CwMatchHistoryMapper
     public function getMappingRows(array $rows): array
     {
         $mappedRows = []; // this will store mapped match history entities
-
         foreach ($rows as $row) // looping through all db rows
         {
             $mappedRows[] = $this->getMappingSingleRow($row); // mapping each row and add it to result
         }
-
         return $mappedRows; // return all mapped match history entities
     }
 
     //this maps one database row to one CwMatchHistory object
     public function getMappingSingleRow(array $row): CwMatchHistory
     {
-        return new CwMatchHistory(
+        return new CwMatchHistory
+        (
             (int)$row['match_id'],
             (string)$row['difficulty'],
             (string)$row['map_version'],

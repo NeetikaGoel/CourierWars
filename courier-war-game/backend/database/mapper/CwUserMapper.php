@@ -11,7 +11,7 @@ class CwUserMapper
     public function getMappingRows(array $rows): array
     {
         $mappedRows = []; // this will store mapped entities
-
+        
         foreach ($rows as $row) // looping through all db rows
         {
             $mappedRows[] = $this->getMappingSingleRow($row); // mapping each row and add it to result

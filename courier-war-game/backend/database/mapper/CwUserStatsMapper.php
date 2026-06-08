@@ -11,12 +11,10 @@ class CwUserStatsMapper
     public function getMappingRows(array $rows): array
     {
         $mappedRows = []; // this will store mapped stats entities
-
         foreach ($rows as $row) // looping through all db rows
         {
             $mappedRows[] = $this->getMappingSingleRow($row); // mapping each row and add it to result
         }
-
         return $mappedRows; // return all mapped stats entities
     }
 

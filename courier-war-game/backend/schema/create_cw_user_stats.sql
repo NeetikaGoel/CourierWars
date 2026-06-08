@@ -30,6 +30,8 @@ USE courier_war;
 
 -- saboteur_hard_wins = saboteur_wins - saboteur_easy_wins - saboteur_medium_wins
 
+-- KEEP IN MIND ABOUT THE DERIVATIVE VALUES!! IF EQUATION CHANGES IN FUTURE, HAVE TO CHANGE DERIVATIONS!!!!!
+
 
 CREATE TABLE IF NOT EXISTS cw_user_stats
 (
