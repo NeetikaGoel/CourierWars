@@ -11,6 +11,19 @@
 *.sln.docstates
 *.env
 
+.DS_Store
+
+
+
+courier-war-poc/src/assets/hero.png
+courier-war-poc/src/assets/typescript.svg
+courier-war-poc/src/assets/vite.svg
+
+
+courier-war-poc/src/assets/tiles/kenneyfiles/
+
+
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 

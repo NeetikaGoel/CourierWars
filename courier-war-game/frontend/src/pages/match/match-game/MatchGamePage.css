@@ -1,0 +1,58 @@
+.match-game-page {
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    background: #020617;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+  }
+  
+  .match-game-stage {
+    min-width: 0;
+    position: relative;
+  }
+  
+  #phaser-game-container {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .match-game-hud {
+    border-left: 1px solid #1e293b;
+    background: #0f172a;
+    padding: 18px;
+    overflow-y: auto;
+  }
+  
+  .match-game-hud h2 {
+    margin: 0 0 10px;
+  }
+  
+  .match-game-hud p {
+    color: #94a3b8;
+  }
+  
+  .match-game-hud-block {
+    display: grid;
+    gap: 6px;
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 12px;
+    background: #111827;
+  }
+  
+  .match-game-hud-block strong {
+    color: #cbd5e1;
+  }
+  
+  .match-game-hud-block span {
+    color: #fde68a;
+  }
+  
+  .match-game-error {
+    padding: 10px;
+    border-radius: 10px;
+    background: #7f1d1d;
+    color: #fee2e2;
+  }

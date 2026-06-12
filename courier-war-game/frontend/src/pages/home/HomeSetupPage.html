@@ -1,0 +1,37 @@
+<section class="home-page">
+    <aside class="home-profile">
+      <h2 data-home-name>Player</h2>
+      <p data-home-user-type>Loading profile...</p>
+      <div data-home-stats></div>
+      <button type="button" data-home-logout>Logout</button>
+      <button type="button" data-home-forget hidden>Forget Guest Session</button>
+    </aside>
+  
+    <main class="home-card">
+      <h1>Start Match</h1>
+      <p>Select difficulty and role preference</p>
+  
+      <label>
+        Difficulty
+        <select data-home-difficulty>
+          <option value="easy">Easy - 7 minutes</option>
+          <option value="medium" selected>Medium - 5 minutes</option>
+          <option value="hard">Hard - 3 minutes</option>
+        </select>
+      </label>
+  
+      <label>
+        Role Preference
+        <select data-home-role>
+          <option value="any" selected>Any</option>
+          <option value="courier">Courier</option>
+          <option value="saboteur">Saboteur</option>
+        </select>
+      </label>
+  
+      <div class="home-error" data-page-error hidden></div>
+      <div class="home-loading" data-page-loading hidden></div>
+  
+      <button class="home-start" type="button" data-home-start>Find Match</button>
+    </main>
+  </section>
