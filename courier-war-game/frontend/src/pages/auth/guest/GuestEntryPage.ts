@@ -47,7 +47,7 @@ export async function mountGuestEntryPage(root: HTMLElement, deps: GuestEntryPag
     const name = pageInputValue(root, "[data-guest-name]");
 
     const error = pageFirstError([
-      name ? pageLengthBetween(name, "Display name", 1, 20) : null,
+      name ? pageLengthBetween(name, "Display name", 3, 20) : null,
     ]);
 
     if (error) {

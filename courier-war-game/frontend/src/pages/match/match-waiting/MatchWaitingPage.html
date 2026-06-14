@@ -1,12 +1,231 @@
 <section class="match-waiting-page">
-    <div class="match-waiting-card">
-      <div class="match-waiting-pulse"></div>
-      <h1>Waiting for Player</h1>
-      <p>Looking for the second player with matching difficulty and role</p>
-      <p class="match-waiting-meta" data-match-waiting-meta>Polling match state...</p>
-  
+  <div class="match-waiting-shell">
+    <div class="match-waiting-grid" aria-hidden="true"></div>
+    <div class="match-waiting-vignette" aria-hidden="true"></div>
+    <div class="match-waiting-scanline" aria-hidden="true"></div>
+    <div class="match-waiting-center-glow" aria-hidden="true"></div>
+
+    <header class="home-setup-header match-waiting-header">
+      <button class="home-setup-brand match-waiting-brand" type="button" data-waiting-home-button aria-label="Courier War home">
+        <span class="home-setup-brand-logo-frame">
+          <img
+            class="home-setup-brand-logo"
+            src="/assets/brand/courier-war-logo.png"
+            alt=""
+            aria-hidden="true"
+          />
+        </span>
+
+        <span class="home-setup-brand-text">
+          <span>Courier</span>
+          <strong>War</strong>
+          <small>Outthink. Outmaneuver. Outdeliver.</small>
+        </span>
+      </button>
+
+      <nav class="home-setup-nav match-waiting-nav" aria-label="Match waiting navigation">
+        <button class="home-setup-nav-item" type="button" data-waiting-home-nav>
+          <span class="home-setup-nav-icon" aria-hidden="true">
+            <img src="/assets/navbar/home.png" alt="" />
+          </span>
+          <span>Home</span>
+        </button>
+
+        <button class="home-setup-nav-item home-setup-nav-item-active" type="button">
+          <span class="home-setup-nav-icon" aria-hidden="true">
+            <img src="/assets/navbar/gameplay.png" alt="" />
+          </span>
+          <span>Play</span>
+        </button>
+
+        <button class="home-setup-nav-item" type="button" data-waiting-stats-nav>
+          <span class="home-setup-nav-icon" aria-hidden="true">
+            <img src="/assets/navbar/stats.png" alt="" />
+          </span>
+          <span>Stats</span>
+        </button>
+
+        <button class="home-setup-nav-item" type="button" data-waiting-features-nav>
+          <span class="home-setup-nav-icon" aria-hidden="true">
+            <img src="/assets/navbar/features.png" alt="" />
+          </span>
+          <span>Features</span>
+        </button>
+
+        <button class="home-setup-nav-item" type="button" data-waiting-settings-nav>
+          <span class="home-setup-nav-icon" aria-hidden="true">
+            <img src="/assets/navbar/support.png" alt="" />
+          </span>
+          <span>Settings</span>
+        </button>
+      </nav>
+
+      <section class="home-setup-player-card" aria-label="Current player">
+        <span class="home-setup-player-avatar" aria-hidden="true">
+          <img src="/assets/login/ghost.png" alt="" />
+        </span>
+
+        <span class="home-setup-player-info">
+          <strong data-waiting-profile-name>Player</strong>
+
+          <small>
+            <i class="home-setup-online-dot"></i>
+            <span>ONLINE</span>
+          </small>
+
+          <span class="home-setup-xp-row">
+            <b>12</b>
+
+            <span>
+              <i></i>
+            </span>
+
+            <em>2,450 / 5,000 XP</em>
+          </span>
+        </span>
+      </section>
+    </header>
+
+    <main class="match-waiting-layout">
+      <section class="match-waiting-title-section">
+        <div class="match-waiting-title-lines match-waiting-title-lines-top" aria-hidden="true">
+          <span></span>
+          <i></i>
+          <span></span>
+        </div>
+
+        <h1 data-waiting-heading>Matchmaking</h1>
+
+        <div class="match-waiting-title-lines match-waiting-title-lines-bottom" aria-hidden="true">
+          <span></span>
+          <i></i>
+          <span></span>
+        </div>
+
+        <p data-waiting-message>Finding a fair opponent for this match...</p>
+      </section>
+
+      <section class="match-waiting-stage">
+        <aside class="match-waiting-role-card match-waiting-role-card-self" data-waiting-self-card>
+          <span class="match-waiting-card-border"></span>
+
+          <h2>Your Role</h2>
+
+          <span class="match-waiting-role-image" aria-hidden="true">
+            <img data-waiting-self-role-image src="/assets/homepage/courier.png" alt="" />
+          </span>
+
+          <strong data-waiting-self-role-title>Courier</strong>
+
+          <p data-waiting-self-role-copy>
+            Deliver the package before time runs out. Find the safest route.
+          </p>
+        </aside>
+
+        <section class="match-waiting-map-area" aria-label="Matchmaking city search">
+          <div class="match-waiting-map-frame">
+            <img
+              class="match-waiting-map-image"
+              src="/assets/match-loading/match-waiting-map.png"
+              alt=""
+              aria-hidden="true"
+            />
+          </div>
+        </section>
+
+        <aside class="match-waiting-role-card match-waiting-role-card-opponent" data-waiting-opponent-card>
+          <span class="match-waiting-card-border"></span>
+
+          <h2>Looking For</h2>
+
+          <span class="match-waiting-role-image" aria-hidden="true">
+            <img data-waiting-opponent-role-image src="/assets/homepage/saboteur.png" alt="" />
+          </span>
+
+          <strong data-waiting-opponent-role-title>Saboteur</strong>
+
+          <p data-waiting-opponent-role-copy>
+            Predicts your route and places hurdles to stop the delivery.
+          </p>
+        </aside>
+      </section>
+
+      <section class="match-waiting-progress-section">
+        <div class="match-waiting-progress-track" aria-label="Matchmaking progress">
+          <span class="match-waiting-progress-fill" data-waiting-progress-fill></span>
+        </div>
+
+        <p>
+          Estimated Wait Time:
+          <strong data-waiting-estimated-time>00:10</strong>
+        </p>
+      </section>
+
+      <section class="match-waiting-status-panel">
+        <h2>Search Status</h2>
+
+        <div class="match-waiting-status-grid">
+          <article class="match-waiting-status-item">
+            <span class="match-waiting-status-icon match-waiting-status-icon-blue">👥</span>
+
+            <div>
+              <strong>Players Online</strong>
+              <em data-waiting-players-online>1,248</em>
+            </div>
+          </article>
+
+          <article class="match-waiting-status-item">
+            <span class="match-waiting-status-icon match-waiting-status-icon-red">◎</span>
+
+            <div>
+              <strong>Waiting Matches</strong>
+              <em data-waiting-matches-found>328</em>
+            </div>
+          </article>
+
+          <article class="match-waiting-radar-wrap" aria-label="Searching radar">
+            <span class="match-waiting-radar">
+              <i></i>
+              <b></b>
+            </span>
+          </article>
+
+          <article class="match-waiting-status-item">
+            <span class="match-waiting-status-icon match-waiting-status-icon-purple">◇</span>
+
+            <div>
+              <strong>Avg. Wait Time</strong>
+              <em data-waiting-average-time>00:12</em>
+            </div>
+          </article>
+
+          <article class="match-waiting-status-item">
+            <span class="match-waiting-status-icon match-waiting-status-icon-green">✓</span>
+
+            <div>
+              <strong>Connection</strong>
+              <em data-waiting-connection>Stable</em>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="match-waiting-tip-panel">
+        <span class="match-waiting-tip-icon" aria-hidden="true">💡</span>
+
+        <div>
+          <strong>Tip</strong>
+          <p data-waiting-tip-text>
+            Use abilities wisely. Timing and strategy are the keys to victory!
+          </p>
+        </div>
+
+        <button class="match-waiting-cancel-button" type="button" data-waiting-cancel-button>
+          Cancel Search
+        </button>
+      </section>
+
       <div class="match-waiting-error" data-page-error hidden></div>
-  
-      <button type="button" data-home-button>Return Home</button>
-    </div>
-  </section>
+    </main>
+  </div>
+</section>

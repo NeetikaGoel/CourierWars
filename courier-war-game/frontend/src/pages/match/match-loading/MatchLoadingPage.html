@@ -1,8 +1,152 @@
-<section class="match-loading-page">
-    <div class="match-loading-card">
-      <div class="match-loading-spinner"></div>
-      <h1>Preparing Match</h1>
-      <p data-match-loading-text>Loading city map and match state...</p>
-      <div class="match-loading-error" data-page-error hidden></div>
-    </div>
-  </section>
+<section class="match-flow-page match-loading-page">
+  <div class="match-flow-shell">
+    <div class="match-flow-bg" aria-hidden="true"></div>
+    <div class="match-flow-grid" aria-hidden="true"></div>
+    <div class="match-flow-vignette" aria-hidden="true"></div>
+
+    <header class="home-setup-header match-flow-header">
+      <button class="home-setup-brand" type="button" data-loading-home-button aria-label="Courier War home">
+        <span class="home-setup-brand-logo-frame">
+          <img class="home-setup-brand-logo" src="/assets/brand/courier-war-logo.png" alt="" aria-hidden="true" />
+        </span>
+
+        <span class="home-setup-brand-text">
+          <span>Courier</span>
+          <strong>War</strong>
+          <small>Outthink. Outmaneuver. Outdeliver.</small>
+        </span>
+      </button>
+
+      <nav class="home-setup-nav match-flow-nav" aria-label="Match loading navigation">
+        <button class="home-setup-nav-item" type="button" data-loading-home-nav>
+          <span class="home-setup-nav-icon" aria-hidden="true"><img src="/assets/navbar/home.png" alt="" /></span>
+          <span>Home</span>
+        </button>
+
+        <button class="home-setup-nav-item home-setup-nav-item-active" type="button">
+          <span class="home-setup-nav-icon" aria-hidden="true"><img src="/assets/navbar/gameplay.png" alt="" /></span>
+          <span>Play</span>
+        </button>
+
+        <button class="home-setup-nav-item" type="button" data-loading-inactive-nav>
+          <span class="home-setup-nav-icon" aria-hidden="true"><img src="/assets/navbar/stats.png" alt="" /></span>
+          <span>Stats</span>
+        </button>
+
+        <button class="home-setup-nav-item" type="button" data-loading-inactive-nav>
+          <span class="home-setup-nav-icon" aria-hidden="true"><img src="/assets/navbar/features.png" alt="" /></span>
+          <span>Features</span>
+        </button>
+
+        <button class="home-setup-nav-item" type="button" data-loading-inactive-nav>
+          <span class="home-setup-nav-icon" aria-hidden="true"><img src="/assets/navbar/support.png" alt="" /></span>
+          <span>How To Play</span>
+        </button>
+
+        <button class="home-setup-nav-item" type="button" data-loading-inactive-nav>
+          <span class="home-setup-nav-icon" aria-hidden="true"><img src="/assets/navbar/support.png" alt="" /></span>
+          <span>Settings</span>
+        </button>
+      </nav>
+
+      <section class="home-setup-player-card" aria-label="Current player">
+        <span class="home-setup-player-avatar" aria-hidden="true">
+          <img src="/assets/login/ghost.png" alt="" />
+        </span>
+
+        <span class="home-setup-player-info">
+          <strong data-loading-profile-name>Neetika Goel</strong>
+          <small><i class="home-setup-online-dot"></i><span>ONLINE</span></small>
+          <span class="home-setup-xp-row"><b>12</b><span><i></i></span><em>2,450 / 5,000 XP</em></span>
+        </span>
+      </section>
+    </header>
+
+    <main class="match-flow-main match-loading-main">
+      <section class="match-flow-title match-loading-title">
+        <div class="match-flow-line" aria-hidden="true"></div>
+        <h1>Generating City Map</h1>
+        <p data-match-loading-text>Please wait while we build your battlefield...</p>
+      </section>
+
+      <section class="match-loading-stage" aria-label="Map generation progress">
+        <aside class="match-loading-side-card match-loading-side-card-blue">
+          <h2>Your Role</h2>
+          <img src="/assets/homepage/courier.png" alt="" aria-hidden="true" />
+          <strong>Courier</strong>
+          <p>Deliver the package before time runs out. Use skills and find the safest route.</p>
+        </aside>
+
+        <div class="match-loading-city-frame" aria-hidden="true">
+          <img src="/assets/match-loading/map.png" alt="" />
+        </div>
+
+        <aside class="match-loading-side-card match-loading-side-card-red">
+          <h2>Opponent Role</h2>
+          <img src="/assets/homepage/saboteur.png" alt="" aria-hidden="true" />
+          <strong>Saboteur</strong>
+          <p>Predict your moves and place hurdles to delay and stop the delivery.</p>
+        </aside>
+      </section>
+
+      <section class="match-loading-progress">
+        <div>
+          <strong data-loading-phase-label>Generating Map Assets</strong>
+          <em data-loading-progress-percent>0%</em>
+        </div>
+
+        <div class="match-flow-progress-track">
+          <span class="match-flow-progress-fill" data-loading-progress-fill></span>
+        </div>
+
+        <p>Estimated Time: <span data-loading-estimated-time>00:08</span></p>
+      </section>
+
+      <section class="match-loading-steps" aria-label="Map generation steps">
+        <article class="match-loading-step match-loading-step-active" data-loading-step="0">
+          <span>▧</span>
+          <strong>Initiating</strong>
+          <p>System Check</p>
+        </article>
+
+        <article class="match-loading-step" data-loading-step="1">
+          <span>▣</span>
+          <strong>Creating City</strong>
+          <p>Building Blocks</p>
+        </article>
+
+        <article class="match-loading-step" data-loading-step="2">
+          <span>◇</span>
+          <strong>Placement</strong>
+          <p>Routes & Zones</p>
+        </article>
+
+        <article class="match-loading-step" data-loading-step="3">
+          <span>⬡</span>
+          <strong>Adding Details</strong>
+          <p>Props & Obstacles</p>
+        </article>
+
+        <article class="match-loading-step" data-loading-step="4">
+          <span>⬢</span>
+          <strong>Finalizing</strong>
+          <p>Optimizing Map</p>
+        </article>
+      </section>
+
+      <section class="match-loading-tip-row">
+        <article class="match-flow-panel match-loading-info-card">
+          <strong>Did You Know?</strong>
+          <p>Different difficulties change route hints, time limits, and strategy advantage.</p>
+        </article>
+
+        <article class="match-flow-panel match-loading-info-card match-loading-info-card-red">
+          <strong>Loading Tip</strong>
+          <p>Plan ahead, adapt fast, and use every second to outthink your opponent.</p>
+        </article>
+      </section>
+
+      <div class="match-flow-error" data-page-error hidden></div>
+    </main>
+  </div>
+</section>

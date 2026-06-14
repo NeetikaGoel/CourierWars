@@ -33,6 +33,61 @@ export async function mountRegisterPage(root: HTMLElement, deps: RegisterPageDep
   const confirmPasswordToggle = root.querySelector<HTMLButtonElement>("[data-confirm-password-toggle]");
   const submitButton = root.querySelector<HTMLButtonElement>(".register-primary-button");
 
+  const usernameInput = root.querySelector<HTMLInputElement>("[data-register-username]");
+  const displayNameInput = root.querySelector<HTMLInputElement>("[data-register-name]");
+  const roleInput = root.querySelector<HTMLInputElement>("[data-register-role]");
+  const termsInput = root.querySelector<HTMLInputElement>("[data-register-terms]");
+  const roleButtons = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-register-role-choice]"));
+
+  let displayNameManuallyChanged = false;
+  let lastAutoDisplayName = "";
+
+  const syncDisplayNameFromUsername = (): void => {
+    if (!usernameInput || !displayNameInput) {
+      return;
+    }
+
+    const username = usernameInput.value.trim();
+
+    if (!displayNameManuallyChanged || displayNameInput.value.trim() === lastAutoDisplayName) {
+      displayNameInput.value = username;
+      lastAutoDisplayName = username;
+      displayNameManuallyChanged = false;
+    }
+  };
+
+  const onDisplayNameInput = (): void => {
+    if (!displayNameInput) {
+      return;
+    }
+
+    displayNameManuallyChanged = displayNameInput.value.trim() !== lastAutoDisplayName;
+  };
+
+  const roleSelect = (role: string): void => {
+    if (!roleInput) {
+      return;
+    }
+
+    roleInput.value = role;
+
+    roleButtons.forEach((button) => {
+      const isSelected = button.dataset.registerRoleChoice === role;
+      button.classList.toggle("register-role-choice-active", isSelected);
+      button.setAttribute("aria-pressed", String(isSelected));
+    });
+  };
+
+  const roleButtonClickHandlers = roleButtons.map((button) => {
+    const handler = (): void => {
+      roleSelect(button.dataset.registerRoleChoice || "any");
+    };
+
+    button.addEventListener("click", handler);
+
+    return { button, handler };
+  });
+
   const togglePasswordInput = (selector: string, button: HTMLButtonElement | null): void => {
     const input = root.querySelector<HTMLInputElement>(selector);
 
@@ -61,7 +116,8 @@ export async function mountRegisterPage(root: HTMLElement, deps: RegisterPageDep
     const email = pageInputValue(root, "[data-register-email]");
     const password = pageInputValue(root, "[data-register-password]");
     const confirmPassword = pageInputValue(root, "[data-register-confirm-password]");
-    const name = pageInputValue(root, "[data-register-name]");
+    const nameRaw = pageInputValue(root, "[data-register-name]");
+    const name = nameRaw || username;
     const preferredRole = pageInputValue(root, "[data-register-role]") || "any";
 
     const error = pageFirstError([
@@ -69,7 +125,9 @@ export async function mountRegisterPage(root: HTMLElement, deps: RegisterPageDep
       pageEmailLooksValid(email) ? null : "Email is invalid",
       pageLengthBetween(password, "Password", 8, 72),
       password === confirmPassword ? null : "Passwords do not match",
-      name ? pageLengthBetween(name, "Display name", 1, 40) : null,
+      pageLengthBetween(name, "Display name", 3, 40),
+      ["courier", "saboteur", "any"].includes(preferredRole) ? null : "Preferred role is invalid",
+      termsInput?.checked ? null : "Please accept the Terms of Service and Privacy Policy",
     ]);
 
     if (error) {
@@ -80,7 +138,7 @@ export async function mountRegisterPage(root: HTMLElement, deps: RegisterPageDep
     try {
       submitButton?.setAttribute("disabled", "true");
       pageLoadingSet(root, true, "Creating account...");
-      await deps.authApi.register({ username, email, password, name: name || undefined, preferredRole });
+      await deps.authApi.register({ username, email, password, name, preferredRole });
       deps.actions.goToHome();
     } catch (errorObject) {
       pageErrorShow(root, errorObject instanceof Error ? errorObject.message : "Registration failed");
@@ -90,6 +148,8 @@ export async function mountRegisterPage(root: HTMLElement, deps: RegisterPageDep
     }
   };
 
+  usernameInput?.addEventListener("input", syncDisplayNameFromUsername);
+  displayNameInput?.addEventListener("input", onDisplayNameInput);
   form?.addEventListener("submit", onSubmit);
   backButton?.addEventListener("click", deps.actions.goToLanding);
   loginTab?.addEventListener("click", deps.actions.goToLogin);
@@ -100,6 +160,8 @@ export async function mountRegisterPage(root: HTMLElement, deps: RegisterPageDep
   confirmPasswordToggle?.addEventListener("click", onConfirmPasswordToggle);
 
   return () => {
+    usernameInput?.removeEventListener("input", syncDisplayNameFromUsername);
+    displayNameInput?.removeEventListener("input", onDisplayNameInput);
     form?.removeEventListener("submit", onSubmit);
     backButton?.removeEventListener("click", deps.actions.goToLanding);
     loginTab?.removeEventListener("click", deps.actions.goToLogin);
@@ -108,5 +170,9 @@ export async function mountRegisterPage(root: HTMLElement, deps: RegisterPageDep
     guestButton?.removeEventListener("click", deps.actions.goToGuest);
     passwordToggle?.removeEventListener("click", onPasswordToggle);
     confirmPasswordToggle?.removeEventListener("click", onConfirmPasswordToggle);
+
+    roleButtonClickHandlers.forEach(({ button, handler }) => {
+      button.removeEventListener("click", handler);
+    });
   };
 }

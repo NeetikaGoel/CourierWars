@@ -1,27 +1,270 @@
-<section class="match-game-page">
-    <div class="match-game-stage">
-      <div id="phaser-game-container" data-phaser-container></div>
-    </div>
-  
-    <aside class="match-game-hud" data-match-hud>
-      <h2>Courier War</h2>
-      <p data-match-status>Connecting...</p>
-  
-      <div class="match-game-hud-block">
-        <strong>Timer</strong>
-        <span data-match-timer>--</span>
-      </div>
-  
-      <div class="match-game-hud-block">
-        <strong>Role</strong>
-        <span data-match-role>--</span>
-      </div>
-  
-      <div class="match-game-hud-block">
-        <strong>State Version</strong>
-        <span data-match-version>0</span>
-      </div>
-  
-      <div class="match-game-error" data-page-error hidden></div>
-    </aside>
-  </section>
+<section class="match-game-page match-game-page-courier" data-match-game-page>
+  <div class="match-game-shell">
+    <div class="match-game-grid" aria-hidden="true"></div>
+    <div class="match-game-vignette" aria-hidden="true"></div>
+
+    <header class="home-setup-header match-game-header">
+      <button class="home-setup-brand match-game-brand" type="button" data-match-home-button aria-label="Courier War home">
+        <span class="home-setup-brand-logo-frame">
+          <img class="home-setup-brand-logo" src="/assets/brand/courier-war-logo.png" alt="" aria-hidden="true" />
+        </span>
+
+        <span class="home-setup-brand-text">
+          <span>Courier</span>
+          <strong>War</strong>
+          <small>Outthink. Outmaneuver. Outdeliver.</small>
+        </span>
+      </button>
+
+      <section class="match-game-top-card match-game-timer-card">
+        <span class="match-game-top-icon" aria-hidden="true">◷</span>
+        <span>
+          <small>Time Remaining</small>
+          <strong data-match-timer>--:--</strong>
+        </span>
+      </section>
+
+      <section class="match-game-top-card match-game-courier-only match-game-progress-card">
+        <span>
+          <small>Lives</small>
+          <strong class="match-game-life-row" data-match-life-row>♥ ♥ ♥</strong>
+        </span>
+
+        <span>
+          <small>Delivery Progress</small>
+          <span class="match-game-meter">
+            <i data-match-progress-fill></i>
+          </span>
+          <em data-match-progress-copy>Getting closer. Keep it up.</em>
+        </span>
+
+        <b data-match-progress-percent>68%</b>
+      </section>
+
+      <section class="match-game-top-card match-game-saboteur-only match-game-energy-card">
+        <span class="match-game-top-icon" aria-hidden="true">ϟ</span>
+        <span>
+          <small>Energy</small>
+          <strong><span data-match-energy-current>72</span> / <span data-match-energy-max>100</span></strong>
+          <span class="match-game-meter match-game-meter-red">
+            <i data-match-energy-fill></i>
+          </span>
+        </span>
+        <em>+10 in 00:18</em>
+      </section>
+
+      <section class="match-game-top-card match-game-saboteur-only match-game-hurdle-count-card">
+        <small>Hurdles Activated</small>
+        <strong><span data-match-hurdle-count>3</span> / 12</strong>
+      </section>
+
+      <section class="home-setup-player-card match-game-player-card">
+        <span class="home-setup-player-avatar" aria-hidden="true">
+          <img data-match-player-avatar src="/assets/login/ghost.png" alt="" />
+        </span>
+
+        <span class="home-setup-player-info">
+          <strong data-match-player-name>Neetika Goel</strong>
+          <small><i class="home-setup-online-dot"></i><span>ONLINE</span></small>
+          <span class="home-setup-xp-row"><b>12</b><span><i></i></span><em>2,450 / 5,000 XP</em></span>
+        </span>
+      </section>
+    </header>
+
+    <main class="match-game-layout" data-match-hud>
+      <aside class="match-game-side match-game-left-side">
+        <section class="match-game-panel match-game-meta-panel">
+          <p>Match ID: <strong data-match-id>#CW-7F3A2B</strong></p>
+          <p>Difficulty: <strong class="match-game-yellow" data-match-difficulty>Medium</strong></p>
+          <p>Role: <strong data-match-role>Courier</strong></p>
+          <p>Status: <strong data-match-status>Active</strong></p>
+        </section>
+
+        <section class="match-game-panel match-game-courier-only">
+          <h2>Current Objective</h2>
+          <div class="match-game-objective-row">
+            <span class="match-game-pin" aria-hidden="true">⌖</span>
+            <p><strong>Deliver Package To Destination</strong><small>Central Plaza, around 820m away</small></p>
+          </div>
+        </section>
+
+        <section class="match-game-panel match-game-courier-only match-game-danger-panel">
+          <h2>Active Obstacle</h2>
+          <div class="match-game-obstacle-row">
+            <span aria-hidden="true">▥</span>
+            <p><strong>Red Traffic Light</strong><small>Main St. & 3rd Ave</small><em>00:03</em></p>
+          </div>
+          <p class="match-game-muted">Stop until green to pass safely.</p>
+        </section>
+
+        <section class="match-game-panel match-game-courier-only">
+          <h2>Route Assist</h2>
+          <p class="match-game-muted">Heavy traffic ahead. Consider using alternate routes via Riverside Dr.</p>
+          <div class="match-game-route-mini" aria-hidden="true"><i></i><b></b></div>
+        </section>
+
+        <section class="match-game-panel match-game-saboteur-only match-game-danger-panel">
+          <h2>Active Hurdles</h2>
+          <div class="match-game-list-row"><strong>Red Traffic Light</strong><span>3s</span></div>
+          <div class="match-game-list-row"><strong>Road Block</strong><span>12s</span></div>
+          <div class="match-game-list-row"><strong>Construction</strong><span>18s</span></div>
+        </section>
+
+        <section class="match-game-panel match-game-saboteur-only">
+          <h2>Traffic Signal Status</h2>
+          <div class="match-game-obstacle-row">
+            <span aria-hidden="true">▥</span>
+            <p><strong>Active Red Light</strong><small>Next signal: 45m</small></p>
+          </div>
+          <span class="match-game-meter match-game-meter-red"><i style="width: 52%"></i></span>
+        </section>
+
+        <section class="match-game-panel match-game-saboteur-only">
+          <h2>Tips</h2>
+          <p class="match-game-muted">Place hurdles on busy intersections and key routes to maximize delay. Manage your energy wisely.</p>
+        </section>
+      </aside>
+
+      <section class="match-game-map-panel">
+        <div id="phaser-game-container" data-phaser-container></div>
+
+        <div class="match-game-map-chip match-game-courier-only">
+          <strong>Courier</strong>
+          <span>Route active</span>
+        </div>
+
+        <div class="match-game-map-chip match-game-saboteur-only">
+          <strong>Saboteur</strong>
+          <span>Placement grid active</span>
+        </div>
+      </section>
+
+      <aside class="match-game-side match-game-right-side">
+        <section class="match-game-panel match-game-courier-only">
+          <h2>Status Overview</h2>
+          <div class="match-game-list-row"><strong>Lives</strong><span data-match-lives-text>3 / 3</span></div>
+          <div class="match-game-list-row"><strong>Destination</strong><span>820m</span></div>
+          <div class="match-game-list-row"><strong>Progress</strong><span data-match-progress-side>68%</span></div>
+          <span class="match-game-meter"><i data-match-progress-fill-side></i></span>
+          <div class="match-game-list-row"><strong>Est. Time Left</strong><span data-match-timer-side>--:--</span></div>
+        </section>
+
+        <section class="match-game-panel match-game-courier-only">
+          <h2>Active Effects</h2>
+          <div class="match-game-effect-row"><span>»</span><p><strong>Speed Boost</strong><small>Increased movement speed</small></p><em>12s</em></div>
+          <div class="match-game-effect-row"><span>▣</span><p><strong>Shield</strong><small>Block one obstacle</small></p><em>18s</em></div>
+          <div class="match-game-effect-row"><span>◎</span><p><strong>Reveal Route</strong><small>Show safest path ahead</small></p><em>22s</em></div>
+        </section>
+
+        <section class="match-game-panel match-game-courier-only">
+          <h2>Obstacle Legend</h2>
+          <div class="match-game-list-row"><strong>Red Traffic Light</strong><span>Stop</span></div>
+          <div class="match-game-list-row"><strong>Construction</strong><span>Slow</span></div>
+          <div class="match-game-list-row"><strong>Traffic Jam</strong><span>Delay</span></div>
+          <div class="match-game-list-row"><strong>Closed Gate</strong><span>Block</span></div>
+        </section>
+
+        <section class="match-game-panel match-game-saboteur-only">
+          <h2>Tile Legend</h2>
+          <div class="match-game-list-row"><strong>Valid Tile</strong><span class="match-game-green">✓</span></div>
+          <div class="match-game-list-row"><strong>Invalid Tile</strong><span class="match-game-red">×</span></div>
+          <div class="match-game-list-row"><strong>Selected Tile</strong><span class="match-game-yellow">◇</span></div>
+          <div class="match-game-list-row"><strong>Courier Route</strong><span class="match-game-blue">↝</span></div>
+          <div class="match-game-list-row"><strong>Courier Position</strong><span class="match-game-blue">⌖</span></div>
+        </section>
+
+        <section class="match-game-panel match-game-saboteur-only">
+          <h2>Overview Map</h2>
+          <div class="match-game-overview-map" aria-hidden="true">
+            <span>A</span><span>B</span><span>D</span><span>E</span>
+          </div>
+        </section>
+      </aside>
+    </main>
+
+    <footer class="match-game-bottom">
+      <section class="match-game-courier-only match-game-ability-dock">
+        <button class="match-game-ability-card" type="button" data-match-action-button data-match-action-label="Speed Boost">
+          <span><img src="/assets/match-game/courier.png" alt="" /></span>
+          <strong>Speed Boost</strong>
+          <p>Increase movement speed for a short time.</p>
+          <em>12s</em>
+        </button>
+
+        <button class="match-game-ability-card" type="button" data-match-action-button data-match-action-label="Shield">
+          <span>▣</span>
+          <strong>Shield</strong>
+          <p>Block the next obstacle or traffic delay.</p>
+          <em>18s</em>
+        </button>
+
+        <button class="match-game-ability-card" type="button" data-match-action-button data-match-action-label="Reveal Route">
+          <span>◎</span>
+          <strong>Reveal Route</strong>
+          <p>Reveal the safest route ahead for a moment.</p>
+          <em>22s</em>
+        </button>
+
+        <button class="match-game-draw-button" type="button" data-match-draw-button>
+          Offer Draw
+        </button>
+      </section>
+
+      <section class="match-game-saboteur-only match-game-saboteur-deck">
+        <article class="match-game-selected-hurdle">
+          <span class="match-game-selected-hurdle-icon" data-selected-hurdle-symbol aria-hidden="true">▥</span>
+      
+          <div>
+            <small>Selected Hurdle</small>
+            <strong data-selected-hurdle-name>Red Traffic Light</strong>
+            <p data-selected-hurdle-description>Block the intersection with a red signal to stop the Courier.</p>
+          </div>
+      
+          <div class="match-game-duration-control">
+            <small>Duration</small>
+            <strong><span data-hurdle-duration-value>04</span> sec</strong>
+            <label>
+              <span>Duration</span>
+              <input type="range" min="2" max="10" step="1" value="4" data-hurdle-duration-input />
+            </label>
+          </div>
+      
+          <div>
+            <small>Energy Cost</small>
+            <strong>ϟ <span data-hurdle-energy-cost>15</span></strong>
+          </div>
+      
+          <button type="button" data-match-activate-hurdle>Activate Hurdle</button>
+        </article>
+      
+        <div class="match-game-hurdle-dock">
+          <button type="button" class="match-game-hurdle-card match-game-hurdle-card-active" data-match-hurdle-button data-hurdle-name="Red Traffic Light" data-hurdle-symbol="▥" data-hurdle-cost="15" data-hurdle-default-duration="4" data-hurdle-description="Block the intersection with a red signal to stop the Courier.">
+            <span aria-hidden="true">▥</span><strong>Red Traffic Light</strong><em>ϟ 15</em>
+          </button>
+      
+          <button type="button" class="match-game-hurdle-card" data-match-hurdle-button data-hurdle-name="Road Block" data-hurdle-symbol="▤" data-hurdle-cost="20" data-hurdle-default-duration="5" data-hurdle-description="Block one future road tile and force the Courier to reroute.">
+            <span aria-hidden="true">▤</span><strong>Road Block</strong><em>ϟ 20</em>
+          </button>
+      
+          <button type="button" class="match-game-hurdle-card" data-match-hurdle-button data-hurdle-name="Construction" data-hurdle-symbol="△" data-hurdle-cost="20" data-hurdle-default-duration="8" data-hurdle-description="Slow Courier movement through a future road section.">
+            <span aria-hidden="true">△</span><strong>Construction</strong><em>ϟ 20</em>
+          </button>
+      
+          <button type="button" class="match-game-hurdle-card" data-match-hurdle-button data-hurdle-name="Traffic Jam" data-hurdle-symbol="▨" data-hurdle-cost="25" data-hurdle-default-duration="6" data-hurdle-description="Create a slow movement zone on an upcoming route.">
+            <span aria-hidden="true">▨</span><strong>Traffic Jam</strong><em>ϟ 25</em>
+          </button>
+      
+          <button type="button" class="match-game-hurdle-card" data-match-hurdle-button data-hurdle-name="Closed Gate" data-hurdle-symbol="⊞" data-hurdle-cost="30" data-hurdle-default-duration="5" data-hurdle-description="Close a shortcut, tunnel, or bridge entrance temporarily.">
+            <span aria-hidden="true">⊞</span><strong>Closed Gate</strong><em>ϟ 30</em>
+          </button>
+        </div>
+      
+        <button class="match-game-draw-button match-game-draw-button-small" type="button" data-match-draw-button>
+          Offer Draw
+        </button>
+      </section>
+    </footer>
+
+    <div class="match-game-error" data-page-error hidden></div>
+  </div>
+</section>

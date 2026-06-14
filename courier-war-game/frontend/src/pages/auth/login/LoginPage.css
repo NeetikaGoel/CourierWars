@@ -968,3 +968,46 @@ input {
     drop-shadow(0 0 8px rgba(255, 69, 69, 0.78))
     drop-shadow(0 0 14px rgba(255, 69, 69, 0.24));
 }
+
+
+/* updated login benefit image icons */
+
+.login-benefit-icon {
+  overflow: hidden;
+}
+
+.login-benefit-icon-image {
+  width: 72%;
+  height: 72%;
+  display: block;
+  object-fit: contain;
+}
+
+.login-benefit-icon-blue .login-benefit-icon-image {
+  filter:
+    drop-shadow(0 0 7px rgba(24, 221, 255, 0.82))
+    drop-shadow(0 0 13px rgba(24, 221, 255, 0.28))
+    drop-shadow(0 0 10px rgba(255, 255, 255, 0.12));
+}
+
+.login-benefit-icon-red .login-benefit-icon-image {
+  filter:
+    drop-shadow(0 0 7px rgba(255, 69, 69, 0.78))
+    drop-shadow(0 0 13px rgba(255, 69, 69, 0.28))
+    drop-shadow(0 0 10px rgba(255, 255, 255, 0.1));
+}
+
+.login-benefit-icon-image-continue {
+  width: 76%;
+  height: 76%;
+}
+
+.login-benefit-icon-image-track {
+  width: 74%;
+  height: 74%;
+}
+
+.login-benefit-icon-image-trophy {
+  width: 78%;
+  height: 78%;
+}

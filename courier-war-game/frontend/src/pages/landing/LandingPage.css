@@ -1195,3 +1195,76 @@ button {
     drop-shadow(0 0 7px rgba(220, 232, 244, 0.68))
     drop-shadow(0 0 13px rgba(180, 205, 225, 0.24));
 }
+
+
+
+/* make center Courier War title sharper and HD */
+
+.landing-hero {
+  z-index: 64;
+}
+
+.landing-title-wrap {
+  position: relative;
+  z-index: 66;
+  filter: none;
+  transform: translateZ(0);
+}
+
+.landing-title {
+  filter: none;
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.landing-title-word {
+  position: relative;
+  z-index: 2;
+  filter: none !important;
+  opacity: 1;
+  -webkit-text-stroke: 0.7px rgba(255, 255, 255, 0.2);
+  text-rendering: geometricPrecision;
+  transform: translateZ(0);
+}
+
+.landing-title-courier {
+  color: #dffbff;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.44),
+    0 0 4px rgba(24, 221, 255, 0.78),
+    0 0 10px rgba(24, 221, 255, 0.42),
+    2px 3px 0 rgba(0, 0, 0, 0.78);
+}
+
+.landing-title-war {
+  color: #ffd7d2;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.42),
+    0 0 4px rgba(255, 69, 69, 0.8),
+    0 0 10px rgba(255, 69, 69, 0.42),
+    2px 3px 0 rgba(0, 0, 0, 0.78);
+}
+
+.landing-title-word::after {
+  filter: none !important;
+  opacity: 0.18;
+  text-shadow: none;
+}
+
+.landing-center-focus {
+  filter: blur(1px);
+  opacity: 0.82;
+}
+
+.landing-scanline {
+  opacity: 0.045;
+}
+
+.landing-vignette {
+  z-index: 34;
+}
+
+.landing-scanline {
+  z-index: 35;
+}

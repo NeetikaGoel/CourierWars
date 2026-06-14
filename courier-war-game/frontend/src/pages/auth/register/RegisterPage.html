@@ -10,13 +10,13 @@
             aria-hidden="true"
           />
         </span>
-      
+
         <span class="register-brand-text">
           <span>Courier</span>
           <strong>War</strong>
         </span>
       </button>
-    
+
       <nav class="register-auth-nav" aria-label="Authentication navigation">
         <button class="register-auth-nav-item" type="button" data-login-tab>
           <span class="register-auth-nav-icon" aria-hidden="true">
@@ -28,7 +28,7 @@
           </span>
           <span>LOGIN</span>
         </button>
-    
+
         <button class="register-auth-nav-item register-auth-nav-item-active" type="button">
           <span class="register-auth-nav-icon" aria-hidden="true">
             <img
@@ -39,7 +39,7 @@
           </span>
           <span>REGISTER</span>
         </button>
-    
+
         <button class="register-auth-nav-item" type="button" data-guest-tab>
           <span class="register-auth-nav-icon" aria-hidden="true">
             <img
@@ -51,12 +51,12 @@
           <span>GUEST PLAY</span>
         </button>
       </nav>
-    
+
       <div class="register-header-login">
         <span class="register-header-cube" aria-hidden="true">
           <img class="register-header-cube-image" src="/assets/login/next.png" alt="" />
         </span>
-    
+
         <span class="register-header-login-copy">
           <small>Already have an account?</small>
           <button type="button" data-login-link>Login</button>
@@ -93,7 +93,13 @@
 
         <section class="register-benefits" aria-label="Registration benefits">
           <article>
-            <span class="register-benefit-icon register-benefit-icon-blue">✚</span>
+            <span class="register-benefit-icon register-benefit-icon-blue" aria-hidden="true">
+              <img
+                class="register-benefit-icon-image"
+                src="/assets/register/profile.png"
+                alt=""
+              />
+            </span>
 
             <div>
               <strong>Your Profile</strong>
@@ -102,16 +108,28 @@
           </article>
 
           <article>
-            <span class="register-benefit-icon register-benefit-icon-red">↗</span>
+            <span class="register-benefit-icon register-benefit-icon-red" aria-hidden="true">
+              <img
+                class="register-benefit-icon-image"
+                src="/assets/register/track.png"
+                alt=""
+              />
+            </span>
 
             <div>
               <strong>Track & Improve</strong>
-              <p>Track performance and climb your way to the top.</p>
+              <p>Track performance and improve every match.</p>
             </div>
           </article>
 
           <article>
-            <span class="register-benefit-icon register-benefit-icon-blue">♜</span>
+            <span class="register-benefit-icon register-benefit-icon-blue" aria-hidden="true">
+              <img
+                class="register-benefit-icon-image"
+                src="/assets/login/trophy.png"
+                alt=""
+              />
+            </span>
 
             <div>
               <strong>Compete & Achieve</strong>
@@ -128,12 +146,12 @@
               alt=""
             />
           </span>
-        
+
           <div>
             <strong>Secure & Trusted</strong>
-            <p>Your data is protected with secure authentication and session handling.</p>
+            <p>Your profile is protected with secure authentication and session handling.</p>
           </div>
-        
+
           <span class="register-secure-lock" aria-hidden="true">
             <img
               class="register-secure-lock-image"
@@ -149,80 +167,156 @@
 
         <div class="register-card-heading">
           <h2>Create Your Account</h2>
-          <p>Fill in the details below to get started</p>
+          <p>Set your identity, secure your profile, and choose your starting role</p>
         </div>
 
         <div class="register-field-grid">
-          <label class="register-field">
-            <span>Display Name</span>
+          <div class="register-form-row register-form-row-two">
+            <label class="register-field register-field-inline">
+              <span>Username :</span>
 
-            <span class="register-input-shell">
-              <i>◆</i>
-              <input data-register-name name="name" autocomplete="name" placeholder="Enter display name" />
-            </span>
+              <span class="register-input-shell">
+                <i>♙</i>
+                <input
+                  data-register-username
+                  name="username"
+                  autocomplete="username"
+                  placeholder="Choose username"
+                />
+              </span>
 
-            <small>Optional. This is how other players will see you.</small>
-          </label>
+              <small>Unique login name</small>
+            </label>
 
-          <label class="register-field">
-            <span>Username</span>
+            <label class="register-field register-field-inline">
+              <span>Display Name :</span>
 
-            <span class="register-input-shell">
-              <i>♙</i>
-              <input data-register-username name="username" autocomplete="username" placeholder="Choose a username" />
-            </span>
+              <span class="register-input-shell">
+                <i>◆</i>
+                <input
+                  data-register-name
+                  name="name"
+                  autocomplete="name"
+                  placeholder="Auto-filled"
+                />
+              </span>
 
-            <small>Username must be unique.</small>
-          </label>
+              <small>Shown to other players</small>
+            </label>
+          </div>
 
-          <label class="register-field register-field-wide">
-            <span>Email Address</span>
+          <div class="register-form-row">
+            <label class="register-field register-field-inline register-field-wide register-field-email">
+              <span>Email Address :</span>
+            
+              <span class="register-input-shell">
+                <i>✉</i>
+                <input
+                  data-register-email
+                  name="email"
+                  type="email"
+                  autocomplete="email"
+                  placeholder="name@example.com"
+                />
+              </span>
+            
+              <small>Used only for secure login and account recovery.</small>
+            </label>
+          </div>
 
-            <span class="register-input-shell">
-              <i>✉</i>
-              <input data-register-email name="email" type="email" autocomplete="email" placeholder="Enter your email address" />
-            </span>
-          </label>
+          <div class="register-form-row register-form-row-two">
+            <label class="register-field register-field-inline">
+              <span>Password :</span>
 
-          <label class="register-field register-field-wide">
-            <span>Password</span>
+              <span class="register-input-shell">
+                <i>⌘</i>
+                <input
+                  data-register-password
+                  name="password"
+                  type="password"
+                  autocomplete="new-password"
+                  placeholder="Create password"
+                />
 
-            <span class="register-input-shell">
-              <i>⌘</i>
-              <input data-register-password name="password" type="password" autocomplete="new-password" placeholder="Create a password" />
-              <button class="register-password-toggle" type="button" data-password-toggle aria-label="Show password">◎</button>
-            </span>
+                <button
+                  class="register-password-toggle"
+                  type="button"
+                  data-password-toggle
+                  aria-label="Show password"
+                >
+                  ◎
+                </button>
+              </span>
 
-            <small>At least 8 characters with letters and numbers.</small>
-          </label>
+              <small>8 to 72 characters</small>
+            </label>
 
-          <label class="register-field register-field-wide">
-            <span>Confirm Password</span>
+            <label class="register-field register-field-inline">
+              <span>Confirm :</span>
 
-            <span class="register-input-shell">
-              <i>▣</i>
-              <input data-register-confirm-password name="confirmPassword" type="password" autocomplete="new-password" placeholder="Confirm your password" />
-              <button class="register-password-toggle" type="button" data-confirm-password-toggle aria-label="Show confirm password">◎</button>
-            </span>
+              <span class="register-input-shell">
+                <i>▣</i>
+                <input
+                  data-register-confirm-password
+                  name="confirmPassword"
+                  type="password"
+                  autocomplete="new-password"
+                  placeholder="Confirm password"
+                />
 
-            <small>Passwords must match.</small>
-          </label>
+                <button
+                  class="register-password-toggle"
+                  type="button"
+                  data-confirm-password-toggle
+                  aria-label="Show confirm password"
+                >
+                  ◎
+                </button>
+              </span>
 
-          <label class="register-field register-field-role">
-            <span>Preferred Role</span>
+              <small>Must match password</small>
+            </label>
+          </div>
 
-            <span class="register-input-shell">
-              <i>⚔</i>
+          <div class="register-form-row">
+            <div class="register-role-panel" role="group" aria-label="Preferred role">
+              <span class="register-role-label">Preferred Role :</span>
 
-              <select data-register-role name="preferredRole">
-                <option value="any" selected>Any Role</option>
-                <option value="courier">Courier</option>
-                <option value="saboteur">Saboteur</option>
-              </select>
-            </span>
+              <div class="register-role-options">
+                <button
+                  class="register-role-choice"
+                  type="button"
+                  data-register-role-choice="courier"
+                  aria-pressed="false"
+                >
+                  <span>Courier</span>
+                  <small>Deliver fast</small>
+                </button>
 
-            <small>Optional. Default is Any Role.</small>
-          </label>
+                <button
+                  class="register-role-choice"
+                  type="button"
+                  data-register-role-choice="saboteur"
+                  aria-pressed="false"
+                >
+                  <span>Saboteur</span>
+                  <small>Block smart</small>
+                </button>
+
+                <button
+                  class="register-role-choice register-role-choice-active"
+                  type="button"
+                  data-register-role-choice="any"
+                  aria-pressed="true"
+                >
+                  <span>Any Role</span>
+                  <small>Assign me</small>
+                </button>
+              </div>
+
+              <input data-register-role name="preferredRole" type="hidden" value="any" />
+            </div>
+          </div>
         </div>
 
         <label class="register-terms">
@@ -254,22 +348,15 @@
           <span class="register-guest-button-icon" aria-hidden="true">
             <img class="register-guest-button-icon-image" src="/assets/login/ghost.png" alt="" />
           </span>
-        
+
           <span class="register-guest-copy">
             <strong>Continue As Guest</strong>
             <small>Skip account creation for now</small>
           </span>
-        
+
           <i>›</i>
         </button>
       </form>
     </main>
-
-    <!-- <footer class="register-footer">
-      <span>●</span>
-      <span>▶</span>
-      <span>◆</span>
-      <span>⚙</span>
-    </footer> -->
   </div>
 </section>
