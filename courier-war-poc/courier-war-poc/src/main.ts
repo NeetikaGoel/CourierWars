@@ -1,14 +1,14 @@
 // Imports Phaser game engine
 import Phaser from "phaser";
 
-// Imports Phaser level config for Courier War V7
-import { phaserGameConfig } from "./game/v7/config/PhaserGameConfig";
+// Imports Phaser level config for Courier War V8 manual city map
+import { phaserGameConfig } from "./game/v8/config/PhaserGameConfig";
 
 // Imports debug display config for side panel width
-import { debugDisplayConfig } from "./game/v7/config/DebugDisplayConfig";
+import { debugDisplayConfig } from "./game/v8/config/DebugDisplayConfig";
 
-// Imports Courier War V7 map prototype scene
-import { MapPrototypeScene } from "./game/v7/scene/MapPrototypeScene";
+// Imports Courier War V8 manual map prototype scene
+import { ManualMapScene } from "./game/v8/scene/ManualMapScene";
 
 // Stores side panel width
 const sidePanelWidthPixels = debugDisplayConfig.sidePanel.visible
@@ -42,8 +42,8 @@ const config: Phaser.Types.Core.GameConfig = {
   // Stores parent HTML element id
   parent: phaserGameConfig.canvas.parentElementId,
 
-  // Registers Courier War V7 prototype scene
-  scene: [MapPrototypeScene],
+  // Registers Courier War V8 manual map prototype scene
+  scene: [ManualMapScene],
 };
 
 // Starts Phaser game

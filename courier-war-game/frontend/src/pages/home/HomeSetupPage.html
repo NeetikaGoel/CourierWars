@@ -1,37 +1,420 @@
-<section class="home-page">
-    <aside class="home-profile">
-      <h2 data-home-name>Player</h2>
-      <p data-home-user-type>Loading profile...</p>
-      <div data-home-stats></div>
-      <button type="button" data-home-logout>Logout</button>
-      <button type="button" data-home-forget hidden>Forget Guest Session</button>
-    </aside>
-  
-    <main class="home-card">
-      <h1>Start Match</h1>
-      <p>Select difficulty and role preference</p>
-  
-      <label>
-        Difficulty
-        <select data-home-difficulty>
-          <option value="easy">Easy - 7 minutes</option>
-          <option value="medium" selected>Medium - 5 minutes</option>
-          <option value="hard">Hard - 3 minutes</option>
-        </select>
-      </label>
-  
-      <label>
-        Role Preference
-        <select data-home-role>
-          <option value="any" selected>Any</option>
-          <option value="courier">Courier</option>
-          <option value="saboteur">Saboteur</option>
-        </select>
-      </label>
-  
-      <div class="home-error" data-page-error hidden></div>
-      <div class="home-loading" data-page-loading hidden></div>
-  
-      <button class="home-start" type="button" data-home-start>Find Match</button>
+<section class="home-setup-page">
+  <div class="home-setup-shell">
+    <div class="home-setup-grid" aria-hidden="true"></div>
+    <div class="home-setup-vignette" aria-hidden="true"></div>
+    <div class="home-setup-scanline" aria-hidden="true"></div>
+    <div class="home-setup-center-glow" aria-hidden="true"></div>
+
+    <header class="home-setup-header">
+      <button class="home-setup-brand" type="button" data-home-back-button aria-label="Courier War home">
+        <span class="home-setup-brand-logo-frame">
+          <img
+            class="home-setup-brand-logo"
+            src="/assets/brand/courier-war-logo.png"
+            alt=""
+            aria-hidden="true"
+          />
+        </span>
+
+        <span class="home-setup-brand-text">
+          <span>Courier</span>
+          <strong>War</strong>
+        </span>
+      </button>
+
+      <nav class="home-setup-nav" aria-label="Home setup navigation">
+        <button class="home-setup-nav-item" type="button" data-home-nav-home>
+          <span class="home-setup-nav-icon" aria-hidden="true">
+            <img src="/assets/navbar/home.png" alt="" />
+          </span>
+          <span>Home</span>
+        </button>
+
+        <button class="home-setup-nav-item home-setup-nav-item-active" type="button" data-home-nav-play>
+          <span class="home-setup-nav-icon" aria-hidden="true">
+            <img src="/assets/navbar/gameplay.png" alt="" />
+          </span>
+          <span>Play</span>
+        </button>
+
+        <button class="home-setup-nav-item" type="button" data-home-nav-stats>
+          <span class="home-setup-nav-icon" aria-hidden="true">
+            <img src="/assets/navbar/stats.png" alt="" />
+          </span>
+          <span>Stats</span>
+        </button>
+
+        <button class="home-setup-nav-item" type="button" data-home-nav-features>
+          <span class="home-setup-nav-icon" aria-hidden="true">
+            <img src="/assets/navbar/features.png" alt="" />
+          </span>
+          <span>Features</span>
+        </button>
+
+        <button class="home-setup-nav-item" type="button" data-home-nav-how-to-play>
+          <span class="home-setup-nav-icon" aria-hidden="true">
+            <img src="/assets/navbar/features.png" alt="" />
+          </span>
+          <span>How To Play</span>
+        </button>
+
+        <button class="home-setup-nav-item" type="button" data-home-nav-settings>
+          <span class="home-setup-nav-icon" aria-hidden="true">
+            <img src="/assets/navbar/support.png" alt="" />
+          </span>
+          <span>Settings</span>
+        </button>
+      </nav>
+
+      <section class="home-setup-player-card" aria-label="Current player">
+        <span class="home-setup-player-avatar" aria-hidden="true">
+          <img src="/assets/login/ghost.png" alt="" />
+        </span>
+
+        <span class="home-setup-player-info">
+          <strong data-home-profile-name>Player</strong>
+
+          <small>
+            <i class="home-setup-online-dot"></i>
+            <span data-home-profile-status>ONLINE</span>
+          </small>
+
+          <span class="home-setup-xp-row">
+            <b>12</b>
+
+            <span>
+              <i></i>
+            </span>
+
+            <em>2,450 / 5,000 XP</em>
+          </span>
+        </span>
+      </section>
+    </header>
+
+    <main class="home-setup-layout">
+      <aside class="home-setup-sidebar">
+        <section class="home-setup-user-panel">
+          <span class="home-setup-user-avatar" aria-hidden="true">
+            <img src="/assets/login/ghost.png" alt="" />
+          </span>
+
+          <div class="home-setup-user-copy">
+            <small>Welcome Back!</small>
+            <strong data-home-sidebar-name>Player</strong>
+            <em data-home-sidebar-role>Courier</em>
+            <p data-home-member-since>Member since 2026</p>
+          </div>
+        </section>
+
+        <section class="home-setup-stat-panel home-setup-career-panel">
+          <h2>Career Stats</h2>
+
+          <div class="home-setup-stat-row">
+            <span>▣</span>
+            <strong>Total Matches</strong>
+            <em data-home-stat-total-matches>0</em>
+          </div>
+
+          <div class="home-setup-stat-row">
+            <span>↗</span>
+            <strong>Total Wins</strong>
+            <em data-home-stat-total-wins>0</em>
+          </div>
+
+          <div class="home-setup-stat-row">
+            <span>△</span>
+            <strong>Total Losses</strong>
+            <em data-home-stat-total-losses>0</em>
+          </div>
+
+          <div class="home-setup-stat-row">
+            <span>◷</span>
+            <strong>Win Rate</strong>
+            <em data-home-stat-win-rate>0%</em>
+          </div>
+        </section>
+
+        <section class="home-setup-stat-panel home-setup-role-performance-panel">
+          <h2>Role Performance</h2>
+
+          <div class="home-setup-stat-row home-setup-stat-row-blue">
+            <span>♟</span>
+            <strong>Courier Wins</strong>
+            <em data-home-stat-courier-wins>0</em>
+          </div>
+
+          <div class="home-setup-stat-row">
+            <span>☠</span>
+            <strong>Courier Losses</strong>
+            <em data-home-stat-courier-losses>0</em>
+          </div>
+
+          <div class="home-setup-stat-row home-setup-stat-row-red">
+            <span>♜</span>
+            <strong>Saboteur Wins</strong>
+            <em data-home-stat-saboteur-wins>0</em>
+          </div>
+
+          <div class="home-setup-stat-row">
+            <span>☣</span>
+            <strong>Saboteur Losses</strong>
+            <em data-home-stat-saboteur-losses>0</em>
+          </div>
+        </section>
+
+        <section class="home-setup-stat-panel home-setup-best-panel">
+          <h2>Best Performance</h2>
+
+          <div class="home-setup-performance-row">
+            <span>✥</span>
+            <strong>
+              Fastest Delivery
+              <small>As Courier</small>
+            </strong>
+            <em data-home-stat-fastest-delivery>--:--</em>
+          </div>
+
+          <div class="home-setup-performance-row">
+            <span>☠</span>
+            <strong>
+              Best Saboteur Delay
+              <small>Delay Achieved</small>
+            </strong>
+            <em data-home-stat-best-saboteur-delay>--:--</em>
+          </div>
+        </section>
+
+        <button class="home-setup-back-button" type="button" data-home-back-button-secondary>
+          <span>←</span>
+          <strong>Back To Home</strong>
+        </button>
+      </aside>
+
+      <section class="home-setup-main">
+        <section class="home-setup-role-section">
+          <div class="home-setup-section-heading home-setup-role-heading">
+            <h2>1. Select Role</h2>
+            <p>Choose the role you want to play in this match</p>
+          </div>
+
+          <div class="home-setup-role-grid">
+            <button
+              class="home-setup-choice-card home-setup-role-card home-setup-role-card-courier"
+              type="button"
+              data-home-role-option="courier"
+              aria-pressed="false"
+            >
+              <span class="home-setup-choice-light"></span>
+
+              <span class="home-setup-role-image" aria-hidden="true">
+                <img src="/assets/homepage/courier.png" alt="" />
+              </span>
+
+              <strong>Courier</strong>
+
+              <p>
+                Deliver the package before time runs out.
+                Find the best route and reach the destination.
+              </p>
+
+              <em>Play As Courier</em>
+            </button>
+
+            <button
+              class="home-setup-choice-card home-setup-role-card home-setup-role-card-saboteur"
+              type="button"
+              data-home-role-option="saboteur"
+              aria-pressed="false"
+            >
+              <span class="home-setup-choice-light"></span>
+
+              <span class="home-setup-role-image" aria-hidden="true">
+                <img src="/assets/homepage/saboteur.png" alt="" />
+              </span>
+
+              <strong>Saboteur</strong>
+
+              <p>
+                Predict the Courier's moves and place hurdles.
+                Delay the delivery.
+              </p>
+
+              <em>Play As Saboteur</em>
+            </button>
+
+            <button
+              class="home-setup-choice-card home-setup-role-card home-setup-role-card-any home-setup-choice-selected"
+              type="button"
+              data-home-role-option="any"
+              aria-pressed="true"
+            >
+              <span class="home-setup-choice-light"></span>
+
+              <span class="home-setup-role-image home-setup-role-image-any" aria-hidden="true">
+                <img src="/assets/homepage/any.png" alt="" />
+              </span>
+
+              <strong>Any Role</strong>
+
+              <p>
+                Let matchmaking assign whichever role gets you into a match faster.
+              </p>
+
+              <em>Play Any Role</em>
+            </button>
+          </div>
+        </section>
+
+        <section class="home-setup-difficulty-section">
+          <div class="home-setup-section-heading">
+            <h2 class="home-setup-heading-with-icon">
+              <img
+                class="home-setup-heading-icon"
+                src="/assets/homepage/timer.png"
+                alt=""
+                aria-hidden="true"
+              />
+              <span>3. Select Difficulty</span>
+            </h2>
+            <p>Difficulty changes the time and route guidance available</p>
+          </div>
+
+          <div class="home-setup-difficulty-grid">
+            <button
+              class="home-setup-choice-card home-setup-difficulty-card home-setup-difficulty-card-easy"
+              type="button"
+              data-home-difficulty-option="easy"
+              aria-pressed="false"
+            >
+              <span class="home-setup-difficulty-copy">
+                <strong>Easy</strong>
+                <em>07:00</em>
+                <small>7 Minutes</small>
+                <b>Safest Route Help</b>
+                <p>Get safest route guidance.</p>
+              </span>
+            </button>
+
+            <button
+              class="home-setup-choice-card home-setup-difficulty-card home-setup-difficulty-card-medium home-setup-choice-selected"
+              type="button"
+              data-home-difficulty-option="medium"
+              aria-pressed="true"
+            >
+              <span class="home-setup-difficulty-copy">
+                <strong>Medium</strong>
+                <em>05:00</em>
+                <small>5 Minutes</small>
+                <b>Shortest Route Help</b>
+                <p>Get shortest route guidance.</p>
+              </span>
+            </button>
+
+            <button
+              class="home-setup-choice-card home-setup-difficulty-card home-setup-difficulty-card-hard"
+              type="button"
+              data-home-difficulty-option="hard"
+              aria-pressed="false"
+            >
+              <span class="home-setup-difficulty-copy">
+                <strong>Hard</strong>
+                <em>03:00</em>
+                <small>3 Minutes</small>
+                <b>No Route Help</b>
+                <p>No guidance. Navigate carefully.</p>
+              </span>
+            </button>
+          </div>
+        </section>
+
+        <section class="home-setup-start-section">
+          <div class="home-setup-error" data-page-error hidden></div>
+          <div class="home-setup-loading" data-page-loading hidden></div>
+
+          <button class="home-setup-start-button" type="button" data-home-start-match>
+            <span>Start Match</span>
+            <strong>›</strong>
+          </button>
+
+          <p>
+            <span>⚠</span>
+            Make your choice wisely. Every second counts.
+          </p>
+        </section>
+      </section>
+
+      <aside class="home-setup-rightbar">
+        <section class="home-setup-map-section">
+          <div class="home-setup-section-heading">
+            <h2>2. Select Map</h2>
+            <p>All matches are played on the same city map for now</p>
+          </div>
+
+          <button
+            class="home-setup-map-card home-setup-choice-card home-setup-choice-selected"
+            type="button"
+            data-home-map-option="neo-city"
+            aria-pressed="true"
+          >
+            <span class="home-setup-choice-light"></span>
+
+            <span class="home-setup-map-preview">
+              <img src="/assets/homepage/map.png" alt="Neo City map preview" />
+            </span>
+
+            <span class="home-setup-map-copy">
+              <span>
+                <strong>Neo City</strong>
+                <p>A futuristic city full of hidden routes, shortcuts, and high-risk zones.</p>
+              </span>
+
+              <span class="home-setup-map-info-button" data-home-map-info>
+                <b>Map Info</b>
+                <i>i</i>
+              </span>
+            </span>
+          </button>
+        </section>
+
+        <section class="home-setup-match-settings">
+          <h2>Match Settings</h2>
+
+          <button class="home-setup-setting-row" type="button" data-home-setting-mode>
+            <span>👥</span>
+            <strong>Mode</strong>
+            <em>1 Courier vs 1 Saboteur</em>
+          </button>
+
+          <button class="home-setup-setting-row" type="button" data-home-setting-lives>
+            <span>♥</span>
+            <strong>Lives (Courier)</strong>
+            <em>3 Lives</em>
+          </button>
+
+          <button class="home-setup-setting-row" type="button" data-home-setting-cooldown>
+            <span>◷</span>
+            <strong>Active Hurdle Cooldown</strong>
+            <em>Enabled</em>
+          </button>
+        </section>
+
+        <section class="home-setup-tips">
+          <div class="home-setup-tips-copy">
+            <h2>Quick Tips</h2>
+
+            <ul>
+              <li>Predict your opponent.</li>
+              <li>Use abilities at the right time.</li>
+              <li>Adapt. Reroute. Deliver.</li>
+            </ul>
+          </div>
+
+          <span class="home-setup-tips-image" aria-hidden="true">
+            <img src="/assets/homepage/saboteur.png" alt="" />
+          </span>
+        </section>
+      </aside>
     </main>
-  </section>
+  </div>
+</section>

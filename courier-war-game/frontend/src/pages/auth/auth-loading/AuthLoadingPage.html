@@ -1,8 +1,197 @@
-<section class="auth-loading-page">
-    <div class="auth-loading-card">
-      <div class="auth-loading-spinner"></div>
-      <h1>Checking Session</h1>
-      <p data-auth-loading-message>Loading your Courier War profile...</p>
-      <div class="auth-loading-error" data-page-error hidden></div>
-    </div>
-  </section>
+<section class="auth-loading-page landing-page">
+  <div class="auth-loading-shell landing-shell">
+    <img
+      class="auth-loading-character-layer landing-character-layer"
+      src="/assets/landing/landing-characters-bg.png"
+      alt=""
+      aria-hidden="true"
+    />
+
+    <div class="auth-loading-grid landing-grid" aria-hidden="true"></div>
+    <div class="auth-loading-vignette landing-vignette" aria-hidden="true"></div>
+    <div class="auth-loading-scanline landing-scanline" aria-hidden="true"></div>
+    <div class="auth-loading-center-focus landing-center-focus" aria-hidden="true"></div>
+
+    <header class="auth-loading-header landing-header">
+      <button class="auth-loading-brand landing-brand" type="button" aria-label="Courier War loading">
+        <span class="landing-brand-logo-frame">
+          <img
+            class="landing-brand-logo"
+            src="/assets/brand/courier-war-logo.png"
+            alt=""
+            aria-hidden="true"
+          />
+        </span>
+
+        <span class="landing-brand-text">
+          <span>Courier</span>
+          <strong>War</strong>
+        </span>
+      </button>
+    </header>
+
+    <aside class="landing-side-sign landing-side-sign-left">
+      <span class="landing-side-sign-line">Checking</span>
+      <span class="landing-side-sign-line">Session</span>
+
+      <span class="landing-side-sign-image-frame" aria-hidden="true">
+        <img
+          class="landing-side-sign-image landing-side-sign-image-delivery"
+          src="/assets/auth/validationtokens.png"
+          alt=""
+        />
+      </span>
+    </aside>
+
+    <aside class="landing-side-sign landing-side-sign-right">
+      <span class="landing-side-sign-line">Preparing</span>
+      <span class="landing-side-sign-line">Profile</span>
+      <strong>⚙</strong>
+    </aside>
+
+    <main class="landing-hero auth-loading-hero">
+      <div class="landing-title-wrap">
+        <h1 class="landing-title">
+          <span class="landing-title-word landing-title-courier">Courier</span>
+          <span class="landing-title-word landing-title-war">War</span>
+        </h1>
+      </div>
+
+      <div class="landing-tagline">
+        <span>VERIFY</span>
+        <i></i>
+        <span>LOAD</span>
+        <i></i>
+        <span>PREPARE</span>
+      </div>
+
+      <p class="landing-description auth-loading-description">
+        <strong data-auth-loading-title>Checking Session...</strong>
+        <br />
+        <span data-auth-loading-message>
+          Verifying your login session and preparing your experience.
+        </span>
+      </p>
+
+      <section class="auth-loading-progress-panel" aria-label="Authentication loading steps">
+        <article class="auth-loading-progress-row" data-auth-step="tokens">
+          <span class="auth-loading-progress-icon" aria-hidden="true">
+            <img
+              class="auth-loading-progress-icon-image"
+              src="/assets/auth/validationtokens.png"
+              alt=""
+            />
+          </span>
+
+          <span class="auth-loading-progress-copy">
+            <strong>Validating tokens</strong>
+            <small>Checking saved access and refresh session</small>
+          </span>
+
+          <span class="auth-loading-step-dots" aria-hidden="true">
+            <i></i>
+            <i></i>
+            <i></i>
+            <i></i>
+            <i></i>
+          </span>
+
+          <em class="auth-loading-step-status" data-auth-step-status="tokens">○</em>
+        </article>
+
+        <article class="auth-loading-progress-row" data-auth-step="profile">
+          <span class="auth-loading-progress-icon" aria-hidden="true">
+            <img
+              class="auth-loading-progress-icon-image"
+              src="/assets/login/next.png"
+              alt=""
+            />
+          </span>
+
+          <span class="auth-loading-progress-copy">
+            <strong>Loading profile</strong>
+            <small>Finding saved player identity and session profile</small>
+          </span>
+
+          <span class="auth-loading-step-dots" aria-hidden="true">
+            <i></i>
+            <i></i>
+            <i></i>
+            <i></i>
+            <i></i>
+          </span>
+
+          <em class="auth-loading-step-status" data-auth-step-status="profile">○</em>
+        </article>
+
+        <article class="auth-loading-progress-row" data-auth-step="userData">
+          <span class="auth-loading-progress-icon" aria-hidden="true">
+            <img
+              class="auth-loading-progress-icon-image"
+              src="/assets/auth/fetchingdata.png"
+              alt=""
+            />
+          </span>
+
+          <span class="auth-loading-progress-copy">
+            <strong>Fetching user data</strong>
+            <small>Loading stats, role preference, and progress data</small>
+          </span>
+
+          <span class="auth-loading-step-dots" aria-hidden="true">
+            <i></i>
+            <i></i>
+            <i></i>
+            <i></i>
+            <i></i>
+          </span>
+
+          <em class="auth-loading-step-status" data-auth-step-status="userData">○</em>
+        </article>
+
+        <article class="auth-loading-progress-row" data-auth-step="gameData">
+          <span class="auth-loading-progress-icon" aria-hidden="true">
+            <img
+              class="auth-loading-progress-icon-image"
+              src="/assets/auth/preparedata.png"
+              alt=""
+            />
+          </span>
+
+          <span class="auth-loading-progress-copy">
+            <strong>Preparing game data</strong>
+            <small>Preparing dashboard, match setup, and game entry</small>
+          </span>
+
+          <span class="auth-loading-step-dots" aria-hidden="true">
+            <i></i>
+            <i></i>
+            <i></i>
+            <i></i>
+            <i></i>
+          </span>
+
+          <em class="auth-loading-step-status" data-auth-step-status="gameData">○</em>
+        </article>
+      </section>
+
+      <section class="auth-loading-error" data-auth-loading-error hidden>
+        <strong>Session check failed</strong>
+
+        <p data-auth-loading-error-message>
+          Something went wrong while checking your session.
+        </p>
+
+        <div>
+          <button type="button" data-auth-loading-retry>Retry</button>
+          <button type="button" data-auth-loading-continue>Continue To Start</button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="landing-footer auth-loading-footer">
+      <span>© 2026 Courier War. All rights reserved.</span>
+      <span>Version 1.0.0</span>
+    </footer>
+  </div>
+</section>

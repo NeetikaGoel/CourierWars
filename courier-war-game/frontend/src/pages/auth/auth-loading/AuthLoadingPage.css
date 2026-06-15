@@ -1,49 +1,581 @@
-.auth-loading-page {
-    min-height: 100vh;
-    display: grid;
-    place-items: center;
-    background: #020617;
-    color: #ffffff;
-    font-family: Arial, sans-serif;
+@import "../../landing/LandingPage.css";
+
+/* auth loading should look like landing page with only middle progress content changed */
+
+.auth-loading-page,
+.auth-loading-shell {
+  background: #02060b;
+}
+
+.auth-loading-header {
+  justify-content: flex-start;
+}
+
+.auth-loading-brand {
+  cursor: default;
+}
+
+.auth-loading-hero {
+  z-index: 64;
+}
+
+.auth-loading-description {
+  display: grid;
+  justify-items: center;
+  gap: 0.22rem;
+}
+
+.auth-loading-description strong {
+  color: var(--landing-blue);
+  font-family: var(--landing-font-display);
+  font-size: clamp(18px, 1.35vw, 30px);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-shadow:
+    0 0 9px rgba(24, 221, 255, 0.86),
+    0 0 18px rgba(24, 221, 255, 0.36);
+}
+
+.auth-loading-description span {
+  color: #edf7ff;
+  font-size: clamp(14px, 1.05vw, 21px);
+  line-height: 1.24;
+}
+
+.auth-loading-progress-panel {
+  width: min(790px, 68vw);
+  margin: clamp(19px, 2.4dvh, 34px) auto 0;
+  display: grid;
+  gap: clamp(10px, 1.15dvh, 16px);
+}
+
+.auth-loading-progress-row {
+  position: relative;
+  min-height: clamp(58px, 6.4dvh, 82px);
+  display: grid;
+  grid-template-columns: clamp(42px, 3.2vw, 60px) minmax(0, 1fr) auto clamp(32px, 2.2vw, 44px);
+  align-items: center;
+  gap: clamp(11px, 1vw, 18px);
+  padding: clamp(10px, 1dvh, 15px) clamp(12px, 1.2vw, 22px);
+  border: 1px solid rgba(24, 221, 255, 0.32);
+  border-left-color: rgba(24, 221, 255, 0.82);
+  clip-path: polygon(0 0, 97% 0, 100% 50%, 97% 100%, 0 100%, 2.5% 50%);
+  background:
+    linear-gradient(90deg, rgba(2, 15, 24, 0.86), rgba(2, 8, 14, 0.72)),
+    radial-gradient(circle at 5% 50%, rgba(24, 221, 255, 0.14), transparent 50%);
+  box-shadow:
+    0 0 18px rgba(24, 221, 255, 0.1),
+    inset 0 0 18px rgba(24, 221, 255, 0.04);
+  backdrop-filter: blur(4px);
+  overflow: hidden;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease,
+    transform 180ms ease;
+}
+
+.auth-loading-progress-row::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 14%, rgba(255, 255, 255, 0.08), transparent 48%);
+  transform: translateX(-120%);
+  opacity: 0;
+}
+
+.auth-loading-progress-icon {
+  width: clamp(38px, 2.8vw, 54px);
+  height: clamp(38px, 2.8vw, 54px);
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(24, 221, 255, 0.42);
+  clip-path: polygon(50% 0, 94% 24%, 94% 75%, 50% 100%, 6% 75%, 6% 24%);
+  background:
+    radial-gradient(circle at 48% 48%, rgba(33, 220, 255, 0.16), rgba(0, 0, 0, 0.1)),
+    rgba(0, 8, 14, 0.72);
+  box-shadow:
+    0 0 14px rgba(24, 221, 255, 0.2),
+    inset 0 0 13px rgba(24, 221, 255, 0.09);
+}
+
+.auth-loading-progress-icon-image {
+  width: 82%;
+  height: 82%;
+  display: block;
+  object-fit: contain;
+  filter:
+    drop-shadow(0 0 7px rgba(24, 221, 255, 0.7))
+    drop-shadow(0 0 12px rgba(24, 221, 255, 0.24));
+}
+
+.auth-loading-progress-copy {
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.auth-loading-progress-copy strong {
+  color: #eafdff;
+  font-family: var(--landing-font-display);
+  font-size: clamp(12px, 0.92vw, 17px);
+  font-weight: 880;
+  letter-spacing: 0.07em;
+  line-height: 1.08;
+  text-transform: uppercase;
+  text-shadow: 0 0 9px rgba(24, 221, 255, 0.42);
+}
+
+.auth-loading-progress-copy small {
+  color: rgba(230, 239, 248, 0.76);
+  font-size: clamp(11px, 0.78vw, 15px);
+  line-height: 1.16;
+}
+
+.auth-loading-step-dots {
+  display: flex;
+  align-items: center;
+  gap: clamp(5px, 0.42vw, 8px);
+}
+
+.auth-loading-step-dots i {
+  width: clamp(6px, 0.5vw, 9px);
+  height: clamp(6px, 0.5vw, 9px);
+  display: block;
+  border-radius: 50%;
+  background: rgba(24, 221, 255, 0.45);
+  opacity: 0.72;
+  box-shadow: 0 0 8px rgba(24, 221, 255, 0.24);
+}
+
+.auth-loading-step-status {
+  width: clamp(28px, 2vw, 40px);
+  height: clamp(28px, 2vw, 40px);
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(24, 221, 255, 0.52);
+  border-radius: 50%;
+  color: var(--landing-blue);
+  font-family: var(--landing-font-display);
+  font-size: clamp(16px, 1.1vw, 23px);
+  font-style: normal;
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 0 10px rgba(24, 221, 255, 0.8);
+  box-shadow:
+    0 0 12px rgba(24, 221, 255, 0.22),
+    inset 0 0 10px rgba(24, 221, 255, 0.08);
+}
+
+/* active loading state */
+
+.auth-loading-step-active {
+  border-color: rgba(24, 221, 255, 0.92);
+  border-left-color: rgba(24, 221, 255, 1);
+  background:
+    linear-gradient(90deg, rgba(3, 35, 50, 0.9), rgba(2, 10, 18, 0.78)),
+    radial-gradient(circle at 5% 50%, rgba(24, 221, 255, 0.28), transparent 54%);
+  box-shadow:
+    0 0 0 1px rgba(24, 221, 255, 0.12),
+    0 0 22px rgba(24, 221, 255, 0.22),
+    inset 0 0 20px rgba(24, 221, 255, 0.08);
+  transform: translateX(2px);
+}
+
+.auth-loading-step-active::after {
+  opacity: 1;
+  animation: authLoadingPanelShine 1.35s ease-in-out infinite;
+}
+
+.auth-loading-step-active .auth-loading-progress-copy strong,
+.auth-loading-step-active .auth-loading-step-status {
+  color: var(--landing-blue);
+  text-shadow:
+    0 0 10px rgba(24, 221, 255, 0.95),
+    0 0 18px rgba(24, 221, 255, 0.42);
+}
+
+.auth-loading-step-active .auth-loading-step-dots i {
+  background: var(--landing-blue);
+  opacity: 1;
+  box-shadow:
+    0 0 8px rgba(24, 221, 255, 0.9),
+    0 0 16px rgba(24, 221, 255, 0.34);
+  animation: authLoadingDotRun 760ms ease-in-out infinite;
+}
+
+.auth-loading-step-active .auth-loading-step-dots i:nth-child(2) {
+  animation-delay: 90ms;
+}
+
+.auth-loading-step-active .auth-loading-step-dots i:nth-child(3) {
+  animation-delay: 180ms;
+}
+
+.auth-loading-step-active .auth-loading-step-dots i:nth-child(4) {
+  animation-delay: 270ms;
+}
+
+.auth-loading-step-active .auth-loading-step-dots i:nth-child(5) {
+  animation-delay: 360ms;
+}
+
+.auth-loading-step-active .auth-loading-step-status {
+  border-color: rgba(24, 221, 255, 0.92);
+  animation: authLoadingStatusPulse 900ms ease-in-out infinite;
+}
+
+/* complete green state */
+
+.auth-loading-step-complete {
+  border-color: rgba(52, 255, 142, 0.78);
+  border-left-color: rgba(52, 255, 142, 0.98);
+  background:
+    linear-gradient(90deg, rgba(5, 40, 22, 0.88), rgba(2, 12, 10, 0.76)),
+    radial-gradient(circle at 5% 50%, rgba(52, 255, 142, 0.22), transparent 54%);
+  box-shadow:
+    0 0 0 1px rgba(52, 255, 142, 0.12),
+    0 0 20px rgba(52, 255, 142, 0.16),
+    inset 0 0 20px rgba(52, 255, 142, 0.08);
+}
+
+.auth-loading-step-complete .auth-loading-progress-icon {
+  border-color: rgba(52, 255, 142, 0.74);
+  box-shadow:
+    0 0 16px rgba(52, 255, 142, 0.28),
+    inset 0 0 14px rgba(52, 255, 142, 0.12);
+}
+
+.auth-loading-step-complete .auth-loading-progress-icon-image {
+  filter:
+    drop-shadow(0 0 7px rgba(52, 255, 142, 0.75))
+    drop-shadow(0 0 12px rgba(52, 255, 142, 0.24));
+}
+
+.auth-loading-step-complete .auth-loading-progress-copy strong,
+.auth-loading-step-complete .auth-loading-step-status {
+  color: #34ff8e;
+  text-shadow: 0 0 12px rgba(52, 255, 142, 0.72);
+}
+
+.auth-loading-step-complete .auth-loading-step-dots i {
+  background: #34ff8e;
+  opacity: 1;
+  box-shadow:
+    0 0 9px rgba(52, 255, 142, 0.82),
+    0 0 15px rgba(52, 255, 142, 0.24);
+}
+
+.auth-loading-step-complete .auth-loading-step-status {
+  border-color: rgba(52, 255, 142, 0.82);
+}
+
+/* error red state */
+
+.auth-loading-step-error {
+  border-color: rgba(255, 69, 69, 0.82);
+  border-left-color: rgba(255, 69, 69, 1);
+  background:
+    linear-gradient(90deg, rgba(55, 6, 10, 0.9), rgba(14, 2, 4, 0.78)),
+    radial-gradient(circle at 5% 50%, rgba(255, 69, 69, 0.24), transparent 54%);
+  box-shadow:
+    0 0 0 1px rgba(255, 69, 69, 0.13),
+    0 0 20px rgba(255, 69, 69, 0.18),
+    inset 0 0 20px rgba(255, 69, 69, 0.08);
+}
+
+.auth-loading-step-error .auth-loading-progress-icon {
+  border-color: rgba(255, 69, 69, 0.82);
+  box-shadow:
+    0 0 16px rgba(255, 69, 69, 0.32),
+    inset 0 0 14px rgba(255, 69, 69, 0.12);
+}
+
+.auth-loading-step-error .auth-loading-progress-icon-image {
+  filter:
+    drop-shadow(0 0 7px rgba(255, 69, 69, 0.8))
+    drop-shadow(0 0 12px rgba(255, 69, 69, 0.28));
+}
+
+.auth-loading-step-error .auth-loading-progress-copy strong,
+.auth-loading-step-error .auth-loading-step-status {
+  color: var(--landing-red-soft);
+  text-shadow: 0 0 12px rgba(255, 69, 69, 0.82);
+}
+
+.auth-loading-step-error .auth-loading-step-dots i {
+  background: var(--landing-red);
+  opacity: 1;
+  box-shadow:
+    0 0 9px rgba(255, 69, 69, 0.82),
+    0 0 15px rgba(255, 69, 69, 0.24);
+}
+
+.auth-loading-step-error .auth-loading-step-status {
+  border-color: rgba(255, 69, 69, 0.82);
+}
+
+/* error box */
+
+.auth-loading-error {
+  width: min(780px, 72vw);
+  margin: clamp(12px, 1.35dvh, 20px) auto 0;
+  padding: clamp(12px, 1vw, 18px);
+  border: 1px solid rgba(255, 69, 69, 0.54);
+  background:
+    linear-gradient(180deg, rgba(65, 8, 10, 0.82), rgba(14, 2, 4, 0.72));
+  color: #ffd8d8;
+  text-align: center;
+  box-shadow:
+    0 0 18px rgba(255, 69, 69, 0.22),
+    inset 0 0 18px rgba(255, 69, 69, 0.08);
+}
+
+.auth-loading-error strong {
+  display: block;
+  color: var(--landing-red-soft);
+  font-family: var(--landing-font-display);
+  font-size: clamp(13px, 1vw, 18px);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.auth-loading-error p {
+  margin: 0.45rem 0 0.8rem;
+  color: #ffe6e6;
+}
+
+.auth-loading-error div {
+  display: flex;
+  justify-content: center;
+  gap: 0.8rem;
+}
+
+.auth-loading-error button {
+  min-height: 38px;
+  padding: 0 1rem;
+  border: 1px solid rgba(255, 180, 180, 0.42);
+  background: rgba(10, 18, 26, 0.7);
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.auth-loading-center-focus {
+  filter: blur(1px);
+  opacity: 0.82;
+}
+
+.auth-loading-scanline {
+  opacity: 0.045;
+}
+
+/* keep landing title sharp */
+
+.auth-loading-hero .landing-title-wrap {
+  filter: none;
+  transform: translateZ(0);
+}
+
+.auth-loading-hero .landing-title {
+  filter: none;
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.auth-loading-hero .landing-title-word {
+  filter: none !important;
+  opacity: 1;
+  -webkit-text-stroke: 0.7px rgba(255, 255, 255, 0.2);
+}
+
+.auth-loading-hero .landing-title-courier {
+  color: #dffbff;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.44),
+    0 0 4px rgba(24, 221, 255, 0.78),
+    0 0 10px rgba(24, 221, 255, 0.42),
+    2px 3px 0 rgba(0, 0, 0, 0.78);
+}
+
+.auth-loading-hero .landing-title-war {
+  color: #ffd7d2;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.42),
+    0 0 4px rgba(255, 69, 69, 0.8),
+    0 0 10px rgba(255, 69, 69, 0.42),
+    2px 3px 0 rgba(0, 0, 0, 0.78);
+}
+
+@keyframes authLoadingPanelShine {
+  0% {
+    transform: translateX(-120%);
   }
-  
-  .auth-loading-card {
-    width: min(420px, calc(100vw - 32px));
-    padding: 34px;
-    border-radius: 22px;
-    background: #111827;
-    text-align: center;
+
+  100% {
+    transform: translateX(120%);
   }
-  
-  .auth-loading-spinner {
-    width: 48px;
-    height: 48px;
-    margin: 0 auto 18px;
-    border: 4px solid #334155;
-    border-top-color: #facc15;
-    border-radius: 50%;
-    animation: auth-loading-spin 0.8s linear infinite;
+}
+
+@keyframes authLoadingDotRun {
+  0% {
+    transform: scale(0.76);
+    opacity: 0.42;
   }
-  
-  .auth-loading-card h1 {
-    margin: 0 0 10px;
+
+  45% {
+    transform: scale(1.22);
+    opacity: 1;
   }
-  
-  .auth-loading-card p {
-    margin: 0;
-    color: #94a3b8;
+
+  100% {
+    transform: scale(0.76);
+    opacity: 0.42;
   }
-  
+}
+
+@keyframes authLoadingStatusPulse {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.72;
+  }
+
+  50% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(0.95);
+    opacity: 0.72;
+  }
+}
+
+@media (max-width: 1180px) {
+  .auth-loading-progress-panel {
+    width: min(760px, 78vw);
+  }
+}
+
+@media (max-width: 720px) {
+  .auth-loading-progress-panel {
+    width: min(520px, 88vw);
+  }
+
+  .auth-loading-progress-row {
+    grid-template-columns: clamp(40px, 10vw, 54px) minmax(0, 1fr) clamp(30px, 8vw, 40px);
+  }
+
+  .auth-loading-step-dots {
+    display: none;
+  }
+
   .auth-loading-error {
-    margin-top: 16px;
-    padding: 10px;
-    border-radius: 10px;
-    background: #7f1d1d;
-    color: #fee2e2;
+    width: min(520px, 88vw);
   }
-  
-  @keyframes auth-loading-spin {
-    to {
-      transform: rotate(360deg);
-    }
+}
+
+/* slimmer auth loading progress spacing */
+
+.auth-loading-hero .landing-title-wrap {
+  margin-bottom: clamp(2px, 0.35dvh, 6px);
+}
+
+.auth-loading-hero .landing-tagline {
+  margin-top: clamp(2px, 0.35dvh, 6px);
+  margin-bottom: clamp(6px, 0.75dvh, 12px);
+}
+
+.auth-loading-description {
+  margin-top: clamp(4px, 0.55dvh, 9px);
+  margin-bottom: 0;
+}
+
+.auth-loading-description strong {
+  font-size: clamp(16px, 1.12vw, 25px);
+}
+
+.auth-loading-description span {
+  font-size: clamp(13px, 0.92vw, 18px);
+}
+
+.auth-loading-progress-panel {
+  width: min(740px, 64vw);
+  margin: clamp(9px, 1.1dvh, 17px) auto 0;
+  gap: clamp(7px, 0.78dvh, 12px);
+}
+
+.auth-loading-progress-row {
+  min-height: clamp(46px, 5.1dvh, 64px);
+  grid-template-columns: clamp(34px, 2.55vw, 48px) minmax(0, 1fr) auto clamp(28px, 1.9vw, 38px);
+  gap: clamp(8px, 0.76vw, 14px);
+  padding: clamp(7px, 0.72dvh, 11px) clamp(10px, 0.95vw, 17px);
+}
+
+.auth-loading-progress-icon {
+  width: clamp(32px, 2.35vw, 44px);
+  height: clamp(32px, 2.35vw, 44px);
+}
+
+.auth-loading-progress-icon-image {
+  width: 78%;
+  height: 78%;
+}
+
+.auth-loading-progress-copy {
+  gap: 0.04rem;
+}
+
+.auth-loading-progress-copy strong {
+  font-size: clamp(11px, 0.82vw, 15px);
+  line-height: 1.02;
+}
+
+.auth-loading-progress-copy small {
+  font-size: clamp(10px, 0.7vw, 13px);
+  line-height: 1.08;
+}
+
+.auth-loading-step-dots {
+  gap: clamp(4px, 0.34vw, 7px);
+}
+
+.auth-loading-step-dots i {
+  width: clamp(5px, 0.42vw, 8px);
+  height: clamp(5px, 0.42vw, 8px);
+}
+
+.auth-loading-step-status {
+  width: clamp(24px, 1.65vw, 34px);
+  height: clamp(24px, 1.65vw, 34px);
+  font-size: clamp(14px, 0.95vw, 20px);
+}
+
+.auth-loading-error {
+  margin-top: clamp(7px, 0.9dvh, 13px);
+  padding: clamp(8px, 0.78vw, 13px);
+}
+
+.auth-loading-footer {
+  bottom: 1.25%;
+}
+
+@media (max-width: 1180px) {
+  .auth-loading-progress-panel {
+    width: min(720px, 76vw);
   }
+}
+
+@media (max-width: 720px) {
+  .auth-loading-progress-panel {
+    width: min(500px, 88vw);
+    gap: 8px;
+  }
+
+  .auth-loading-progress-row {
+    min-height: 52px;
+    padding: 8px 12px;
+  }
+}

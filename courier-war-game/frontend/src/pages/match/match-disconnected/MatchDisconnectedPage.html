@@ -1,14 +1,117 @@
-<section class="match-disconnected-page">
-    <div class="match-disconnected-card">
-      <h1>Match Connection Lost</h1>
-      <p>
-        The match state could not be loaded. This can happen if the cache server restarts
-        or the active match expires.
-      </p>
-  
-      <div class="match-disconnected-actions">
-        <button type="button" data-retry-button>Retry</button>
-        <button type="button" data-home-button>Return Home</button>
-      </div>
-    </div>
-  </section>
+<section class="match-flow-page match-disconnected-page">
+  <div class="match-flow-shell">
+    <div class="match-flow-bg" aria-hidden="true"></div>
+    <div class="match-flow-grid" aria-hidden="true"></div>
+    <div class="match-flow-vignette" aria-hidden="true"></div>
+
+    <header class="home-setup-header match-flow-header">
+      <button class="home-setup-brand" type="button" data-home-button aria-label="Courier War home">
+        <span class="home-setup-brand-logo-frame">
+          <img class="home-setup-brand-logo" src="/assets/brand/courier-war-logo.png" alt="" aria-hidden="true" />
+        </span>
+
+        <span class="home-setup-brand-text">
+          <span>Courier</span>
+          <strong>War</strong>
+          <small>Outthink. Outmaneuver. Outdeliver.</small>
+        </span>
+      </button>
+
+      <nav class="home-setup-nav match-flow-nav" aria-label="Disconnected navigation">
+        <button class="home-setup-nav-item" type="button" data-home-button>
+          <span class="home-setup-nav-icon" aria-hidden="true"><img src="/assets/navbar/home.png" alt="" /></span>
+          <span>Home</span>
+        </button>
+
+        <button class="home-setup-nav-item home-setup-nav-item-active" type="button">
+          <span class="home-setup-nav-icon" aria-hidden="true"><img src="/assets/navbar/gameplay.png" alt="" /></span>
+          <span>Play</span>
+        </button>
+
+        <button class="home-setup-nav-item" type="button" data-disconnected-inactive-nav>
+          <span class="home-setup-nav-icon" aria-hidden="true"><img src="/assets/navbar/stats.png" alt="" /></span>
+          <span>Stats</span>
+        </button>
+
+        <button class="home-setup-nav-item" type="button" data-disconnected-inactive-nav>
+          <span class="home-setup-nav-icon" aria-hidden="true"><img src="/assets/navbar/features.png" alt="" /></span>
+          <span>Features</span>
+        </button>
+
+        <button class="home-setup-nav-item" type="button" data-disconnected-inactive-nav>
+          <span class="home-setup-nav-icon" aria-hidden="true"><img src="/assets/navbar/support.png" alt="" /></span>
+          <span>How To Play</span>
+        </button>
+
+        <button class="home-setup-nav-item" type="button" data-disconnected-inactive-nav>
+          <span class="home-setup-nav-icon" aria-hidden="true"><img src="/assets/navbar/support.png" alt="" /></span>
+          <span>Settings</span>
+        </button>
+      </nav>
+
+      <section class="home-setup-player-card" aria-label="Current player">
+        <span class="home-setup-player-avatar" aria-hidden="true"><img src="/assets/login/ghost.png" alt="" /></span>
+        <span class="home-setup-player-info">
+          <strong data-disconnected-profile-name>Neetika Goel</strong>
+          <small><i class="home-setup-online-dot"></i><span>ONLINE</span></small>
+          <span class="home-setup-xp-row"><b>12</b><span><i></i></span><em>2,450 / 5,000 XP</em></span>
+        </span>
+      </section>
+    </header>
+
+    <main class="match-flow-main match-disconnected-main">
+      <section class="match-flow-title match-disconnected-title">
+        <div class="match-disconnected-alert" aria-hidden="true">!</div>
+        <h1>Match Disconnected</h1>
+        <p>We’re sorry, your match was disconnected.<br />The connection to the game server was lost.</p>
+      </section>
+
+      <section class="match-disconnected-reasons match-flow-panel">
+        <h2>Possible Reasons</h2>
+
+        <article>
+          <span>↯</span>
+          <strong>Network Issue</strong>
+          <p>Lost connection to the game server.</p>
+        </article>
+
+        <article>
+          <span>▤</span>
+          <strong>Cache Unavailable</strong>
+          <p>Match state is missing or cache server is unreachable.</p>
+        </article>
+
+        <article>
+          <span>◇</span>
+          <strong>Match Cancelled</strong>
+          <p>This match is no longer active.</p>
+        </article>
+      </section>
+
+      <section class="match-disconnected-next match-flow-panel">
+        <div>
+          <strong>What Happens Next?</strong>
+          <p>You will be returned to the Home screen. No progress or stats were affected.</p>
+        </div>
+
+        <span aria-hidden="true">⌂</span>
+      </section>
+
+      <section class="match-disconnected-countdown">
+        <strong>Returning To Home Screen In</strong>
+        <em data-disconnected-countdown>08</em>
+
+        <div class="match-flow-progress-track">
+          <span class="match-flow-progress-fill" data-disconnected-progress-fill></span>
+        </div>
+      </section>
+
+      <section class="match-disconnected-actions">
+        <button class="match-flow-action-button" type="button" data-home-button>Return To Home Now</button>
+        <button class="match-flow-action-button match-flow-action-button-red" type="button" data-retry-button>Retry Match</button>
+      </section>
+
+      <div class="match-flow-error" data-page-error hidden></div>
+    </main>
+  </div>
+</section>
