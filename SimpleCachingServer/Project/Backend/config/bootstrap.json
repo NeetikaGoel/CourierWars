@@ -1,0 +1,39 @@
+{
+    "config": {
+      "ttlDefault": 7200,
+      "ttlMax": 604800,
+      "host": "127.0.0.1",
+      "port": 8080,
+      "logFile": "logs/cache-server.log"
+    },
+    "items": [
+      {
+        "key": "cw:config:project",
+        "value": {
+          "project": "courier-war",
+          "mapVersion": "v1",
+          "mapGenerationVersion": "city_map_generation_v7",
+          "runtimeState": "cache-backed"
+        },
+        "ttl": 86400
+      },
+      {
+        "key": "cw:map:bootstrap:v1:list",
+        "value": {
+          "mapVersion": "v1",
+          "mapGenerationVersion": "city_map_generation_v7",
+          "mapCount": 0,
+          "generatedAtMs": 0,
+          "items": []
+        },
+        "ttl": 86400
+      },
+      {
+        "key": "cw:health:backend-ping",
+        "value": {
+          "status": "waiting-for-backend-bootstrap"
+        },
+        "ttl": 60
+      }
+    ]
+  }

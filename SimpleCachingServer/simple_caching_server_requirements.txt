@@ -1,0 +1,100 @@
+Simple Caching Server Requirements
+======================================
+
+1. Goal
+Build a small PHP in-memory caching server for local applications. It starts from a script, can be shutdown with a script, loads initial data from a bootstrap file, stays running until shutdown, and exposes simple HTTP APIs.
+
+2. Scope
+In scope: single process, in-memory key/value cache, TTL support, local HTTP APIs, basic auth separation, simple admin metrics.
+Out of scope: clustering, replication, persistence database, advanced eviction, advanced monitoring, cloud-scale design.
+
+3. Runtime Behavior
+- Server starts/stops using a script.
+- On startup it reads a bootstrap file and preloads required cache data.
+- Cache data stays only in memory while the process is running.
+- Data may be lost on shutdown; reload comes from the bootstrap file on next start.
+- Server must support clean shutdown.
+- Expired items must not be returned.
+- Expired items can be removed lazily on access or by a simple cleanup loop.
+
+4. Data Model
+- Cache uses key/value pairs.
+- Key: string.
+- Value: string, number, boolean, or JSON-compatible object/array.
+- Store metadata per item: key, value, created time, updated time, TTL in seconds, expiry time.
+
+5. TTL Rules
+- Default TTL is 2 hours (7200 seconds).
+- Caller may override TTL when setting data.
+- If TTL is missing, use the default.
+- TTL must be validated; minimum TTL is 1 second.
+- Optional maximum TTL may be defined to prevent mistakes, e.g. 7 days.
+
+6. Bootstrap File
+- Bootstrap file should use JSON.
+- Can have config values, and optional cache items.
+- Each item must support: key, value, optional ttl.
+- Invalid items should be skipped with an error log.
+- If the file cannot be read, startup must continue with hardcoded default values after a warning output.
+- Example: {"config":{"ttl_default":7200},items":[{"key":"config.mode","value":"classic"},{"key":"feature.banner","value":{"enabled":true},"ttl":3600}]}
+
+7. Normal Permission APIs
+- These APIs are for normal users/applications.
+- POST /v1/cache/set : set or overwrite a key; input = key, value, optional ttl.
+- GET /v1/cache/get?key=... : return value if found and not expired.
+- POST or DELETE /v1/cache/delete : remove a key; input = key.
+- All responses should be JSON with success flag, message, and relevant data.
+
+8. Admin Permission APIs
+- These APIs are for admin users only.
+- POST /v1/admin/cache/bulk-set : add or overwrite multiple items.
+- POST /v1/admin/cache/purge-selected : delete multiple keys.
+- POST /v1/admin/cache/purge-all : clear the full cache.
+- GET /v1/admin/cache/list : list current non-expired items, with simple limit support.
+- GET /v1/admin/cache/uptime : return current process uptime.
+- GET /v1/admin/cache/size : return total item count and approximate cache memory usage.
+- GET /v1/admin/cache/health : return basic server status.
+
+9. Security
+- Basic security is enough; keep it simple.
+- Server should listen only on localhost or a restricted internal network.
+- Use authentication for all APIs.
+- Support two permission groups: normal and admin.
+- Admin endpoints must be blocked for normal users.
+- Use HTTPS only if required by the environment; otherwise restrict access at network level.
+- Do not expose this service publicly.
+- Validate all inputs and reject malformed requests.
+- Avoid executing user-provided code or shell commands.
+
+10. Deployment
+- Deploy inside restricted permission boundaries.
+- Service should be accessible only to approved local applications.
+- Run under a dedicated low-privilege service account if possible.
+- Startup, stop, and restart should be script-based.
+- Logs should go to a local file and stdout/stderr.
+
+11. Error Handling
+- API errors must return JSON with clear messages and proper HTTP status codes.
+- Missing key on get returns not found.
+- Delete on missing key may still return success.
+- Invalid TTL or malformed JSON must return validation errors.
+
+12. Non-Functional Requirements
+- Code should be simple, readable, and easy for a junior developer to maintain.
+- Prefer clear structure over clever optimizations.
+- Keep dependencies minimal.
+- Support moderate local usage; no need for high-scale performance tuning.
+
+13. Suggested Project Structure
+- start script, stop script, bootstrap JSON file, cache service class, API routing/controller layer, auth/permission check layer, logging utility, README.
+
+14. Acceptance Criteria
+- Server starts from script and loads bootstrap data.
+- Default TTL works and custom TTL overrides work.
+- set/get/delete APIs work for normal users.
+- Admin APIs work and are permission-protected.
+- Expired items are never returned.
+- Uptime and cache size endpoints return correct values.
+- Service is reachable only from allowed local applications.
+- Project can be run and understood easily by a junior developer.
+- Server can be stopped or restarted with a script.
