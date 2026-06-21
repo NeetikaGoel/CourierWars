@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    bootstrap="tests/LoadFiles.php"
+    colors="true"
+    cacheDirectory=".phpunit.cache"
+>
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+    </testsuites>
+
+    <source>
+        <include>
+            <directory>Auth</directory>
+            <directory>Controller</directory>
+            <directory>Http</directory>
+            <directory>Logging</directory>
+            <directory>src</directory>
+            <directory>Utility</directory>
+        </include>
+    </source>
+</phpunit>

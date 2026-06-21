@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <title>Dashboard for /Users/neetika.goel/Desktop/Version2/neetika-goel-intern-prepwork-v2/SimpleCachingServer/Project/Backend</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="_css/bootstrap.min.css?v=14.1.9" rel="stylesheet" type="text/css">
+  <link href="_css/style.css?v=14.1.9" rel="stylesheet" type="text/css">
+  <link href="_css/custom.css" rel="stylesheet" type="text/css">
+ </head>
+ <body>
+  <header>
+   <div class="container-fluid">
+    <div class="row">
+     <div class="col-md-12">
+      <nav aria-label="breadcrumb">
+       <ol class="breadcrumb">
+         <li class="breadcrumb-item"><a href="index.html">/Users/neetika.goel/Desktop/Version2/neetika-goel-intern-prepwork-v2/SimpleCachingServer/Project/Backend</a></li>
+         <li class="breadcrumb-item active">(Dashboard)</li>
+
+       </ol>
+      </nav>
+     </div>
+    </div>
+   </div>
+  </header>
+  <div class="container-fluid">
+   <div class="row dashboard-row">
+    <div class="col-md-6">
+     <h3>Classes</h3>
+     <p class="text-muted small">Bubble size = executable lines. Hover for details, click to navigate.</p>
+     <div class="file-coverage-chart">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid meet">
+ <style>
+  .bubble-success { fill: var(--phpunit-success-bar); opacity: 0.7; }
+  .bubble-warning { fill: var(--phpunit-warning-bar); opacity: 0.7; }
+  .bubble-danger { fill: var(--phpunit-danger-bar); opacity: 0.7; }
+  .bubble-success:hover, .bubble-warning:hover, .bubble-danger:hover { opacity: 1; stroke: var(--bs-emphasis-color); stroke-width: 1.5; }
+  .chart-grid { stroke: var(--bs-border-color); stroke-width: 0.5; stroke-dasharray: 4,4; opacity: 0.5; }
+  .chart-axis { stroke: var(--bs-border-color); stroke-width: 1; }
+  .chart-label { fill: var(--bs-body-color); font-size: 11px; font-family: var(--bs-font-sans-serif, sans-serif); }
+  .chart-title { fill: var(--bs-body-color); font-size: 12px; font-family: var(--bs-font-sans-serif, sans-serif); }
+ </style>
+ <line x1="60.0" y1="20" x2="60.0" y2="350" class="chart-grid"/>
+ <text x="60.0" y="368" text-anchor="middle" class="chart-label">0%</text>
+ <line x1="204.0" y1="20" x2="204.0" y2="350" class="chart-grid"/>
+ <text x="204.0" y="368" text-anchor="middle" class="chart-label">20%</text>
+ <line x1="348.0" y1="20" x2="348.0" y2="350" class="chart-grid"/>
+ <text x="348.0" y="368" text-anchor="middle" class="chart-label">40%</text>
+ <line x1="492.0" y1="20" x2="492.0" y2="350" class="chart-grid"/>
+ <text x="492.0" y="368" text-anchor="middle" class="chart-label">60%</text>
+ <line x1="636.0" y1="20" x2="636.0" y2="350" class="chart-grid"/>
+ <text x="636.0" y="368" text-anchor="middle" class="chart-label">80%</text>
+ <line x1="780.0" y1="20" x2="780.0" y2="350" class="chart-grid"/>
+ <text x="780.0" y="368" text-anchor="middle" class="chart-label">100%</text>
+ <line x1="60" y1="350.0" x2="780" y2="350.0" class="chart-grid"/>
+ <text x="52" y="350.0" text-anchor="end" dominant-baseline="middle" class="chart-label">0</text>
+ <line x1="60" y1="284.0" x2="780" y2="284.0" class="chart-grid"/>
+ <text x="52" y="284.0" text-anchor="end" dominant-baseline="middle" class="chart-label">10</text>
+ <line x1="60" y1="218.0" x2="780" y2="218.0" class="chart-grid"/>
+ <text x="52" y="218.0" text-anchor="end" dominant-baseline="middle" class="chart-label">20</text>
+ <line x1="60" y1="152.0" x2="780" y2="152.0" class="chart-grid"/>
+ <text x="52" y="152.0" text-anchor="end" dominant-baseline="middle" class="chart-label">30</text>
+ <line x1="60" y1="86.0" x2="780" y2="86.0" class="chart-grid"/>
+ <text x="52" y="86.0" text-anchor="end" dominant-baseline="middle" class="chart-label">40</text>
+ <line x1="60" y1="20.0" x2="780" y2="20.0" class="chart-grid"/>
+ <text x="52" y="20.0" text-anchor="end" dominant-baseline="middle" class="chart-label">50</text>
+ <line x1="60" y1="20" x2="60" y2="350" class="chart-axis"/>
+ <line x1="60" y1="350" x2="780" y2="350" class="chart-axis"/>
+ <text x="420.0" y="395" text-anchor="middle" class="chart-title">Line Coverage (%)</text>
+ <text x="15" y="185.0" text-anchor="middle" transform="rotate(-90, 15, 185.0)" class="chart-title">Cyclomatic Complexity</text>
+ <a href="Controller/AdminCacheController.php.html#16"><circle cx="642.1" cy="119.0" r="20.0" class="bubble-warning"><title>AdminCacheController — Coverage: 80.9% | Lines: 141 | Complexity: 35</title></circle></a>
+ <a href="Controller/CacheController.php.html#16"><circle cx="670.4" cy="178.4" r="16.2" class="bubble-warning"><title>CacheController — Coverage: 84.8% | Lines: 92 | Complexity: 26</title></circle></a>
+ <a href="Http/Request.php.html#5"><circle cx="524.8" cy="125.6" r="15.0" class="bubble-warning"><title>Request — Coverage: 64.6% | Lines: 79 | Complexity: 34</title></circle></a>
+ <a href="src/Bootstrap/BootstrapLoader.php.html#8"><circle cx="722.4" cy="92.6" r="14.6" class="bubble-success"><title>BootstrapLoader — Coverage: 92.0% | Lines: 75 | Complexity: 39</title></circle></a>
+ <a href="src/Cache/CacheService.php.html#8"><circle cx="670.2" cy="158.6" r="12.9" class="bubble-warning"><title>CacheService — Coverage: 84.7% | Lines: 59 | Complexity: 29</title></circle></a>
+ <a href="src/App/Application.php.html#18"><circle cx="60.0" cy="290.6" r="11.2" class="bubble-danger"><title>Application — Coverage: 0.0% | Lines: 44 | Complexity: 9</title></circle></a>
+ <a href="Controller/AdminCacheMetricsController.php.html#16"><circle cx="552.6" cy="264.2" r="10.4" class="bubble-warning"><title>AdminCacheMetricsController — Coverage: 68.4% | Lines: 38 | Complexity: 13</title></circle></a>
+ <a href="Utility/ValidationUtilities.php.html#5"><circle cx="649.1" cy="152.0" r="9.7" class="bubble-warning"><title>ValidationUtilities — Coverage: 81.8% | Lines: 33 | Complexity: 30</title></circle></a>
+ <a href="src/Cache/CacheItem.php.html#5"><circle cx="780.0" cy="257.6" r="9.4" class="bubble-success"><title>CacheItem — Coverage: 100.0% | Lines: 31 | Complexity: 14</title></circle></a>
+ <a href="Logging/Logger.php.html#5"><circle cx="686.1" cy="303.8" r="8.1" class="bubble-warning"><title>Logger — Coverage: 87.0% | Lines: 23 | Complexity: 7</title></circle></a>
+ <a href="Auth/AuthService.php.html#11"><circle cx="780.0" cy="270.8" r="6.7" class="bubble-success"><title>AuthService — Coverage: 100.0% | Lines: 16 | Complexity: 12</title></circle></a>
+ <a href="Http/JsonResponse.php.html#6"><circle cx="317.1" cy="317.0" r="6.3" class="bubble-danger"><title>JsonResponse — Coverage: 35.7% | Lines: 14 | Complexity: 5</title></circle></a>
+ <a href="Http/ResponseFactory.php.html#7"><circle cx="780.0" cy="336.8" r="6.3" class="bubble-success"><title>ResponseFactory — Coverage: 100.0% | Lines: 14 | Complexity: 2</title></circle></a>
+ <a href="Utility/IdempotencyUtilities.php.html#5"><circle cx="780.0" cy="323.6" r="4.0" class="bubble-success"><title>IdempotencyUtilities — Coverage: 100.0% | Lines: 4 | Complexity: 4</title></circle></a>
+ <a href="Utility/RateLimitUtilities.php.html#5"><circle cx="780.0" cy="323.6" r="4.0" class="bubble-success"><title>RateLimitUtilities — Coverage: 100.0% | Lines: 4 | Complexity: 4</title></circle></a>
+ <a href="Utility/SanitizationUtilities.php.html#7"><circle cx="780.0" cy="323.6" r="4.0" class="bubble-success"><title>SanitizationUtilities — Coverage: 100.0% | Lines: 4 | Complexity: 4</title></circle></a>
+ <a href="Utility/AuditLoggerUtilities.php.html#5"><circle cx="780.0" cy="336.8" r="4.0" class="bubble-success"><title>AuditLoggerUtilities — Coverage: 100.0% | Lines: 2 | Complexity: 2</title></circle></a>
+ <a href="Auth/Role.php.html#5"><circle cx="60.0" cy="343.4" r="4.0" class="bubble-danger"><title>Role — Coverage: 0.0% | Lines: 1 | Complexity: 1</title></circle></a>
+</svg>
+     </div>
+    </div>
+    <div class="col-md-6 dashboard-column">
+     <h3>&nbsp;</h3>
+     <p class="text-muted small">Sorted by descending CRAP (Change Risk Anti-Patterns) index.</p>
+     <div class="scrollbox">
+<table class="table">
+ <thead>
+  <tr>
+   <th>Class</th>
+   <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+   <th class="text-right">Coverage</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr><td><a href="src/App/Application.php.html#18">Application</a></td><td class="text-right">90</td><td class="text-right">0.0%</td></tr>
+  <tr><td><a href="Http/Request.php.html#5">Request</a></td><td class="text-right">85.47</td><td class="text-right">64.6%</td></tr>
+  <tr><td><a href="Controller/AdminCacheController.php.html#16">AdminCacheController</a></td><td class="text-right">43.60</td><td class="text-right">80.9%</td></tr>
+  <tr><td><a href="src/Bootstrap/BootstrapLoader.php.html#8">BootstrapLoader</a></td><td class="text-right">39.78</td><td class="text-right">92.0%</td></tr>
+  <tr><td><a href="Utility/ValidationUtilities.php.html#5">ValidationUtilities</a></td><td class="text-right">35.41</td><td class="text-right">81.8%</td></tr>
+  <tr><td><a href="src/Cache/CacheService.php.html#8">CacheService</a></td><td class="text-right">31.99</td><td class="text-right">84.7%</td></tr>
+  <tr><td><a href="Controller/CacheController.php.html#16">CacheController</a></td><td class="text-right">28.38</td><td class="text-right">84.8%</td></tr>
+  <tr><td><a href="Controller/AdminCacheMetricsController.php.html#16">AdminCacheMetricsController</a></td><td class="text-right">18.32</td><td class="text-right">68.4%</td></tr>
+  <tr><td><a href="src/Cache/CacheItem.php.html#5">CacheItem</a></td><td class="text-right">14</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Auth/AuthService.php.html#11">AuthService</a></td><td class="text-right">12</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Http/JsonResponse.php.html#6">JsonResponse</a></td><td class="text-right">11.64</td><td class="text-right">35.7%</td></tr>
+  <tr><td><a href="Logging/Logger.php.html#5">Logger</a></td><td class="text-right">7.11</td><td class="text-right">87.0%</td></tr>
+  <tr><td><a href="Utility/IdempotencyUtilities.php.html#5">IdempotencyUtilities</a></td><td class="text-right">4</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Utility/RateLimitUtilities.php.html#5">RateLimitUtilities</a></td><td class="text-right">4</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Utility/SanitizationUtilities.php.html#7">SanitizationUtilities</a></td><td class="text-right">4</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Auth/Role.php.html#5">Role</a></td><td class="text-right">2</td><td class="text-right">0.0%</td></tr>
+  <tr><td><a href="Http/ResponseFactory.php.html#7">ResponseFactory</a></td><td class="text-right">2</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Utility/AuditLoggerUtilities.php.html#5">AuditLoggerUtilities</a></td><td class="text-right">2</td><td class="text-right">100.0%</td></tr>
+ </tbody>
+</table>
+     </div>
+    </div>
+   </div>
+   <div class="row dashboard-row">
+    <div class="col-md-6">
+     <h3>Methods</h3>
+     <p class="text-muted small">Bubble size = executable lines. Hover for details, click to navigate.</p>
+     <div class="file-coverage-chart">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid meet">
+ <style>
+  .bubble-success { fill: var(--phpunit-success-bar); opacity: 0.7; }
+  .bubble-warning { fill: var(--phpunit-warning-bar); opacity: 0.7; }
+  .bubble-danger { fill: var(--phpunit-danger-bar); opacity: 0.7; }
+  .bubble-success:hover, .bubble-warning:hover, .bubble-danger:hover { opacity: 1; stroke: var(--bs-emphasis-color); stroke-width: 1.5; }
+  .chart-grid { stroke: var(--bs-border-color); stroke-width: 0.5; stroke-dasharray: 4,4; opacity: 0.5; }
+  .chart-axis { stroke: var(--bs-border-color); stroke-width: 1; }
+  .chart-label { fill: var(--bs-body-color); font-size: 11px; font-family: var(--bs-font-sans-serif, sans-serif); }
+  .chart-title { fill: var(--bs-body-color); font-size: 12px; font-family: var(--bs-font-sans-serif, sans-serif); }
+ </style>
+ <line x1="60.0" y1="20" x2="60.0" y2="350" class="chart-grid"/>
+ <text x="60.0" y="368" text-anchor="middle" class="chart-label">0%</text>
+ <line x1="204.0" y1="20" x2="204.0" y2="350" class="chart-grid"/>
+ <text x="204.0" y="368" text-anchor="middle" class="chart-label">20%</text>
+ <line x1="348.0" y1="20" x2="348.0" y2="350" class="chart-grid"/>
+ <text x="348.0" y="368" text-anchor="middle" class="chart-label">40%</text>
+ <line x1="492.0" y1="20" x2="492.0" y2="350" class="chart-grid"/>
+ <text x="492.0" y="368" text-anchor="middle" class="chart-label">60%</text>
+ <line x1="636.0" y1="20" x2="636.0" y2="350" class="chart-grid"/>
+ <text x="636.0" y="368" text-anchor="middle" class="chart-label">80%</text>
+ <line x1="780.0" y1="20" x2="780.0" y2="350" class="chart-grid"/>
+ <text x="780.0" y="368" text-anchor="middle" class="chart-label">100%</text>
+ <line x1="60" y1="350.0" x2="780" y2="350.0" class="chart-grid"/>
+ <text x="52" y="350.0" text-anchor="end" dominant-baseline="middle" class="chart-label">0</text>
+ <line x1="60" y1="267.5" x2="780" y2="267.5" class="chart-grid"/>
+ <text x="52" y="267.5" text-anchor="end" dominant-baseline="middle" class="chart-label">5</text>
+ <line x1="60" y1="185.0" x2="780" y2="185.0" class="chart-grid"/>
+ <text x="52" y="185.0" text-anchor="end" dominant-baseline="middle" class="chart-label">10</text>
+ <line x1="60" y1="102.5" x2="780" y2="102.5" class="chart-grid"/>
+ <text x="52" y="102.5" text-anchor="end" dominant-baseline="middle" class="chart-label">15</text>
+ <line x1="60" y1="20.0" x2="780" y2="20.0" class="chart-grid"/>
+ <text x="52" y="20.0" text-anchor="end" dominant-baseline="middle" class="chart-label">20</text>
+ <line x1="60" y1="20" x2="60" y2="350" class="chart-axis"/>
+ <line x1="60" y1="350" x2="780" y2="350" class="chart-axis"/>
+ <text x="420.0" y="395" text-anchor="middle" class="chart-title">Line Coverage (%)</text>
+ <text x="15" y="185.0" text-anchor="middle" transform="rotate(-90, 15, 185.0)" class="chart-title">Cyclomatic Complexity</text>
+ <a href="Controller/AdminCacheController.php.html#31"><circle cx="645.0" cy="119.0" r="20.0" class="bubble-warning"><title>AdminCacheController::bulkSet — Coverage: 81.2% | Lines: 64 | Complexity: 14</title></circle></a>
+ <a href="Controller/AdminCacheController.php.html#156"><circle cx="660.0" cy="168.5" r="16.2" class="bubble-warning"><title>AdminCacheController::purgeSelected — Coverage: 83.3% | Lines: 42 | Complexity: 11</title></circle></a>
+ <a href="Controller/CacheController.php.html#32"><circle cx="697.7" cy="201.5" r="14.8" class="bubble-warning"><title>CacheController::set — Coverage: 88.6% | Lines: 35 | Complexity: 9</title></circle></a>
+ <a href="Controller/CacheController.php.html#172"><circle cx="687.1" cy="201.5" r="13.9" class="bubble-warning"><title>CacheController::delete — Coverage: 87.1% | Lines: 31 | Complexity: 9</title></circle></a>
+ <a href="Http/Request.php.html#88"><circle cx="780.0" cy="201.5" r="13.7" class="bubble-success"><title>Request::createRequestFromRawHttp — Coverage: 100.0% | Lines: 30 | Complexity: 9</title></circle></a>
+ <a href="src/Bootstrap/BootstrapLoader.php.html#19"><circle cx="696.9" cy="284.0" r="12.7" class="bubble-warning"><title>BootstrapLoader::load — Coverage: 88.5% | Lines: 26 | Complexity: 4</title></circle></a>
+ <a href="Controller/CacheController.php.html#117"><circle cx="600.0" cy="234.5" r="12.2" class="bubble-warning"><title>CacheController::get — Coverage: 75.0% | Lines: 24 | Complexity: 7</title></circle></a>
+ <a href="Controller/AdminCacheController.php.html#276"><circle cx="642.9" cy="267.5" r="11.5" class="bubble-warning"><title>AdminCacheController::list — Coverage: 81.0% | Lines: 21 | Complexity: 5</title></circle></a>
+ <a href="Logging/Logger.php.html#22"><circle cx="672.0" cy="284.0" r="11.2" class="bubble-warning"><title>Logger::writeLog — Coverage: 85.0% | Lines: 20 | Complexity: 4</title></circle></a>
+ <a href="src/Bootstrap/BootstrapLoader.php.html#135"><circle cx="708.0" cy="168.5" r="11.2" class="bubble-success"><title>BootstrapLoader::itemsSalvage — Coverage: 90.0% | Lines: 20 | Complexity: 11</title></circle></a>
+ <a href="Http/Request.php.html#28"><circle cx="60.0" cy="234.5" r="10.6" class="bubble-danger"><title>Request::createRequestFromGlobals — Coverage: 0.0% | Lines: 18 | Complexity: 7</title></circle></a>
+ <a href="Controller/AdminCacheController.php.html#245"><circle cx="540.0" cy="284.0" r="8.7" class="bubble-warning"><title>AdminCacheController::purgeAll — Coverage: 66.7% | Lines: 12 | Complexity: 4</title></circle></a>
+ <a href="Controller/AdminCacheMetricsController.php.html#31"><circle cx="540.0" cy="284.0" r="8.7" class="bubble-warning"><title>AdminCacheMetricsController::uptime — Coverage: 66.7% | Lines: 12 | Complexity: 4</title></circle></a>
+ <a href="Controller/AdminCacheMetricsController.php.html#62"><circle cx="540.0" cy="284.0" r="8.7" class="bubble-warning"><title>AdminCacheMetricsController::size — Coverage: 66.7% | Lines: 12 | Complexity: 4</title></circle></a>
+ <a href="Controller/AdminCacheMetricsController.php.html#93"><circle cx="540.0" cy="284.0" r="8.7" class="bubble-warning"><title>AdminCacheMetricsController::health — Coverage: 66.7% | Lines: 12 | Complexity: 4</title></circle></a>
+ <a href="src/Bootstrap/BootstrapLoader.php.html#100"><circle cx="780.0" cy="69.5" r="8.7" class="bubble-success"><title>BootstrapLoader::configSalvage — Coverage: 100.0% | Lines: 12 | Complexity: 17</title></circle></a>
+ <a href="src/App/Application.php.html#41"><circle cx="60.0" cy="333.5" r="8.3" class="bubble-danger"><title>Application::__construct — Coverage: 0.0% | Lines: 11 | Complexity: 1</title></circle></a>
+ <a href="Auth/AuthService.php.html#23"><circle cx="780.0" cy="234.5" r="7.9" class="bubble-success"><title>AuthService::authenticate — Coverage: 100.0% | Lines: 10 | Complexity: 7</title></circle></a>
+ <a href="Http/Request.php.html#247"><circle cx="60.0" cy="267.5" r="7.9" class="bubble-danger"><title>Request::readHeaders — Coverage: 0.0% | Lines: 10 | Complexity: 5</title></circle></a>
+ <a href="Http/JsonResponse.php.html#20"><circle cx="60.0" cy="317.0" r="7.5" class="bubble-danger"><title>JsonResponse::send — Coverage: 0.0% | Lines: 9 | Complexity: 2</title></circle></a>
+ <a href="Http/ResponseFactory.php.html#20"><circle cx="780.0" cy="333.5" r="7.5" class="bubble-success"><title>ResponseFactory::error — Coverage: 100.0% | Lines: 9 | Complexity: 1</title></circle></a>
+ <a href="src/App/Application.php.html#79"><circle cx="60.0" cy="333.5" r="7.5" class="bubble-danger"><title>Application::bootstrapLoad — Coverage: 0.0% | Lines: 9 | Complexity: 1</title></circle></a>
+ <a href="src/App/Application.php.html#123"><circle cx="60.0" cy="300.5" r="7.5" class="bubble-danger"><title>Application::authConfigLoad — Coverage: 0.0% | Lines: 9 | Complexity: 3</title></circle></a>
+ <a href="Utility/ValidationUtilities.php.html#94"><circle cx="780.0" cy="267.5" r="7.1" class="bubble-success"><title>ValidationUtilities::validateLimit — Coverage: 100.0% | Lines: 8 | Complexity: 5</title></circle></a>
+ <a href="src/App/Application.php.html#66"><circle cx="60.0" cy="333.5" r="7.1" class="bubble-danger"><title>Application::handle — Coverage: 0.0% | Lines: 8 | Complexity: 1</title></circle></a>
+ <a href="src/Bootstrap/BootstrapLoader.php.html#83"><circle cx="690.0" cy="317.0" r="7.1" class="bubble-warning"><title>BootstrapLoader::createDefaultBootstrapFile — Coverage: 87.5% | Lines: 8 | Complexity: 2</title></circle></a>
+ <a href="src/Cache/CacheItem.php.html#99"><circle cx="780.0" cy="333.5" r="7.1" class="bubble-success"><title>CacheItem::toArray — Coverage: 100.0% | Lines: 8 | Complexity: 1</title></circle></a>
+ <a href="src/Cache/CacheService.php.html#143"><circle cx="780.0" cy="300.5" r="7.1" class="bubble-success"><title>CacheService::list — Coverage: 100.0% | Lines: 8 | Complexity: 3</title></circle></a>
+ <a href="Http/Request.php.html#16"><circle cx="780.0" cy="333.5" r="6.6" class="bubble-success"><title>Request::__construct — Coverage: 100.0% | Lines: 7 | Complexity: 1</title></circle></a>
+ <a href="Utility/ValidationUtilities.php.html#44"><circle cx="574.3" cy="251.0" r="6.6" class="bubble-warning"><title>ValidationUtilities::validateTtl — Coverage: 71.4% | Lines: 7 | Complexity: 6</title></circle></a>
+ <a href="src/App/Application.php.html#101"><circle cx="60.0" cy="300.5" r="6.6" class="bubble-danger"><title>Application::preloadItemsLoad — Coverage: 0.0% | Lines: 7 | Complexity: 3</title></circle></a>
+ <a href="src/Bootstrap/BootstrapLoader.php.html#70"><circle cx="780.0" cy="333.5" r="6.6" class="bubble-success"><title>BootstrapLoader::getDefaultConfig — Coverage: 100.0% | Lines: 7 | Complexity: 1</title></circle></a>
+ <a href="src/Cache/CacheItem.php.html#17"><circle cx="780.0" cy="333.5" r="6.6" class="bubble-success"><title>CacheItem::__construct — Coverage: 100.0% | Lines: 7 | Complexity: 1</title></circle></a>
+ <a href="src/Cache/CacheService.php.html#61"><circle cx="780.0" cy="317.0" r="6.6" class="bubble-success"><title>CacheService::set — Coverage: 100.0% | Lines: 7 | Complexity: 2</title></circle></a>
+ <a href="src/Cache/CacheService.php.html#89"><circle cx="780.0" cy="300.5" r="6.6" class="bubble-success"><title>CacheService::get — Coverage: 100.0% | Lines: 7 | Complexity: 3</title></circle></a>
+ <a href="src/Cache/CacheService.php.html#113"><circle cx="780.0" cy="317.0" r="6.1" class="bubble-success"><title>CacheService::delete — Coverage: 100.0% | Lines: 6 | Complexity: 2</title></circle></a>
+ <a href="src/Cache/CacheService.php.html#179"><circle cx="780.0" cy="333.5" r="6.1" class="bubble-success"><title>CacheService::health — Coverage: 100.0% | Lines: 6 | Complexity: 1</title></circle></a>
+ <a href="Auth/AuthService.php.html#55"><circle cx="780.0" cy="284.0" r="5.6" class="bubble-success"><title>AuthService::authorize — Coverage: 100.0% | Lines: 5 | Complexity: 4</title></circle></a>
+ <a href="Http/Request.php.html#195"><circle cx="780.0" cy="300.5" r="5.6" class="bubble-success"><title>Request::getHeader — Coverage: 100.0% | Lines: 5 | Complexity: 3</title></circle></a>
+ <a href="Http/ResponseFactory.php.html#10"><circle cx="780.0" cy="333.5" r="5.6" class="bubble-success"><title>ResponseFactory::success — Coverage: 100.0% | Lines: 5 | Complexity: 1</title></circle></a>
+ <a href="src/Cache/CacheItem.php.html#84"><circle cx="780.0" cy="333.5" r="5.6" class="bubble-success"><title>CacheItem::refresh — Coverage: 100.0% | Lines: 5 | Complexity: 1</title></circle></a>
+ <a href="src/Cache/CacheService.php.html#32"><circle cx="60.0" cy="284.0" r="5.6" class="bubble-danger"><title>CacheService::validateTtl — Coverage: 0.0% | Lines: 5 | Complexity: 4</title></circle></a>
+ <a href="src/Cache/CacheService.php.html#161"><circle cx="780.0" cy="333.5" r="5.6" class="bubble-success"><title>CacheService::size — Coverage: 100.0% | Lines: 5 | Complexity: 1</title></circle></a>
+ <a href="Utility/SanitizationUtilities.php.html#9"><circle cx="780.0" cy="284.0" r="5.0" class="bubble-success"><title>SanitizationUtilities::sanitizeKey — Coverage: 100.0% | Lines: 4 | Complexity: 4</title></circle></a>
+ <a href="Utility/ValidationUtilities.php.html#62"><circle cx="600.0" cy="284.0" r="5.0" class="bubble-warning"><title>ValidationUtilities::validateValue — Coverage: 75.0% | Lines: 4 | Complexity: 4</title></circle></a>
+ <a href="src/Cache/CacheService.php.html#171"><circle cx="780.0" cy="333.5" r="5.0" class="bubble-success"><title>CacheService::uptime — Coverage: 100.0% | Lines: 4 | Complexity: 1</title></circle></a>
+ <a href="Http/JsonResponse.php.html#13"><circle cx="780.0" cy="333.5" r="4.3" class="bubble-success"><title>JsonResponse::__construct — Coverage: 100.0% | Lines: 3 | Complexity: 1</title></circle></a>
+ <a href="src/Cache/CacheService.php.html#136"><circle cx="780.0" cy="333.5" r="4.3" class="bubble-success"><title>CacheService::purgeAll — Coverage: 100.0% | Lines: 3 | Complexity: 1</title></circle></a>
+ <a href="src/Cache/CacheService.php.html#191"><circle cx="780.0" cy="300.5" r="4.3" class="bubble-success"><title>CacheService::cleanupExpired — Coverage: 100.0% | Lines: 3 | Complexity: 3</title></circle></a>
+ <a href="Controller/AdminCacheController.php.html#24"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>AdminCacheController::__construct — Coverage: 100.0% | Lines: 2 | Complexity: 1</title></circle></a>
+ <a href="Controller/AdminCacheMetricsController.php.html#24"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>AdminCacheMetricsController::__construct — Coverage: 100.0% | Lines: 2 | Complexity: 1</title></circle></a>
+ <a href="Controller/CacheController.php.html#25"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>CacheController::__construct — Coverage: 100.0% | Lines: 2 | Complexity: 1</title></circle></a>
+ <a href="Utility/ValidationUtilities.php.html#8"><circle cx="780.0" cy="317.0" r="4.0" class="bubble-success"><title>ValidationUtilities::validateMethodPost — Coverage: 100.0% | Lines: 2 | Complexity: 2</title></circle></a>
+ <a href="Utility/ValidationUtilities.php.html#15"><circle cx="780.0" cy="317.0" r="4.0" class="bubble-success"><title>ValidationUtilities::validateMethodGet — Coverage: 100.0% | Lines: 2 | Complexity: 2</title></circle></a>
+ <a href="Utility/ValidationUtilities.php.html#22"><circle cx="60.0" cy="317.0" r="4.0" class="bubble-danger"><title>ValidationUtilities::validateMethodDelete — Coverage: 0.0% | Lines: 2 | Complexity: 2</title></circle></a>
+ <a href="Utility/ValidationUtilities.php.html#29"><circle cx="780.0" cy="317.0" r="4.0" class="bubble-success"><title>ValidationUtilities::validateJson — Coverage: 100.0% | Lines: 2 | Complexity: 2</title></circle></a>
+ <a href="Utility/ValidationUtilities.php.html#36"><circle cx="780.0" cy="300.5" r="4.0" class="bubble-success"><title>ValidationUtilities::validateKey — Coverage: 100.0% | Lines: 2 | Complexity: 3</title></circle></a>
+ <a href="Utility/ValidationUtilities.php.html#75"><circle cx="780.0" cy="317.0" r="4.0" class="bubble-success"><title>ValidationUtilities::validateItemsArray — Coverage: 100.0% | Lines: 2 | Complexity: 2</title></circle></a>
+ <a href="Utility/ValidationUtilities.php.html#83"><circle cx="420.0" cy="317.0" r="4.0" class="bubble-danger"><title>ValidationUtilities::validateItemArray — Coverage: 50.0% | Lines: 2 | Complexity: 2</title></circle></a>
+ <a href="src/Cache/CacheService.php.html#23"><circle cx="60.0" cy="284.0" r="4.0" class="bubble-danger"><title>CacheService::validateKey — Coverage: 0.0% | Lines: 2 | Complexity: 4</title></circle></a>
+ <a href="src/Cache/CacheService.php.html#47"><circle cx="60.0" cy="300.5" r="4.0" class="bubble-danger"><title>CacheService::validateValue — Coverage: 0.0% | Lines: 2 | Complexity: 3</title></circle></a>
+ <a href="Auth/AuthService.php.html#16"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>AuthService::__construct — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="Auth/Role.php.html#10"><circle cx="60.0" cy="333.5" r="4.0" class="bubble-danger"><title>Role::__construct — Coverage: 0.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="Http/JsonResponse.php.html#42"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>JsonResponse::getStatusCode — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="Http/JsonResponse.php.html#47"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>JsonResponse::getBody — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="Http/Request.php.html#177"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>Request::getMethod — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="Http/Request.php.html#183"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>Request::getPath — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="Http/Request.php.html#188"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>Request::getHeaders — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="Http/Request.php.html#211"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>Request::getQueryParams — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="Http/Request.php.html#217"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>Request::getQueryParam — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="Http/Request.php.html#223"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>Request::getBody — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="Http/Request.php.html#229"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>Request::getBodyField — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="Http/Request.php.html#235"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>Request::getRawBody — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="Http/Request.php.html#240"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>Request::getHasInvalidJson — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="Logging/Logger.php.html#7"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>Logger::logInfo — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="Logging/Logger.php.html#12"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>Logger::logWarn — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="Logging/Logger.php.html#17"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>Logger::logError — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="Utility/AuditLoggerUtilities.php.html#8"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>AuditLoggerUtilities::adminCacheAuditLog — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="Utility/AuditLoggerUtilities.php.html#14"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>AuditLoggerUtilities::cacheAuditLog — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="Utility/IdempotencyUtilities.php.html#8"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>IdempotencyUtilities::adminCacheIdempotencyCheck — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="Utility/IdempotencyUtilities.php.html#15"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>IdempotencyUtilities::cacheSetIdempotencyCheck — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="Utility/IdempotencyUtilities.php.html#22"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>IdempotencyUtilities::cacheGetIdempotencyCheck — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="Utility/IdempotencyUtilities.php.html#29"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>IdempotencyUtilities::cacheDeleteIdempotencyCheck — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="Utility/RateLimitUtilities.php.html#8"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>RateLimitUtilities::adminCacheRateLimitCheck — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="Utility/RateLimitUtilities.php.html#16"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>RateLimitUtilities::cacheSetRateLimitCheck — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="Utility/RateLimitUtilities.php.html#23"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>RateLimitUtilities::cacheGetRateLimitCheck — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="Utility/RateLimitUtilities.php.html#31"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>RateLimitUtilities::cacheDeleteRateLimitCheck — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="src/Bootstrap/BootstrapLoader.php.html#13"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>BootstrapLoader::__construct — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="src/Bootstrap/BootstrapLoader.php.html#178"><circle cx="780.0" cy="300.5" r="4.0" class="bubble-success"><title>BootstrapLoader::isValidKey — Coverage: 100.0% | Lines: 1 | Complexity: 3</title></circle></a>
+ <a href="src/Cache/CacheItem.php.html#32"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>CacheItem::getKey — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="src/Cache/CacheItem.php.html#37"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>CacheItem::getValue — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="src/Cache/CacheItem.php.html#42"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>CacheItem::getCreatedAt — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="src/Cache/CacheItem.php.html#47"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>CacheItem::getUpdatedAt — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="src/Cache/CacheItem.php.html#52"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>CacheItem::getTtl — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="src/Cache/CacheItem.php.html#57"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>CacheItem::getExpiresAt — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="src/Cache/CacheItem.php.html#62"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>CacheItem::setValue — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="src/Cache/CacheItem.php.html#68"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>CacheItem::setUpdatedAt — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="src/Cache/CacheItem.php.html#73"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>CacheItem::setTtl — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="src/Cache/CacheItem.php.html#78"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>CacheItem::setExpiresAt — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="src/Cache/CacheItem.php.html#94"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>CacheItem::isExpired — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+ <a href="src/Cache/CacheService.php.html#17"><circle cx="780.0" cy="333.5" r="4.0" class="bubble-success"><title>CacheService::__construct — Coverage: 100.0% | Lines: 1 | Complexity: 1</title></circle></a>
+</svg>
+     </div>
+    </div>
+    <div class="col-md-6 dashboard-column">
+     <h3>&nbsp;</h3>
+     <p class="text-muted small">Sorted by descending CRAP (Change Risk Anti-Patterns) index.</p>
+     <div class="scrollbox">
+<table class="table">
+ <thead>
+  <tr>
+   <th>Method</th>
+   <th class="text-right"><abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr></th>
+   <th class="text-right">Coverage</th>
+  </tr>
+ </thead>
+ <tbody>
+  <tr><td><a href="Http/Request.php.html#28">Request::createRequestFromGlobals</a></td><td class="text-right">56</td><td class="text-right">0.0%</td></tr>
+  <tr><td><a href="Http/Request.php.html#247">Request::readHeaders</a></td><td class="text-right">30</td><td class="text-right">0.0%</td></tr>
+  <tr><td><a href="src/Cache/CacheService.php.html#23">CacheService::validateKey</a></td><td class="text-right">20</td><td class="text-right">0.0%</td></tr>
+  <tr><td><a href="src/Cache/CacheService.php.html#32">CacheService::validateTtl</a></td><td class="text-right">20</td><td class="text-right">0.0%</td></tr>
+  <tr><td><a href="src/Bootstrap/BootstrapLoader.php.html#100">BootstrapLoader::configSalvage</a></td><td class="text-right">17</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Controller/AdminCacheController.php.html#31">AdminCacheController::bulkSet</a></td><td class="text-right">15.29</td><td class="text-right">81.2%</td></tr>
+  <tr><td><a href="src/App/Application.php.html#101">Application::preloadItemsLoad</a></td><td class="text-right">12</td><td class="text-right">0.0%</td></tr>
+  <tr><td><a href="src/App/Application.php.html#123">Application::authConfigLoad</a></td><td class="text-right">12</td><td class="text-right">0.0%</td></tr>
+  <tr><td><a href="src/Cache/CacheService.php.html#47">CacheService::validateValue</a></td><td class="text-right">12</td><td class="text-right">0.0%</td></tr>
+  <tr><td><a href="Controller/AdminCacheController.php.html#156">AdminCacheController::purgeSelected</a></td><td class="text-right">11.56</td><td class="text-right">83.3%</td></tr>
+  <tr><td><a href="src/Bootstrap/BootstrapLoader.php.html#135">BootstrapLoader::itemsSalvage</a></td><td class="text-right">11.12</td><td class="text-right">90.0%</td></tr>
+  <tr><td><a href="Controller/CacheController.php.html#172">CacheController::delete</a></td><td class="text-right">9.17</td><td class="text-right">87.1%</td></tr>
+  <tr><td><a href="Controller/CacheController.php.html#32">CacheController::set</a></td><td class="text-right">9.12</td><td class="text-right">88.6%</td></tr>
+  <tr><td><a href="Http/Request.php.html#88">Request::createRequestFromRawHttp</a></td><td class="text-right">9</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Controller/CacheController.php.html#117">CacheController::get</a></td><td class="text-right">7.77</td><td class="text-right">75.0%</td></tr>
+  <tr><td><a href="Auth/AuthService.php.html#23">AuthService::authenticate</a></td><td class="text-right">7</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Utility/ValidationUtilities.php.html#44">ValidationUtilities::validateTtl</a></td><td class="text-right">6.84</td><td class="text-right">71.4%</td></tr>
+  <tr><td><a href="Http/JsonResponse.php.html#20">JsonResponse::send</a></td><td class="text-right">6</td><td class="text-right">0.0%</td></tr>
+  <tr><td><a href="Utility/ValidationUtilities.php.html#22">ValidationUtilities::validateMethodDelete</a></td><td class="text-right">6</td><td class="text-right">0.0%</td></tr>
+  <tr><td><a href="Controller/AdminCacheController.php.html#276">AdminCacheController::list</a></td><td class="text-right">5.17</td><td class="text-right">81.0%</td></tr>
+  <tr><td><a href="Utility/ValidationUtilities.php.html#94">ValidationUtilities::validateLimit</a></td><td class="text-right">5</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Controller/AdminCacheController.php.html#245">AdminCacheController::purgeAll</a></td><td class="text-right">4.59</td><td class="text-right">66.7%</td></tr>
+  <tr><td><a href="Controller/AdminCacheMetricsController.php.html#31">AdminCacheMetricsController::uptime</a></td><td class="text-right">4.59</td><td class="text-right">66.7%</td></tr>
+  <tr><td><a href="Controller/AdminCacheMetricsController.php.html#62">AdminCacheMetricsController::size</a></td><td class="text-right">4.59</td><td class="text-right">66.7%</td></tr>
+  <tr><td><a href="Controller/AdminCacheMetricsController.php.html#93">AdminCacheMetricsController::health</a></td><td class="text-right">4.59</td><td class="text-right">66.7%</td></tr>
+  <tr><td><a href="Utility/ValidationUtilities.php.html#62">ValidationUtilities::validateValue</a></td><td class="text-right">4.25</td><td class="text-right">75.0%</td></tr>
+  <tr><td><a href="Logging/Logger.php.html#22">Logger::writeLog</a></td><td class="text-right">4.05</td><td class="text-right">85.0%</td></tr>
+  <tr><td><a href="src/Bootstrap/BootstrapLoader.php.html#19">BootstrapLoader::load</a></td><td class="text-right">4.02</td><td class="text-right">88.5%</td></tr>
+  <tr><td><a href="Auth/AuthService.php.html#55">AuthService::authorize</a></td><td class="text-right">4</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Utility/SanitizationUtilities.php.html#9">SanitizationUtilities::sanitizeKey</a></td><td class="text-right">4</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Http/Request.php.html#195">Request::getHeader</a></td><td class="text-right">3</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Utility/ValidationUtilities.php.html#36">ValidationUtilities::validateKey</a></td><td class="text-right">3</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="src/Bootstrap/BootstrapLoader.php.html#178">BootstrapLoader::isValidKey</a></td><td class="text-right">3</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="src/Cache/CacheService.php.html#89">CacheService::get</a></td><td class="text-right">3</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="src/Cache/CacheService.php.html#143">CacheService::list</a></td><td class="text-right">3</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="src/Cache/CacheService.php.html#191">CacheService::cleanupExpired</a></td><td class="text-right">3</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Utility/ValidationUtilities.php.html#83">ValidationUtilities::validateItemArray</a></td><td class="text-right">2.50</td><td class="text-right">50.0%</td></tr>
+  <tr><td><a href="src/Bootstrap/BootstrapLoader.php.html#83">BootstrapLoader::createDefaultBootstrapFile</a></td><td class="text-right">2.01</td><td class="text-right">87.5%</td></tr>
+  <tr><td><a href="Auth/Role.php.html#10">Role::__construct</a></td><td class="text-right">2</td><td class="text-right">0.0%</td></tr>
+  <tr><td><a href="Utility/ValidationUtilities.php.html#8">ValidationUtilities::validateMethodPost</a></td><td class="text-right">2</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Utility/ValidationUtilities.php.html#15">ValidationUtilities::validateMethodGet</a></td><td class="text-right">2</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Utility/ValidationUtilities.php.html#29">ValidationUtilities::validateJson</a></td><td class="text-right">2</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Utility/ValidationUtilities.php.html#75">ValidationUtilities::validateItemsArray</a></td><td class="text-right">2</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="src/App/Application.php.html#41">Application::__construct</a></td><td class="text-right">2</td><td class="text-right">0.0%</td></tr>
+  <tr><td><a href="src/App/Application.php.html#66">Application::handle</a></td><td class="text-right">2</td><td class="text-right">0.0%</td></tr>
+  <tr><td><a href="src/App/Application.php.html#79">Application::bootstrapLoad</a></td><td class="text-right">2</td><td class="text-right">0.0%</td></tr>
+  <tr><td><a href="src/Cache/CacheService.php.html#61">CacheService::set</a></td><td class="text-right">2</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="src/Cache/CacheService.php.html#113">CacheService::delete</a></td><td class="text-right">2</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Auth/AuthService.php.html#16">AuthService::__construct</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Controller/AdminCacheController.php.html#24">AdminCacheController::__construct</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Controller/AdminCacheMetricsController.php.html#24">AdminCacheMetricsController::__construct</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Controller/CacheController.php.html#25">CacheController::__construct</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Http/JsonResponse.php.html#13">JsonResponse::__construct</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Http/JsonResponse.php.html#42">JsonResponse::getStatusCode</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Http/JsonResponse.php.html#47">JsonResponse::getBody</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Http/Request.php.html#16">Request::__construct</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Http/Request.php.html#177">Request::getMethod</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Http/Request.php.html#183">Request::getPath</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Http/Request.php.html#188">Request::getHeaders</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Http/Request.php.html#211">Request::getQueryParams</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Http/Request.php.html#217">Request::getQueryParam</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Http/Request.php.html#223">Request::getBody</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Http/Request.php.html#229">Request::getBodyField</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Http/Request.php.html#235">Request::getRawBody</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Http/Request.php.html#240">Request::getHasInvalidJson</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Http/ResponseFactory.php.html#10">ResponseFactory::success</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Http/ResponseFactory.php.html#20">ResponseFactory::error</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Logging/Logger.php.html#7">Logger::logInfo</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Logging/Logger.php.html#12">Logger::logWarn</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Logging/Logger.php.html#17">Logger::logError</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Utility/AuditLoggerUtilities.php.html#8">AuditLoggerUtilities::adminCacheAuditLog</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Utility/AuditLoggerUtilities.php.html#14">AuditLoggerUtilities::cacheAuditLog</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Utility/IdempotencyUtilities.php.html#8">IdempotencyUtilities::adminCacheIdempotencyCheck</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Utility/IdempotencyUtilities.php.html#15">IdempotencyUtilities::cacheSetIdempotencyCheck</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Utility/IdempotencyUtilities.php.html#22">IdempotencyUtilities::cacheGetIdempotencyCheck</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Utility/IdempotencyUtilities.php.html#29">IdempotencyUtilities::cacheDeleteIdempotencyCheck</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Utility/RateLimitUtilities.php.html#8">RateLimitUtilities::adminCacheRateLimitCheck</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Utility/RateLimitUtilities.php.html#16">RateLimitUtilities::cacheSetRateLimitCheck</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Utility/RateLimitUtilities.php.html#23">RateLimitUtilities::cacheGetRateLimitCheck</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="Utility/RateLimitUtilities.php.html#31">RateLimitUtilities::cacheDeleteRateLimitCheck</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="src/Bootstrap/BootstrapLoader.php.html#13">BootstrapLoader::__construct</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="src/Bootstrap/BootstrapLoader.php.html#70">BootstrapLoader::getDefaultConfig</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="src/Cache/CacheItem.php.html#17">CacheItem::__construct</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="src/Cache/CacheItem.php.html#32">CacheItem::getKey</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="src/Cache/CacheItem.php.html#37">CacheItem::getValue</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="src/Cache/CacheItem.php.html#42">CacheItem::getCreatedAt</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="src/Cache/CacheItem.php.html#47">CacheItem::getUpdatedAt</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="src/Cache/CacheItem.php.html#52">CacheItem::getTtl</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="src/Cache/CacheItem.php.html#57">CacheItem::getExpiresAt</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="src/Cache/CacheItem.php.html#62">CacheItem::setValue</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="src/Cache/CacheItem.php.html#68">CacheItem::setUpdatedAt</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="src/Cache/CacheItem.php.html#73">CacheItem::setTtl</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="src/Cache/CacheItem.php.html#78">CacheItem::setExpiresAt</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="src/Cache/CacheItem.php.html#84">CacheItem::refresh</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="src/Cache/CacheItem.php.html#94">CacheItem::isExpired</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="src/Cache/CacheItem.php.html#99">CacheItem::toArray</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="src/Cache/CacheService.php.html#17">CacheService::__construct</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="src/Cache/CacheService.php.html#136">CacheService::purgeAll</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="src/Cache/CacheService.php.html#161">CacheService::size</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="src/Cache/CacheService.php.html#171">CacheService::uptime</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+  <tr><td><a href="src/Cache/CacheService.php.html#179">CacheService::health</a></td><td class="text-right">1</td><td class="text-right">100.0%</td></tr>
+ </tbody>
+</table>
+     </div>
+    </div>
+   </div>
+   <footer>
+    <hr/>
+    <p>
+     <small>Generated by <a href="https://github.com/sebastianbergmann/php-code-coverage" target="_top">php-code-coverage 14.1.9</a> using <a href="https://www.php.net/" target="_top">PHP 8.5.5</a> and <a href="https://phpunit.de/">PHPUnit 13.1.13</a> at Sat May 30 14:42:59 UTC 2026.</small>
+    </p>
+   </footer>
+  </div>
+ </body>
+</html>
