@@ -311,42 +311,6 @@ button {
   box-shadow: 0 0 8px rgba(109, 255, 98, 0.82);
 }
 
-.home-setup-xp-row {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 0.35rem;
-  align-items: center;
-}
-
-.home-setup-xp-row b {
-  width: 22px;
-  height: 22px;
-  display: grid;
-  place-items: center;
-  border: 1px solid rgba(24, 221, 255, 0.62);
-  border-radius: 50%;
-  color: var(--home-blue);
-  font-size: 0.68rem;
-}
-
-.home-setup-xp-row span {
-  height: 8px;
-  background: rgba(22, 53, 69, 0.88);
-  clip-path: polygon(0 0, 95% 0, 100% 50%, 95% 100%, 0 100%);
-}
-
-.home-setup-xp-row span i {
-  display: block;
-  width: 49%;
-  height: 100%;
-  background: linear-gradient(90deg, var(--home-blue), #29a8ff);
-}
-
-.home-setup-xp-row em {
-  color: rgba(225, 235, 244, 0.72);
-  font-size: clamp(7px, 0.55vw, 10px);
-  font-style: normal;
-}
 
 .home-setup-layout {
   position: absolute;
@@ -1449,4 +1413,37 @@ button {
   background:
     radial-gradient(circle at 50% 0, rgba(255, 80, 205, 0.75) 0, transparent 38%),
     linear-gradient(110deg, transparent 22%, rgba(255, 255, 255, 0.08), transparent 62%);
+}
+
+
+
+.home-setup-session-button {
+  width: fit-content;
+  min-width: 112px;
+  min-height: 26px;
+  padding: 0.18rem 0.72rem;
+  border: 1px solid rgba(255, 69, 69, 0.58);
+  background:
+    linear-gradient(180deg, rgba(255, 69, 69, 0.14), rgba(68, 8, 10, 0.42)),
+    rgba(2, 10, 16, 0.84);
+  color: var(--home-red-soft);
+  font-family: var(--home-font-display);
+  font-size: clamp(8px, 0.6vw, 11px);
+  font-weight: 820;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
+}
+
+.home-setup-session-button:hover,
+.home-setup-session-button:focus-visible {
+  color: #ffd7d7;
+  border-color: rgba(255, 110, 110, 0.82);
+  box-shadow: 0 0 14px rgba(255, 69, 69, 0.24);
+}
+
+.match-loading-cancel-button {
+  margin-top: 0.2rem;
+  min-height: 40px;
 }

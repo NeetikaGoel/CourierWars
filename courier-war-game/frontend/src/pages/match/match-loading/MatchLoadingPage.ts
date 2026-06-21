@@ -7,13 +7,24 @@ export interface MatchLoadingPageMatchState {
   status?: number;
 }
 
+type MatchLoadingRole = "courier" | "saboteur";
+
+export interface MatchLoadingPageLaunchData {
+  assignedRole?: MatchLoadingRole;
+  opponentRole?: MatchLoadingRole;
+  playerName?: string;
+  sessionType?: "guest" | "registered";
+}
+
 export interface MatchLoadingPageDependencies {
   matchId: string | number;
+  launchData?: MatchLoadingPageLaunchData;
   matchApi: {
     getMatchMap: (matchId: string | number) => Promise<unknown>;
     getMatchState: (matchId: string | number, knownVersion: number) => Promise<MatchLoadingPageMatchState>;
   };
   actions: {
+    cancelSearch?: () => void;
     goToMatchWaiting: (matchId: string | number) => void;
     goToMatchGame: (matchId: string | number, mapPayload: unknown, matchState: unknown) => void;
     goToDisconnected: (matchId: string | number) => void;
@@ -36,6 +47,30 @@ function delay(ms: number): Promise<void> {
   return new Promise((resolve) => {
     window.setTimeout(resolve, ms);
   });
+}
+
+function oppositeRoleGet(role: MatchLoadingRole): MatchLoadingRole {
+  return role === "courier" ? "saboteur" : "courier";
+}
+
+function roleTitleGet(role: MatchLoadingRole): string {
+  return role === "courier" ? "Courier" : "Saboteur";
+}
+
+function roleImageGet(role: MatchLoadingRole): string {
+  return role === "courier" ? "/assets/homepage/courier.png" : "/assets/homepage/saboteur.png";
+}
+
+function roleCopyGet(role: MatchLoadingRole, isSelf: boolean): string {
+  if (role === "courier") {
+    return isSelf
+      ? "Deliver the package before time runs out. Find the safest route and reach the destination."
+      : "Moves fast, reroutes under pressure, and tries to complete the delivery.";
+  }
+
+  return isSelf
+    ? "Predict the Courier's route and place hurdles before they arrive."
+    : "Places timed hurdles, blocks routes, and tries to delay the delivery.";
 }
 
 function setText(root: HTMLElement, selector: string, value: string): void {
@@ -70,6 +105,28 @@ function setActiveStep(root: HTMLElement, stepIndex: number): void {
   setText(root, "[data-loading-phase-label]", phase.label);
 }
 
+function roleCardSet(root: HTMLElement, role: MatchLoadingRole, isSelf: boolean): void {
+  const cardSelector = isSelf ? "[data-loading-self-role-card]" : "[data-loading-opponent-role-card]";
+  const imageSelector = isSelf ? "[data-loading-self-role-image]" : "[data-loading-opponent-role-image]";
+  const titleSelector = isSelf ? "[data-loading-self-role-title]" : "[data-loading-opponent-role-title]";
+  const copySelector = isSelf ? "[data-loading-self-role-copy]" : "[data-loading-opponent-role-copy]";
+
+  const card = root.querySelector<HTMLElement>(cardSelector);
+  const image = root.querySelector<HTMLImageElement>(imageSelector);
+
+  if (card) {
+    card.classList.toggle("match-loading-side-card-blue", role === "courier");
+    card.classList.toggle("match-loading-side-card-red", role === "saboteur");
+  }
+
+  if (image) {
+    image.src = roleImageGet(role);
+  }
+
+  setText(root, titleSelector, roleTitleGet(role));
+  setText(root, copySelector, roleCopyGet(role, isSelf));
+}
+
 export async function mountMatchLoadingPage(root: HTMLElement, deps: MatchLoadingPageDependencies): Promise<() => void> {
   let cancelled = false;
   let phaseIndex = 0;
@@ -77,11 +134,15 @@ export async function mountMatchLoadingPage(root: HTMLElement, deps: MatchLoadin
 
   root.innerHTML = matchLoadingPageHtml;
 
+  const selfRole = deps.launchData?.assignedRole ?? "courier";
+  const opponentRole = deps.launchData?.opponentRole ?? oppositeRoleGet(selfRole);
+
   const homeButtonList = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-loading-home-button], [data-loading-home-nav]"));
   const inactiveNavButtonList = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-loading-inactive-nav]"));
+  const cancelButton = root.querySelector<HTMLButtonElement>("[data-loading-cancel-button]");
 
   const goHome = (): void => {
-    deps.actions.goToDisconnected(deps.matchId);
+    deps.actions.cancelSearch?.();
   };
 
   const showPrototypeMessage = (): void => {
@@ -90,7 +151,12 @@ export async function mountMatchLoadingPage(root: HTMLElement, deps: MatchLoadin
 
   homeButtonList.forEach((button) => button.addEventListener("click", goHome));
   inactiveNavButtonList.forEach((button) => button.addEventListener("click", showPrototypeMessage));
+  cancelButton?.addEventListener("click", goHome);
 
+  setText(root, "[data-loading-profile-name]", deps.launchData?.playerName ?? "Player");
+  setText(root, "[data-loading-profile-status]", deps.launchData?.sessionType === "guest" ? "GUEST ONLINE" : "ONLINE");
+  roleCardSet(root, selfRole, true);
+  roleCardSet(root, opponentRole, false);
   setProgress(root, 8);
   setActiveStep(root, 0);
 
@@ -156,5 +222,6 @@ export async function mountMatchLoadingPage(root: HTMLElement, deps: MatchLoadin
     window.clearInterval(intervalId);
     homeButtonList.forEach((button) => button.removeEventListener("click", goHome));
     inactiveNavButtonList.forEach((button) => button.removeEventListener("click", showPrototypeMessage));
+    cancelButton?.removeEventListener("click", goHome);
   };
 }

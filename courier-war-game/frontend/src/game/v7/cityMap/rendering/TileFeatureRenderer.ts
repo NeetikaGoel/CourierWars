@@ -4,6 +4,9 @@ import Phaser from "phaser";
 // Imports visual configuration for feature colors
 import { cityMapVisualConfig } from "../../config/CityMapVisualConfig";
 
+// Imports feature renderer geometry configuration
+import { tileFeatureRenderConfig } from "../../config/TileFeatureRenderConfig";
+
 // Imports Phaser color converter
 import { phaserColorNumberFromHexGet } from "../../utility/PhaserColorConverter";
 
@@ -67,19 +70,37 @@ export class TileFeatureRenderer {
       y: cityTile.y,
     });
 
+    const config = tileFeatureRenderConfig.startMarker;
     const startColorNumber = phaserColorNumberFromHexGet(cityMapVisualConfig.feature.startMarkerColorHex);
     const outlineColorNumber = phaserColorNumberFromHexGet(cityMapVisualConfig.feature.markerOutlineColorHex);
 
-    this.graphics.fillStyle(startColorNumber, 0.22);
-    this.graphics.fillCircle(tileCenter.x, tileCenter.y - 8, 15);
+    this.graphics.fillStyle(startColorNumber, config.glowAlpha);
+    this.graphics.fillCircle(
+      tileCenter.x,
+      tileCenter.y + config.glowYOffsetPixels,
+      config.glowRadiusPixels
+    );
 
-    this.graphics.lineStyle(3, outlineColorNumber, 0.95);
-    this.graphics.fillStyle(startColorNumber, 1);
-    this.graphics.fillCircle(tileCenter.x, tileCenter.y - 10, 8);
-    this.graphics.strokeCircle(tileCenter.x, tileCenter.y - 10, 8);
+    this.graphics.lineStyle(config.coreOutlineWidthPixels, outlineColorNumber, config.coreOutlineAlpha);
+    this.graphics.fillStyle(startColorNumber, config.coreAlpha);
+    this.graphics.fillCircle(
+      tileCenter.x,
+      tileCenter.y + config.coreYOffsetPixels,
+      config.coreRadiusPixels
+    );
+    this.graphics.strokeCircle(
+      tileCenter.x,
+      tileCenter.y + config.coreYOffsetPixels,
+      config.coreRadiusPixels
+    );
 
-    this.graphics.lineStyle(2, startColorNumber, 0.9);
-    this.graphics.lineBetween(tileCenter.x, tileCenter.y - 1, tileCenter.x, tileCenter.y + 9);
+    this.graphics.lineStyle(config.stemLineWidthPixels, startColorNumber, config.stemAlpha);
+    this.graphics.lineBetween(
+      tileCenter.x,
+      tileCenter.y + config.stemStartYOffsetPixels,
+      tileCenter.x,
+      tileCenter.y + config.stemEndYOffsetPixels
+    );
   }
 
   // Draws delivery marker
@@ -89,34 +110,44 @@ export class TileFeatureRenderer {
       y: cityTile.y,
     });
 
+    const config = tileFeatureRenderConfig.deliveryMarker;
     const deliveryColorNumber = phaserColorNumberFromHexGet(cityMapVisualConfig.feature.deliveryMarkerColorHex);
     const outlineColorNumber = phaserColorNumberFromHexGet(cityMapVisualConfig.feature.markerOutlineColorHex);
 
-    this.graphics.fillStyle(deliveryColorNumber, 0.2);
-    this.graphics.fillCircle(tileCenter.x, tileCenter.y - 7, 16);
+    this.graphics.fillStyle(deliveryColorNumber, config.glowAlpha);
+    this.graphics.fillCircle(
+      tileCenter.x,
+      tileCenter.y + config.glowYOffsetPixels,
+      config.glowRadiusPixels
+    );
 
-    this.graphics.fillStyle(deliveryColorNumber, 1);
+    this.graphics.fillStyle(deliveryColorNumber, config.flagAlpha);
     this.graphics.fillTriangle(
-      tileCenter.x - 7,
-      tileCenter.y - 22,
-      tileCenter.x + 11,
-      tileCenter.y - 15,
-      tileCenter.x - 7,
-      tileCenter.y - 8
+      tileCenter.x + config.flagPointA.xOffsetPixels,
+      tileCenter.y + config.flagPointA.yOffsetPixels,
+      tileCenter.x + config.flagPointB.xOffsetPixels,
+      tileCenter.y + config.flagPointB.yOffsetPixels,
+      tileCenter.x + config.flagPointC.xOffsetPixels,
+      tileCenter.y + config.flagPointC.yOffsetPixels
     );
 
-    this.graphics.lineStyle(2, outlineColorNumber, 0.95);
+    this.graphics.lineStyle(config.flagOutlineWidthPixels, outlineColorNumber, config.flagOutlineAlpha);
     this.graphics.strokeTriangle(
-      tileCenter.x - 7,
-      tileCenter.y - 22,
-      tileCenter.x + 11,
-      tileCenter.y - 15,
-      tileCenter.x - 7,
-      tileCenter.y - 8
+      tileCenter.x + config.flagPointA.xOffsetPixels,
+      tileCenter.y + config.flagPointA.yOffsetPixels,
+      tileCenter.x + config.flagPointB.xOffsetPixels,
+      tileCenter.y + config.flagPointB.yOffsetPixels,
+      tileCenter.x + config.flagPointC.xOffsetPixels,
+      tileCenter.y + config.flagPointC.yOffsetPixels
     );
 
-    this.graphics.lineStyle(3, outlineColorNumber, 0.9);
-    this.graphics.lineBetween(tileCenter.x - 7, tileCenter.y - 22, tileCenter.x - 7, tileCenter.y + 8);
+    this.graphics.lineStyle(config.poleLineWidthPixels, outlineColorNumber, config.poleAlpha);
+    this.graphics.lineBetween(
+      tileCenter.x + config.poleXOffsetPixels,
+      tileCenter.y + config.poleStartYOffsetPixels,
+      tileCenter.x + config.poleXOffsetPixels,
+      tileCenter.y + config.poleEndYOffsetPixels
+    );
   }
 
   // Draws traffic signal using green or red runtime state
@@ -125,6 +156,7 @@ export class TileFeatureRenderer {
       return;
     }
 
+    const config = tileFeatureRenderConfig.trafficSignal;
     const trafficSignalState = matchPrototypeState.trafficSignalStateById[cityTile.trafficSignalId];
     const signalRed = trafficSignalState?.stateName === TrafficSignalStateName.Red;
 
@@ -134,87 +166,152 @@ export class TileFeatureRenderer {
 
     const signalColorNumber = phaserColorNumberFromHexGet(signalColorHex);
     const poleColorNumber = phaserColorNumberFromHexGet(cityMapVisualConfig.feature.trafficSignalPoleColorHex);
+    const lensInactiveColorNumber = phaserColorNumberFromHexGet(config.lensInactiveColorHex);
 
     const tileCenter = isometricTileCenterWorldPointGet({
       x: cityTile.x,
       y: cityTile.y,
     });
 
-    this.graphics.fillStyle(signalColorNumber, 0.18);
-    this.graphics.fillCircle(tileCenter.x + 4, tileCenter.y - 11, 10);
+    const signalX = tileCenter.x + config.xOffsetPixels;
 
-    this.graphics.lineStyle(2, poleColorNumber, 0.82);
-    this.graphics.lineBetween(tileCenter.x + 4, tileCenter.y - 5, tileCenter.x + 4, tileCenter.y + 5);
+    this.graphics.fillStyle(signalColorNumber, config.glowAlpha);
+    this.graphics.fillCircle(
+      signalX,
+      tileCenter.y + config.glowYOffsetPixels,
+      config.glowRadiusPixels
+    );
 
-    this.graphics.fillStyle(signalColorNumber, 1);
-    this.graphics.fillRoundedRect(tileCenter.x - 1, tileCenter.y - 20, 10, 15, 3);
+    this.graphics.lineStyle(config.poleLineWidthPixels, poleColorNumber, config.poleAlpha);
+    this.graphics.lineBetween(
+      signalX,
+      tileCenter.y + config.poleTopYOffsetPixels,
+      signalX,
+      tileCenter.y + config.poleBottomYOffsetPixels
+    );
 
-    this.graphics.lineStyle(1, poleColorNumber, 0.9);
-    this.graphics.strokeRoundedRect(tileCenter.x - 1, tileCenter.y - 20, 10, 15, 3);
+    this.graphics.fillStyle(signalColorNumber, config.bodyAlpha);
+    this.graphics.fillRoundedRect(
+      tileCenter.x + config.bodyXOffsetPixels,
+      tileCenter.y + config.bodyYOffsetPixels,
+      config.bodyWidthPixels,
+      config.bodyHeightPixels,
+      config.bodyRadiusPixels
+    );
 
-    this.graphics.fillStyle(0x061016, 0.9);
-    this.graphics.fillCircle(tileCenter.x + 4, tileCenter.y - 16, 2);
-    this.graphics.fillCircle(tileCenter.x + 4, tileCenter.y - 12, 2);
-    this.graphics.fillCircle(tileCenter.x + 4, tileCenter.y - 8, 2);
+    this.graphics.lineStyle(config.bodyOutlineWidthPixels, poleColorNumber, config.bodyOutlineAlpha);
+    this.graphics.strokeRoundedRect(
+      tileCenter.x + config.bodyXOffsetPixels,
+      tileCenter.y + config.bodyYOffsetPixels,
+      config.bodyWidthPixels,
+      config.bodyHeightPixels,
+      config.bodyRadiusPixels
+    );
 
-    this.graphics.fillStyle(signalColorNumber, 1);
-    this.graphics.fillCircle(tileCenter.x + 4, signalRed ? tileCenter.y - 16 : tileCenter.y - 8, 2.4);
+    this.graphics.fillStyle(lensInactiveColorNumber, config.lensInactiveAlpha);
+
+    config.lensYOffsetListPixels.forEach((lensYOffsetPixels) => {
+      this.graphics.fillCircle(signalX, tileCenter.y + lensYOffsetPixels, config.lensRadiusPixels);
+    });
+
+    const activeLensIndex = signalRed ? config.redLensIndex : config.greenLensIndex;
+    const activeLensYOffsetPixels = config.lensYOffsetListPixels[activeLensIndex];
+
+    this.graphics.fillStyle(signalColorNumber, config.bodyAlpha);
+    this.graphics.fillCircle(
+      signalX,
+      tileCenter.y + activeLensYOffsetPixels,
+      config.activeLensRadiusPixels
+    );
   }
 
   // Draws tunnel entrance hint
   tileFeatureTunnelEntranceDraw(cityTile: CityTile): void {
     const tileCenter = isometricTileCenterWorldPointGet({ x: cityTile.x, y: cityTile.y });
+    const config = tileFeatureRenderConfig.tunnelEntrance;
     const tunnelColorNumber = phaserColorNumberFromHexGet(cityMapVisualConfig.feature.tunnelEntranceColorHex);
 
-    this.graphics.fillStyle(tunnelColorNumber, 0.18);
-    this.graphics.fillCircle(tileCenter.x, tileCenter.y - 4, 12);
+    this.graphics.fillStyle(tunnelColorNumber, config.glowAlpha);
+    this.graphics.fillCircle(
+      tileCenter.x,
+      tileCenter.y + config.glowYOffsetPixels,
+      config.glowRadiusPixels
+    );
 
-    this.graphics.lineStyle(3, tunnelColorNumber, 0.95);
-    this.graphics.strokeRoundedRect(tileCenter.x - 8, tileCenter.y - 13, 16, 13, 7);
+    this.graphics.lineStyle(config.archLineWidthPixels, tunnelColorNumber, config.archAlpha);
+    this.graphics.strokeRoundedRect(
+      tileCenter.x + config.archXOffsetPixels,
+      tileCenter.y + config.archYOffsetPixels,
+      config.archWidthPixels,
+      config.archHeightPixels,
+      config.archRadiusPixels
+    );
 
-    this.graphics.lineStyle(2, tunnelColorNumber, 0.55);
-    this.graphics.lineBetween(tileCenter.x - 8, tileCenter.y - 1, tileCenter.x + 8, tileCenter.y - 1);
+    this.graphics.lineStyle(config.baseLineWidthPixels, tunnelColorNumber, config.baseLineAlpha);
+    this.graphics.lineBetween(
+      tileCenter.x + config.baseLineLeftXOffsetPixels,
+      tileCenter.y + config.baseLineYOffsetPixels,
+      tileCenter.x + config.baseLineRightXOffsetPixels,
+      tileCenter.y + config.baseLineYOffsetPixels
+    );
   }
 
   // Draws shortcut entrance hint
   tileFeatureShortcutEntranceDraw(cityTile: CityTile): void {
     const tileCenter = isometricTileCenterWorldPointGet({ x: cityTile.x, y: cityTile.y });
+    const config = tileFeatureRenderConfig.shortcutEntrance;
     const shortcutColorNumber = phaserColorNumberFromHexGet(cityMapVisualConfig.feature.shortcutEntranceColorHex);
+    const outlineColorNumber = phaserColorNumberFromHexGet(config.outlineColorHex);
 
-    this.graphics.fillStyle(shortcutColorNumber, 0.2);
-    this.graphics.fillCircle(tileCenter.x, tileCenter.y - 3, 10);
-
-    this.graphics.fillStyle(shortcutColorNumber, 0.95);
-    this.graphics.fillTriangle(
+    this.graphics.fillStyle(shortcutColorNumber, config.glowAlpha);
+    this.graphics.fillCircle(
       tileCenter.x,
-      tileCenter.y - 10,
-      tileCenter.x - 7,
-      tileCenter.y + 4,
-      tileCenter.x + 7,
-      tileCenter.y + 4
+      tileCenter.y + config.glowYOffsetPixels,
+      config.glowRadiusPixels
     );
 
-    this.graphics.lineStyle(1, phaserColorNumberFromHexGet("#ffffff"), 0.75);
+    this.graphics.fillStyle(shortcutColorNumber, config.triangleAlpha);
+    this.graphics.fillTriangle(
+      tileCenter.x + config.trianglePointA.xOffsetPixels,
+      tileCenter.y + config.trianglePointA.yOffsetPixels,
+      tileCenter.x + config.trianglePointB.xOffsetPixels,
+      tileCenter.y + config.trianglePointB.yOffsetPixels,
+      tileCenter.x + config.trianglePointC.xOffsetPixels,
+      tileCenter.y + config.trianglePointC.yOffsetPixels
+    );
+
+    this.graphics.lineStyle(config.outlineLineWidthPixels, outlineColorNumber, config.outlineAlpha);
     this.graphics.strokeTriangle(
-      tileCenter.x,
-      tileCenter.y - 10,
-      tileCenter.x - 7,
-      tileCenter.y + 4,
-      tileCenter.x + 7,
-      tileCenter.y + 4
+      tileCenter.x + config.trianglePointA.xOffsetPixels,
+      tileCenter.y + config.trianglePointA.yOffsetPixels,
+      tileCenter.x + config.trianglePointB.xOffsetPixels,
+      tileCenter.y + config.trianglePointB.yOffsetPixels,
+      tileCenter.x + config.trianglePointC.xOffsetPixels,
+      tileCenter.y + config.trianglePointC.yOffsetPixels
     );
   }
 
   // Draws bridge entrance hint
   tileFeatureBridgeEntranceDraw(cityTile: CityTile): void {
     const tileCenter = isometricTileCenterWorldPointGet({ x: cityTile.x, y: cityTile.y });
+    const config = tileFeatureRenderConfig.bridgeEntrance;
     const bridgeColorNumber = phaserColorNumberFromHexGet(cityMapVisualConfig.feature.bridgeEntranceColorHex);
 
-    this.graphics.lineStyle(3, bridgeColorNumber, 0.95);
-    this.graphics.lineBetween(tileCenter.x - 8, tileCenter.y - 4, tileCenter.x + 8, tileCenter.y - 4);
-    this.graphics.lineBetween(tileCenter.x - 8, tileCenter.y + 4, tileCenter.x + 8, tileCenter.y + 4);
+    this.graphics.lineStyle(config.lineWidthPixels, bridgeColorNumber, config.lineAlpha);
+    this.graphics.lineBetween(
+      tileCenter.x + config.lineLeftXOffsetPixels,
+      tileCenter.y + config.topLineYOffsetPixels,
+      tileCenter.x + config.lineRightXOffsetPixels,
+      tileCenter.y + config.topLineYOffsetPixels
+    );
+    this.graphics.lineBetween(
+      tileCenter.x + config.lineLeftXOffsetPixels,
+      tileCenter.y + config.bottomLineYOffsetPixels,
+      tileCenter.x + config.lineRightXOffsetPixels,
+      tileCenter.y + config.bottomLineYOffsetPixels
+    );
 
-    this.graphics.fillStyle(bridgeColorNumber, 0.28);
-    this.graphics.fillCircle(tileCenter.x, tileCenter.y, 8);
+    this.graphics.fillStyle(bridgeColorNumber, config.glowAlpha);
+    this.graphics.fillCircle(tileCenter.x, tileCenter.y, config.glowRadiusPixels);
   }
 }
