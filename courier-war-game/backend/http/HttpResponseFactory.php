@@ -1,17 +1,9 @@
 <?php
-
 declare(strict_types=1);
 
-//importing app config for API version
 require_once __DIR__ . '/../config/AppConfig.php';
-
-//importing HTTP status constants
 require_once __DIR__ . '/../constants/HttpStatusCode.php';
-
-//importing stable API error code constants
 require_once __DIR__ . '/../constants/ApiErrorCode.php';
-
-//importing response object
 require_once __DIR__ . '/HttpJsonResponse.php';
 
 //this file creates standard API response envelopes

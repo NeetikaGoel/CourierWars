@@ -1,43 +1,53 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/../constants/MatchStatusValue.php';
+
 class PollingConfig // this class stores polling values that can be tuned after testing
 {
-    public const ACTIVE_MATCH_POLL_INTERVAL_INDEX = 0;
-    public const WAITING_MATCH_POLL_INTERVAL_INDEX = 1;
-    public const READY_MATCH_POLL_INTERVAL_INDEX = 2;
-    public const ENDED_MATCH_POLL_INTERVAL_INDEX = 3; // before result screen loads
-    public const INACTIVE_TAB_POLL_INTERVAL_INDEX = 4; // slower polling when browser tab is inactive
     public const POLL_KNOWN_VERSION_DEFAULT = 0; // default known version for first poll
+    public const INACTIVE_TAB_POLL_INTERVAL_MS = 5000; // slower polling when browser tab is inactive
 
-    //array = [500,1000,750,1000,5000]
-    public const POLL_INTERVAL_MS_LIST = [500,1000,750,1000,5000];
+    //array indexes directly use MatchStatusValue values
+    //0 waiting, 1 ready, 2 active, 3 completed, 4 draw
+    //array = [1000,750,500,1000,1000]
+    public const POLL_INTERVAL_MS_LIST = [1000, 750, 500, 1000, 1000];
 
     //now functions for returning polling intervals for diff match states
 
     public static function activeMatchPollIntervalMs(): int
     {
-        return self::POLL_INTERVAL_MS_LIST[self::ACTIVE_MATCH_POLL_INTERVAL_INDEX];
+        return self::POLL_INTERVAL_MS_LIST[MatchStatusValue::ACTIVE];
     }
 
     public static function waitingMatchPollIntervalMs(): int
     {
-        return self::POLL_INTERVAL_MS_LIST[self::WAITING_MATCH_POLL_INTERVAL_INDEX];
+        return self::POLL_INTERVAL_MS_LIST[MatchStatusValue::WAITING];
     }
 
     public static function readyMatchPollIntervalMs(): int
     {
-        return self::POLL_INTERVAL_MS_LIST[self::READY_MATCH_POLL_INTERVAL_INDEX];
+        return self::POLL_INTERVAL_MS_LIST[MatchStatusValue::READY];
     }
 
     public static function endedMatchPollIntervalMs(): int
     {
-        return self::POLL_INTERVAL_MS_LIST[self::ENDED_MATCH_POLL_INTERVAL_INDEX];
+        return self::POLL_INTERVAL_MS_LIST[MatchStatusValue::COMPLETED];
+    }
+
+    public static function drawMatchPollIntervalMs(): int
+    {
+        return self::POLL_INTERVAL_MS_LIST[MatchStatusValue::DRAW];
     }
 
     public static function inactiveTabPollIntervalMs(): int
     {
-        return self::POLL_INTERVAL_MS_LIST[self::INACTIVE_TAB_POLL_INTERVAL_INDEX];
+        return self::INACTIVE_TAB_POLL_INTERVAL_MS;
+    }
+
+    public static function matchStatusPollIntervalMs(int $matchStatus): int
+    {
+        return self::POLL_INTERVAL_MS_LIST[$matchStatus] ?? self::waitingMatchPollIntervalMs();
     }
 
     public static function defaultKnownVersion(): int

@@ -39,6 +39,6 @@ class CsrfConfig
     //to tell if csrf cookie is httponly or not, which should return false so frontend can read and send the token name in header
     public static function httpOnlyCookieEnabled(): bool
     {
-        return false; //so js cannot read the cookie
+        return false; //so js can actually read the cookie!!!!!
     }
 }

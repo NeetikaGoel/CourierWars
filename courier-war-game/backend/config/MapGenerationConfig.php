@@ -85,7 +85,7 @@ class MapGenerationConfig
     public const DELIVERY_ZONE_ID_PREFERRED = 'zone-8';
     public const START_DELIVERY_VALID_ROAD_SEARCH_RADIUS_TILES_MAX = 20;
 
-    public const GENERATED_MAP_COUNT_INITIAL = 10;
+    public const GENERATED_MAP_COUNT_INITIAL = 1;
     public const GENERATION_RETRY_COUNT_MAX = 10;
     public const GENERATION_RETRY_SEED_OFFSET = 9973;
 

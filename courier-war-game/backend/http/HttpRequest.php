@@ -1,9 +1,10 @@
 <?php
-
 declare(strict_types=1);
 
 require_once __DIR__ . '/../constants/HttpHeaders.php';
 require_once __DIR__ . '/../constants/HttpRequestValue.php';
+require_once __DIR__ . '/HttpJsonBodyParser.php';
+require_once __DIR__ . '/HttpRequestGlobalReader.php';
 
 //SO WHAT THIS FILE WILL DO LETS SEE
 
@@ -48,7 +49,7 @@ class HttpRequest
     private ?array $_jsonBody = null; // decoded JSON body as array or null if invalid
     private ?string $_jsonDecodeError = null; // JSON decode error message if body is invalid
 
-    //private constructor so request is created through fromGlobals only
+    //pvt constructor so request is created through fromGlobals only
     private function __construct(string $method, string $path, array $headers, array $cookies, array $queryParams, string $rawBody, string $requestId)
     {
         $this->_method = $method;
@@ -60,21 +61,20 @@ class HttpRequest
         $this->_requestId = $requestId;
     }
 
-    //this creates HttpRequest using PHP globals from current HTTP request
+    //this will be creating HttpRequest using PHP globals from current HTTP request
     public static function fromGlobals(): HttpRequest
     {
-        $method = strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? HttpRequestValue::METHOD_DEFAULT)); // get HTTP method and make uppercase
-        $uri = (string)($_SERVER['REQUEST_URI'] ?? HttpRequestValue::PATH_DEFAULT); // get full request URI with query string maybe
-        $path = parse_url($uri, PHP_URL_PATH); // extract only path part from URI
-        $path = self::normalizePath($path === false || $path === null ? HttpRequestValue::PATH_DEFAULT : $path); // normalize path safely
-        $headers = self::headersFromGlobals(); // read request headers from PHP globals
-        $cookies = $_COOKIE; // read cookies sent by browser
-        $queryParams = $_GET; // read query params parsed by PHP
-        $rawBody = file_get_contents(HttpRequestValue::BODY_STREAM); // read raw request body
-        $rawBody = $rawBody === false ? '' : $rawBody; // use empty string if body cannot be read
-        $requestId = self::requestIdResolve($headers); // use client request id if safe or generate one
+        $requestData = HttpRequestGlobalReader::requestDataFromGlobalsGet();
 
-        return new HttpRequest($method, $path, $headers, $cookies, $queryParams, $rawBody, $requestId); // return request object
+        return new HttpRequest(
+            $requestData['method'],
+            $requestData['path'],
+            $requestData['headers'],
+            $requestData['cookies'],
+            $requestData['queryParams'],
+            $requestData['rawBody'],
+            $requestData['requestId']
+        );
     }
 
     //so now getters time!!!!
@@ -142,8 +142,7 @@ class HttpRequest
     {
         $contentType = $this->getHeader(HttpHeaders::CONTENT_TYPE); // get content type header
 
-        if ($contentType === null) // if no content type was sent
-        {
+        if ($contentType === null) {
             return null;
         }
 
@@ -203,103 +202,14 @@ class HttpRequest
     //this decodes JSON body only 1 time
     private function decodeJsonBodyIfNeeded(): void
     {
-        if ($this->_jsonBodyDecoded) // if already decoded before
-        {
+        if ($this->_jsonBodyDecoded) {
             return;
         }
 
         $this->_jsonBodyDecoded = true; // mark as decoded attempt done
+        $parseResult = HttpJsonBodyParser::jsonBodyParse($this->_rawBody);
 
-        if (!$this->hasRawBody()) // if there is no body
-        {
-            $this->_jsonBody = []; // empty body is treated as empty array
-            return;
-        }
-
-        $decodedBody = json_decode($this->_rawBody, true); // decode JSON body as associative array
-
-        if (json_last_error() !== JSON_ERROR_NONE) // check JSON parse error
-        {
-            $this->_jsonBody = null; // invalid JSON means no usable body
-            $this->_jsonDecodeError = json_last_error_msg(); // store JSON error message
-            return;
-        }
-
-        if (!is_array($decodedBody)) // JSON body must be object/array for our APIs
-        {
-            $this->_jsonBody = null; // scalar JSON values are not valid API body
-            $this->_jsonDecodeError = 'JSON body must be an object or array'; // store friendly error
-            return;
-        }
-
-        $this->_jsonBody = $decodedBody; // store decoded body
-    }
-
-    //this normalizes route path for router matching
-    private static function normalizePath(string $path): string
-    {
-        $path = HttpRequestValue::PATH_SEPARATOR . ltrim($path, HttpRequestValue::PATH_SEPARATOR); // always start path with slash
-
-        if ($path !== HttpRequestValue::PATH_DEFAULT && str_ends_with($path, HttpRequestValue::PATH_SEPARATOR)) // if path has trailing slash and is not root
-        {
-            $path = rtrim($path, HttpRequestValue::PATH_SEPARATOR); // remove trailing slash
-        }
-
-        return $path;
-    }
-
-    //this reads headers from globals and normalizes names
-    private static function headersFromGlobals(): array
-    {
-        $headers = []; // this will store normalized headers
-
-        if (function_exists('getallheaders')) // apache/nginx may provide this helper
-        {
-            foreach (getallheaders() as $name => $value) // loop through all headers
-            {
-                $headers[strtolower((string)$name)] = (string)$value; // store header lowercase
-            }
-        }
-
-        foreach ($_SERVER as $key => $value) // fallback because getallheaders may not work everywhere
-        {
-            if (str_starts_with($key, HttpHeaders::SERVER_HTTP_PREFIX)) // normal request headers appear as HTTP_HEADER_NAME
-            {
-                $name = strtolower(str_replace('_', '-', substr($key, strlen(HttpHeaders::SERVER_HTTP_PREFIX)))); // convert HTTP_CONTENT_TYPE style to content-type
-
-                $headers[$name] = (string)$value; // store normalized header
-            }
-        }
-
-        if (isset($_SERVER[HttpHeaders::SERVER_CONTENT_TYPE])) // content-type may not start with HTTP_
-        {
-            $headers[HttpHeaders::CONTENT_TYPE_NORMALIZED] = (string)$_SERVER[HttpHeaders::SERVER_CONTENT_TYPE]; // store content type
-        }
-
-        if (isset($_SERVER[HttpHeaders::SERVER_CONTENT_LENGTH])) // content-length may not start with HTTP_
-        {
-            $headers['content-length'] = (string)$_SERVER[HttpHeaders::SERVER_CONTENT_LENGTH]; // store content length
-        }
-
-        return $headers;
-    }
-
-    //this resolves request id from header or creates one
-    private static function requestIdResolve(array $headers): string
-    {
-        $requestId = $headers[HttpHeaders::X_REQUEST_ID_NORMALIZED] ?? ''; // read optional client request id
-
-        if (is_string($requestId) && preg_match(HttpRequestValue::REQUEST_ID_REGEX, $requestId) === 1) // accept only safe request id
-        {
-            return $requestId;
-        }
-
-        try // random_bytes can throw exception
-        {
-            return HttpRequestValue::REQUEST_ID_PREFIX . bin2hex(random_bytes(HttpRequestValue::REQUEST_ID_RANDOM_BYTE_COUNT)); // generate safe request id
-        } catch (Throwable) // if random generation fails
-        {
-            return HttpRequestValue::REQUEST_ID_PREFIX . uniqid('', true); // fallback request id
-        }
+        $this->_jsonBody = $parseResult['jsonBody'];
+        $this->_jsonDecodeError = $parseResult['jsonDecodeError'];
     }
 }

@@ -88,9 +88,6 @@ CREATE TABLE IF NOT EXISTS cw_match_history
         ON DELETE RESTRICT
         ON UPDATE CASCADE,
 
-    CONSTRAINT check_cw_match_history_different_players_valid
-        CHECK (courier_user_id <> saboteur_user_id),
-
     CONSTRAINT check_cw_match_history_time_order_valid
         CHECK (ended_at>=started_at),
 
