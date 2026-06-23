@@ -3,6 +3,9 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
+
+SimpleCachingServer/Project/Backend/config/auth.local.php
+
 # User-specific files
 *.rsuser
 *.suo
