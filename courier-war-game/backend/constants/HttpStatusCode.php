@@ -1,11 +1,12 @@
-<?php 
+<?php
 declare(strict_types=1);
 
 // HTTP status codes that will be used by API responses
-class HttpStatusCode 
+class HttpStatusCode
 {
     public const OK = 200; // successful read/action
     public const CREATED = 201; // new user guest/match was created
+    public const MULTIPLE_CHOICES = 300; // first redirect status, used as success upper bound
     public const BAD_REQUEST = 400; // invalid request body/field shape
     public const UNAUTHORIZED = 401; // auth is missing expired/invalid
     public const FORBIDDEN = 403; // user is authenticated but not allowed

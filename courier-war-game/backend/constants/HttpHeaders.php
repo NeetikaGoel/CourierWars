@@ -6,6 +6,7 @@ class HttpHeaders
 {
     public const CONTENT_TYPE = 'Content-Type'; // response/request header name for body type
     public const CONTENT_TYPE_NORMALIZED = 'content-type'; // lowercase version used internally after header normalization
+    public const CONTENT_LENGTH_NORMALIZED = 'content-length'; // lowercase version used internally after header normalization
 
     public const SET_COOKIE = 'Set-Cookie'; // response header name used to set/clear browser cookies
 
@@ -18,4 +19,7 @@ class HttpHeaders
     public const SERVER_HTTP_PREFIX = 'HTTP_'; // prefix PHP uses for normal request headers inside $_SERVER
     public const SERVER_CONTENT_TYPE = 'CONTENT_TYPE'; // special PHP server key for content type
     public const SERVER_CONTENT_LENGTH = 'CONTENT_LENGTH'; // special PHP server key for content length
+
+    public const SERVER_HEADER_UNDERSCORE_CHAR = '_'; // server header separator char
+    public const HEADER_DASH_CHAR = '-'; // normalized HTTP header separator char
 }

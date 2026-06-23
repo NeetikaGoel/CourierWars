@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../config/MapGenerationConfig.php';
 require_once __DIR__ . '/../map/serializer/CityMapSnapshotSerializer.php';
+require_once __DIR__ . '/../utility/JsonSafeEncoder.php';
 
 //this service owns backend map generation entry points
 class MapGenerationService
@@ -72,12 +73,7 @@ class MapGenerationService
             return $cityMapGenerated;
         }
 
-        $json = json_encode($cityMapGenerated, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-
-        if ($json === false) {
-            throw new RuntimeException('generated map could not be encoded');
-        }
-
+        $json = JsonSafeEncoder::encodeMixed($cityMapGenerated);
         $decoded = json_decode($json, true);
 
         if (!is_array($decoded)) {

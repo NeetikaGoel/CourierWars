@@ -59,10 +59,8 @@ class CityMapSnapshotSerializer
 
                 $normalizedRow[] = $this->tileNormalize($tile);
             }
-
             $normalizedRows[] = $normalizedRow;
         }
-
         return $normalizedRows;
     }
 

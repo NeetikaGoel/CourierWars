@@ -40,7 +40,7 @@ class HttpJsonResponse
     private array $_headers; // normal response headers
     private array $_cookieHeaders; // Set-Cookie headers need separate handling
 
-    //constructor to create response object now ofc
+    //now we need a constructor to create response object now ofc
     public function __construct(int $statusCode, array $body, array $headers = [], array $cookieHeaders = [])
     {
         $this->_statusCode = $statusCode;
