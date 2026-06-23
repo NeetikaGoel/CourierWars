@@ -32,11 +32,16 @@ class MapBootstrapService
             $mapSnapshot = $this->_mapGenerationService->previewMapGenerate((string)$seed);
             $mapKey = CacheServerKeyFactory::mapBootstrapItemKey(MapGenerationConfig::MAP_VERSION, $index);
 
-            $this->_cacheServerClient->cacheSet(
+            //here too hehe
+            $stored=$this->_cacheServerClient->cacheSet(
                 $mapKey,
                 $mapSnapshot,
                 CacheServerTtlConfig::bootstrapMapTtlSeconds()
             );
+
+            if (!$stored) {
+                throw new RuntimeException('cache store failed');
+            }
 
             $storedItems[] = [
                 'index' => $index,
@@ -54,11 +59,16 @@ class MapBootstrapService
             'items' => $storedItems,
         ];
 
-        $this->_cacheServerClient->cacheSet(
+        $stored = $this->_cacheServerClient->cacheSet(
             CacheServerKeyFactory::mapBootstrapListKey(MapGenerationConfig::MAP_VERSION),
             $listPayload,
             CacheServerTtlConfig::bootstrapMapTtlSeconds()
         );
+
+        //here also okay
+        if (!$stored) {
+            throw new RuntimeException('cache store failed');
+        }
 
         return $listPayload;
     }
@@ -86,11 +96,16 @@ class MapBootstrapService
     //this stores active match map in cache
     public function activeMatchMapStore(int $matchId, array $mapSnapshot, int $timerTotalMs): void
     {
-        $this->_cacheServerClient->cacheSet(
+        $stored=$this->_cacheServerClient->cacheSet(
             CacheServerKeyFactory::matchMapKey($matchId),
             $mapSnapshot,
             CacheServerTtlConfig::activeMatchMapTtlSeconds($timerTotalMs)
         );
+
+        //here also we use cache set so adding verification
+        if (!$stored) {
+            throw new RuntimeException('cache store failed!!');
+        }
     }
 
     //this gets active match map from cache

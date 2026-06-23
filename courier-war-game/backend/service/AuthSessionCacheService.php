@@ -62,11 +62,16 @@ class AuthSessionCacheService
 
         $sessionMetadata[self::FIELD_LAST_SEEN_AT_MS] = Clock::unixMilliseconds();
 
-        $this->_cacheServerClient->cacheSet(
+        $stored = $this->_cacheServerClient->cacheSet(
             CacheServerKeyFactory::authSessionKey((string)$sessionMetadata[self::FIELD_SID_HASH]),
             $sessionMetadata,
             CacheServerTtlConfig::authSessionTtlSeconds()
         );
+
+        //adding verification here as per pr review
+        if (!$stored) {
+            throw new RuntimeException('auth session cache store failed!!');
+        }
     }
 
     //this gets session metadata by raw session id
