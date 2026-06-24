@@ -727,6 +727,6 @@
 }
 
 .match-waiting-header .home-setup-player-info strong,
-.match-waiting-header .home-setup-xp-row em {
+.match-waiting-header .home-setup-session-button {
   white-space: nowrap;
 }

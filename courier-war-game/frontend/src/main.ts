@@ -11,6 +11,8 @@ import { mountMatchDisconnectedPage } from "./pages/match/match-disconnected/Mat
 import { mountMatchResultPage, type MatchResultData } from "./pages/match/result/MatchResultPage";
 import { FrontendMatchStatusValue } from "./constants/FrontendMatchStatusValue";
 import { mapApi } from "./common/api/MapApi";
+import { authApi } from "./common/api/AuthApi";
+import { profileApi } from "./common/api/ProfileApi";
 import { PhaserMatchGameController } from "./game/v7/scene/PhaserMatchGameController";
 
 const appRootElement = document.querySelector<HTMLDivElement>("#app");
@@ -23,11 +25,13 @@ const appRoot: HTMLDivElement = appRootElement;
 
 type PrototypeRole = "courier" | "saboteur";
 type PrototypeResultMode = "courierDelivered" | "saboteurTimeout" | "drawAgreement";
+type CurrentProfile = Awaited<ReturnType<typeof profileApi.getProfile>>;
+type SessionType = "guest" | "registered";
 
 const MATCH_TIMER_TOTAL_MS = 300000;
 
 let currentCleanup: (() => void) | null = null;
-let fakeSessionActive = false;
+let currentProfile: CurrentProfile | null = null;
 let currentMatchAssignedRole: PrototypeRole = "courier";
 let currentMatchDifficulty = "medium";
 let currentMatchStartedAtMs = Date.now();
@@ -38,6 +42,112 @@ async function pageMount(mountFunction: () => Promise<() => void>): Promise<void
   currentCleanup?.();
   currentCleanup = await mountFunction();
 }
+
+function currentPlayerNameGet(): string {
+  return currentProfile?.user.name || currentProfile?.user.username || "Player";
+}
+
+function currentSessionTypeGet(): SessionType {
+  return currentProfile?.user.isGuest ? "guest" : "registered";
+}
+
+function oppositeRoleGet(role: PrototypeRole): PrototypeRole {
+  return role === "courier" ? "saboteur" : "courier";
+}
+
+function currentParticipantNamesGet(): { courierName: string; saboteurName: string } {
+  const playerName = currentPlayerNameGet();
+
+  if (currentMatchAssignedRole === "saboteur") {
+    return {
+      courierName: "Opponent",
+      saboteurName: playerName,
+    };
+  }
+
+  return {
+    courierName: playerName,
+    saboteurName: "Opponent",
+  };
+}
+
+function textSet(selector: string, value: string): void {
+  const element = appRoot.querySelector<HTMLElement>(selector);
+
+  if (element) {
+    element.textContent = value;
+  }
+}
+
+function sessionButtonWire(): () => void {
+  const buttonList = Array.from(appRoot.querySelectorAll<HTMLButtonElement>("[data-session-end-button]"));
+  const label = currentSessionTypeGet() === "registered" ? "Logout" : "Forget Session";
+
+  const onClick = (): void => {
+    void sessionEndAndGoLanding();
+  };
+
+  buttonList.forEach((button) => {
+    button.textContent = label;
+    button.addEventListener("click", onClick);
+  });
+
+  return () => {
+    buttonList.forEach((button) => {
+      button.removeEventListener("click", onClick);
+    });
+  };
+}
+
+function profileHeaderHydrate(): void {
+  textSet("[data-current-profile-name]", currentPlayerNameGet());
+  textSet("[data-current-profile-status]", currentSessionTypeGet() === "guest" ? "GUEST ONLINE" : "ONLINE");
+}
+
+const trackedProfileApi = {
+  getProfile: async (): Promise<CurrentProfile> => {
+    currentProfile = await profileApi.getProfile();
+
+    return currentProfile;
+  },
+};
+
+const trackedAuthApi = {
+  login: async (payload: { identifier: string; password: string }): Promise<void> => {
+    await authApi.login(payload);
+    currentProfile = await profileApi.getProfile();
+  },
+
+  register: async (payload: {
+    username: string;
+    email: string;
+    password: string;
+    name?: string;
+    preferredRole: string;
+  }): Promise<void> => {
+    await authApi.register(payload);
+    currentProfile = await profileApi.getProfile();
+  },
+
+  guest: async (payload: { name?: string }): Promise<void> => {
+    await authApi.guest(payload);
+    currentProfile = await profileApi.getProfile();
+  },
+
+  refresh: async (): Promise<void> => {
+    await authApi.refresh();
+  },
+
+  logout: async (): Promise<void> => {
+    await authApi.logout();
+    currentProfile = null;
+  },
+
+  forgetGuest: async (): Promise<void> => {
+    await authApi.forgetGuest();
+    currentProfile = null;
+  },
+};
 
 function matchTimerRemainingMsGet(): number {
   const elapsedMs = Date.now() - currentMatchStartedAtMs;
@@ -64,92 +174,15 @@ function currentMatchStatusGet(timerRemainingMs: number): number {
   return FrontendMatchStatusValue.Active;
 }
 
-const fakeAuthApi = {
-  login: async (_payload: { identifier: string; password: string }): Promise<void> => {
-    console.log("fake login", _payload);
-    fakeSessionActive = true;
-  },
-
-  register: async (_payload: {
-    username: string;
-    email: string;
-    password: string;
-    name?: string;
-    preferredRole: string;
-  }): Promise<void> => {
-    console.log("fake register", _payload);
-    fakeSessionActive = true;
-  },
-
-  guest: async (_payload: { name?: string }): Promise<void> => {
-    console.log("fake guest", _payload);
-    fakeSessionActive = true;
-  },
-
-  refresh: async (): Promise<void> => {
-    console.log("fake refresh");
-
-    if (!fakeSessionActive) {
-      throw new Error("UNAUTHORIZED");
-    }
-  },
-
-  logout: async (): Promise<void> => {
-    console.log("fake logout");
-    fakeSessionActive = false;
-  },
-
-  forgetGuest: async (): Promise<void> => {
-    console.log("fake forget guest");
-    fakeSessionActive = false;
-  },
-};
-
-const fakeProfileApi = {
-  getProfile: async () => {
-    if (!fakeSessionActive) {
-      throw new Error("UNAUTHORIZED");
-    }
-
-    return {
-      user: {
-        userId: 1,
-        username: "neetika_demo",
-        name: "Neetika Goel",
-        email: null,
-        isGuest: true,
-        createdAt: "2026-06-01T00:00:00.000Z",
-      },
-      stats: {
-        totalMatches: 0,
-        totalWins: 0,
-        totalLosses: 0,
-        courierMatches: 0,
-        courierWins: 0,
-        courierLosses: 0,
-        saboteurMatches: 0,
-        saboteurWins: 0,
-        saboteurLosses: 0,
-        fastestDeliveryMs: null,
-        bestSaboteurDelayMs: null,
-        preferredRole: "any",
-        lastPlayedRole: null,
-      },
-    };
-  },
-};
-
-const fakeMatchApi = {
-  create: async (_payload: {
+const MatchApi = {
+  create: async (payload: {
     difficulty: string;
     rolePreference: string;
     mapVersion: string;
     mapGenerationVersion: string;
   }) => {
-    console.log("fake create match", _payload);
-
-    currentMatchAssignedRole = _payload.rolePreference === "saboteur" ? "saboteur" : "courier";
-    currentMatchDifficulty = _payload.difficulty;
+    currentMatchAssignedRole = payload.rolePreference === "saboteur" ? "saboteur" : "courier";
+    currentMatchDifficulty = payload.difficulty;
     currentMatchStateVersion = 1;
     currentResultMode = null;
 
@@ -166,12 +199,12 @@ const mapPreviewMatchApi = {
     return mapApi.previewMapGet({ seed: 20260531 });
   },
 
-  getMatchState: async (_matchId: string | number, _knownVersion: number) => {
+  getMatchState: async (matchId: string | number, _knownVersion: number) => {
     const timerRemainingMs = matchTimerRemainingMsGet();
     const status = currentMatchStatusGet(timerRemainingMs);
 
     return {
-      matchId: _matchId,
+      matchId,
       status,
       assignedRole: currentMatchAssignedRole,
       stateVersion: currentMatchStateVersion++,
@@ -183,71 +216,22 @@ const mapPreviewMatchApi = {
       obstacleEnergySpent: 120,
       energyMax: 100,
       activeHurdleCount: 3,
+      playerName: currentPlayerNameGet(),
     };
   },
 
   getResult: async (matchId: string | number): Promise<MatchResultData> => {
-    if (currentResultMode === "drawAgreement") {
-      return {
-        matchId,
-        winnerRole: "draw",
-        endReason: "drawAgreement",
-        difficulty: currentMatchDifficulty,
-        matchTimeMs: MATCH_TIMER_TOTAL_MS,
-        timeRemainingMs: matchTimerRemainingMsGet(),
-        courierLivesRemaining: 3,
-        deliveryProgressPct: deliveryProgressGet(matchTimerRemainingMsGet()),
-        obstacleEnergySpent: 120,
-        obstacleEnergyRemaining: 72,
-        obstacleEnergyMax: 200,
-        hurdlesActivated: 9,
-        successfulDelays: 6,
-        mostUsedHurdle: "Traffic Light",
-        longestActiveHurdleMs: 18000,
-        predictionAccuracyPct: 68,
-        abilitiesUsed: 3,
-        distanceTravelledKm: 4.23,
-        routesChanged: 5,
-        courierName: "Neetika Goel",
-        saboteurName: "Santosh Shedbalkar",
-      };
-    }
-
-    if (currentResultMode === "saboteurTimeout") {
-      return {
-        matchId,
-        winnerRole: "saboteur",
-        endReason: "timerExpired",
-        difficulty: currentMatchDifficulty,
-        matchTimeMs: MATCH_TIMER_TOTAL_MS,
-        timeRemainingMs: 0,
-        courierLivesRemaining: 2,
-        deliveryProgressPct: 84,
-        obstacleEnergySpent: 145,
-        obstacleEnergyRemaining: 40,
-        obstacleEnergyMax: 200,
-        hurdlesActivated: 11,
-        successfulDelays: 8,
-        mostUsedHurdle: "Road Block",
-        longestActiveHurdleMs: 22000,
-        predictionAccuracyPct: 74,
-        abilitiesUsed: 3,
-        distanceTravelledKm: 3.84,
-        routesChanged: 7,
-        courierName: "Neetika Goel",
-        saboteurName: "Santosh Shedbalkar",
-      };
-    }
+    const participantNames = currentParticipantNamesGet();
 
     return {
       matchId,
-      winnerRole: "courier",
-      endReason: "delivered",
+      winnerRole: currentResultMode === "drawAgreement" ? "draw" : "courier",
+      endReason: currentResultMode === "drawAgreement" ? "drawAgreement" : "delivered",
       difficulty: currentMatchDifficulty,
       matchTimeMs: MATCH_TIMER_TOTAL_MS,
       timeRemainingMs: Math.max(12000, matchTimerRemainingMsGet()),
       courierLivesRemaining: 3,
-      deliveryProgressPct: 100,
+      deliveryProgressPct: currentResultMode === "drawAgreement" ? deliveryProgressGet(matchTimerRemainingMsGet()) : 100,
       obstacleEnergySpent: 120,
       obstacleEnergyRemaining: 72,
       obstacleEnergyMax: 200,
@@ -259,8 +243,8 @@ const mapPreviewMatchApi = {
       abilitiesUsed: 3,
       distanceTravelledKm: 4.23,
       routesChanged: 5,
-      courierName: "Neetika Goel",
-      saboteurName: "Santosh Shedbalkar",
+      courierName: participantNames.courierName,
+      saboteurName: participantNames.saboteurName,
       hurdleCounts: {
         redTrafficLight: 3,
         roadBlock: 2,
@@ -272,6 +256,21 @@ const mapPreviewMatchApi = {
     };
   },
 };
+
+async function sessionEndAndGoLanding(): Promise<void> {
+  try {
+    if (currentProfile?.user.isGuest) {
+      await authApi.forgetGuest();
+    } else if (currentProfile) {
+      await authApi.logout();
+    }
+  } catch {
+    // ignore auth cleanup failure and still return to landing
+  } finally {
+    currentProfile = null;
+    goToLanding();
+  }
+}
 
 function goToLanding(): void {
   void pageMount(() =>
@@ -286,8 +285,8 @@ function goToLanding(): void {
 function goToAuthLoading(): void {
   void pageMount(() =>
     mountAuthLoadingPage(appRoot, {
-      authApi: fakeAuthApi,
-      profileApi: fakeProfileApi,
+      authApi: trackedAuthApi,
+      profileApi: trackedProfileApi,
       actions: {
         goToHome,
         goToLanding,
@@ -312,8 +311,8 @@ function goToMatchWaiting(
   currentMatchDifficulty = setupData.difficulty;
   currentResultMode = null;
 
-  void pageMount(() =>
-    mountMatchWaitingPage(appRoot, {
+  void pageMount(async () => {
+    const cleanup = await mountMatchWaitingPage(appRoot, {
       launchData: {
         matchId,
         assignedRole: setupData.assignedRole,
@@ -324,29 +323,45 @@ function goToMatchWaiting(
         mapVersion: setupData.mapVersion,
         mapGenerationVersion: setupData.mapGenerationVersion,
         estimatedWaitSeconds: 3,
-        playerName: "Neetika Goel",
+        playerName: currentPlayerNameGet(),
       },
       actions: {
         goToHome,
         goToMatchLoading,
       },
-    })
-  );
+    });
+
+    profileHeaderHydrate();
+    const sessionCleanup = sessionButtonWire();
+
+    return () => {
+      sessionCleanup();
+      cleanup();
+    };
+  });
 }
 
 function goToMatchLoading(loadingData: MatchWaitingPageToLoadingData | string): void {
   const matchId = typeof loadingData === "string" ? loadingData : loadingData.matchId;
+  const opponentRole = typeof loadingData === "string" ? oppositeRoleGet(currentMatchAssignedRole) : loadingData.opponentRole;
 
   if (typeof loadingData !== "string") {
     currentMatchAssignedRole = loadingData.assignedRole;
     currentMatchDifficulty = loadingData.difficulty;
   }
 
-  void pageMount(() =>
-    mountMatchLoadingPage(appRoot, {
+  void pageMount(async () => {
+    const cleanup = await mountMatchLoadingPage(appRoot, {
       matchId,
+      launchData: {
+        assignedRole: currentMatchAssignedRole,
+        opponentRole,
+        playerName: currentPlayerNameGet(),
+        sessionType: currentSessionTypeGet(),
+      },
       matchApi: mapPreviewMatchApi,
       actions: {
+        cancelSearch: goToHome,
         goToMatchWaiting: (waitingMatchId) => {
           goToMatchWaiting(String(waitingMatchId), {
             assignedRole: currentMatchAssignedRole,
@@ -361,8 +376,16 @@ function goToMatchLoading(loadingData: MatchWaitingPageToLoadingData | string): 
         goToMatchGame,
         goToDisconnected: goToMatchDisconnected,
       },
-    })
-  );
+    });
+
+    profileHeaderHydrate();
+    const sessionCleanup = sessionButtonWire();
+
+    return () => {
+      sessionCleanup();
+      cleanup();
+    };
+  });
 }
 
 function goToMatchGame(matchId: string | number, mapPayload: unknown, matchState: unknown): void {
@@ -383,6 +406,8 @@ function goToMatchGame(matchId: string | number, mapPayload: unknown, matchState
         goToDisconnected: goToMatchDisconnected,
       },
     });
+
+    textSet("[data-match-player-name]", currentPlayerNameGet());
 
     const drawButtonList = Array.from(appRoot.querySelectorAll<HTMLButtonElement>("[data-match-draw-button]"));
 
@@ -405,23 +430,34 @@ function goToMatchResult(matchId: string | number): void {
     currentResultMode = "courierDelivered";
   }
 
-  void pageMount(() =>
-    mountMatchResultPage(appRoot, {
+  void pageMount(async () => {
+    const cleanup = await mountMatchResultPage(appRoot, {
       matchId,
       matchApi: mapPreviewMatchApi,
-      sessionType: "guest",
+      sessionType: currentSessionTypeGet(),
+      currentPlayerName: currentPlayerNameGet(),
       actions: {
         goToHome,
         playAgain: goToHome,
-        exitMatch: goToLanding,
+        exitMatch: () => {
+          void sessionEndAndGoLanding();
+        },
       },
-    })
-  );
+    });
+
+    profileHeaderHydrate();
+    const sessionCleanup = sessionButtonWire();
+
+    return () => {
+      sessionCleanup();
+      cleanup();
+    };
+  });
 }
 
 function goToMatchDisconnected(matchId: string | number): void {
-  void pageMount(() =>
-    mountMatchDisconnectedPage(appRoot, {
+  void pageMount(async () => {
+    const cleanup = await mountMatchDisconnectedPage(appRoot, {
       matchId,
       actions: {
         retryMatch: (retryMatchId) => {
@@ -429,14 +465,23 @@ function goToMatchDisconnected(matchId: string | number): void {
         },
         goToHome: goToHome,
       },
-    })
-  );
+    });
+
+    textSet("[data-disconnected-profile-name]", currentPlayerNameGet());
+    profileHeaderHydrate();
+    const sessionCleanup = sessionButtonWire();
+
+    return () => {
+      sessionCleanup();
+      cleanup();
+    };
+  });
 }
 
 function goToLogin(): void {
   void pageMount(() =>
     mountLoginPage(appRoot, {
-      authApi: fakeAuthApi,
+      authApi: trackedAuthApi,
       actions: {
         goToHome,
         goToLanding,
@@ -450,7 +495,7 @@ function goToLogin(): void {
 function goToRegister(): void {
   void pageMount(() =>
     mountRegisterPage(appRoot, {
-      authApi: fakeAuthApi,
+      authApi: trackedAuthApi,
       actions: {
         goToHome,
         goToLanding,
@@ -464,7 +509,7 @@ function goToRegister(): void {
 function goToGuest(): void {
   void pageMount(() =>
     mountGuestEntryPage(appRoot, {
-      authApi: fakeAuthApi,
+      authApi: trackedAuthApi,
       actions: {
         goToHome,
         goToLanding,
@@ -476,10 +521,10 @@ function goToGuest(): void {
 }
 
 function goToHome(): void {
-  void pageMount(() =>
-    mountHomeSetupPage(appRoot, {
-      profileApi: fakeProfileApi,
-      matchApi: fakeMatchApi,
+  void pageMount(async () => {
+    const cleanup = await mountHomeSetupPage(appRoot, {
+      profileApi: trackedProfileApi,
+      matchApi: MatchApi,
       actions: {
         goToLanding,
         goToMatchWaiting,
@@ -487,8 +532,16 @@ function goToHome(): void {
           goToMatchLoading(matchId);
         },
       },
-    })
-  );
+    });
+
+    profileHeaderHydrate();
+    const sessionCleanup = sessionButtonWire();
+
+    return () => {
+      sessionCleanup();
+      cleanup();
+    };
+  });
 }
 
-goToHome();
+goToAuthLoading();

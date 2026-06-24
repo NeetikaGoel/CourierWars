@@ -8,166 +8,147 @@
         <span class="home-setup-brand-logo-frame">
           <img class="home-setup-brand-logo" src="/assets/brand/courier-war-logo.png" alt="" aria-hidden="true" />
         </span>
-    
+
         <span class="home-setup-brand-text">
           <span>Courier</span>
           <strong>War</strong>
           <small>Outthink. Outmaneuver. Outdeliver.</small>
         </span>
       </button>
-    
+
       <nav class="home-setup-nav match-result-top-nav" aria-label="Result navigation">
         <button class="home-setup-nav-item" type="button" data-home-button>
           <span class="home-setup-nav-icon" aria-hidden="true"><img src="/assets/navbar/home.png" alt="" /></span>
           <span>Home</span>
         </button>
-    
+
         <button class="home-setup-nav-item home-setup-nav-item-active" type="button">
           <span class="home-setup-nav-icon" aria-hidden="true"><img src="/assets/navbar/gameplay.png" alt="" /></span>
           <span>Play</span>
         </button>
-    
+
         <button class="home-setup-nav-item" type="button">
           <span class="home-setup-nav-icon" aria-hidden="true"><img src="/assets/navbar/stats.png" alt="" /></span>
           <span>Stats</span>
         </button>
-    
+
         <button class="home-setup-nav-item" type="button">
           <span class="home-setup-nav-icon" aria-hidden="true"><img src="/assets/navbar/features.png" alt="" /></span>
           <span>Features</span>
         </button>
-    
+
         <button class="home-setup-nav-item" type="button">
           <span class="home-setup-nav-icon" aria-hidden="true"><img src="/assets/navbar/features.png" alt="" /></span>
           <span>How To Play</span>
         </button>
-    
+
         <button class="home-setup-nav-item" type="button">
           <span class="home-setup-nav-icon" aria-hidden="true"><img src="/assets/navbar/support.png" alt="" /></span>
           <span>Settings</span>
         </button>
       </nav>
-    
+
       <section class="home-setup-player-card" aria-label="Current player">
         <span class="home-setup-player-avatar" aria-hidden="true">
           <img src="/assets/login/ghost.png" alt="" />
         </span>
-    
+
         <span class="home-setup-player-info">
-          <strong>Neetika Goel</strong>
-          <small><i class="home-setup-online-dot"></i><span>ONLINE</span></small>
-          <span class="home-setup-xp-row"><b>12</b><span><i></i></span><em>2,450 / 5,000 XP</em></span>
+          <strong data-current-profile-name>Player</strong>
+          <small><i class="home-setup-online-dot"></i><span data-current-profile-status>ONLINE</span></small>
+          <button class="home-setup-session-button" type="button" data-session-end-button>Logout</button>
         </span>
       </section>
     </header>
 
     <header class="match-result-header">
-      <span>Match ID: <strong data-result-match-id>CW-2026-05-24-0012</strong></span>
+      <span>Match ID: <strong data-result-match-id>CW-0001</strong></span>
       <h1>Match Result</h1>
       <span>Match Time: <strong data-result-match-time>05:00</strong></span>
     </header>
 
     <main class="match-result-main">
-      <section class="match-result-hero match-result-courier-panel">
-        <div class="match-result-role-title">
-          <span class="match-result-role-title-image" aria-hidden="true">
-            <img src="/assets/homepage/courier.png" alt="" />
-          </span>
+      <section class="match-result-outcome-panel">
+        <strong data-result-outcome-label>Victory</strong>
+        <h2 data-result-outcome-title>Courier Wins</h2>
+        <p data-result-outcome-reason>Package delivered successfully</p>
+      </section>
 
-          <div>
-            <h2 data-result-courier-headline>Courier Wins!</h2>
-            <p data-result-courier-subtitle>Package delivered successfully</p>
-            <small data-result-courier-player-line>Neetika Goel - Player 1</small>
-          </div>
-        </div>
+      <section class="match-result-player-grid">
+        <article class="match-result-player-card match-result-courier-card" data-result-courier-card>
+          <span class="match-result-player-status" data-result-courier-ribbon>Winner</span>
 
-        <article class="match-result-player-card match-result-winner-card">
-          <span class="match-result-ribbon" data-result-courier-ribbon>Winner</span>
           <span class="match-result-role-icon" aria-hidden="true">
             <img src="/assets/homepage/courier.png" alt="" />
           </span>
+
           <div>
-            <strong>Courier</strong>
-            <p data-result-courier-name>Neetika Goel</p>
-            <em>Player 1</em>
+            <small>Courier</small>
+            <h2 data-result-courier-headline>Courier Wins</h2>
+            <p data-result-courier-name>Player 1</p>
+            <em data-result-courier-player-line>Player 1</em>
           </div>
-          <span class="match-result-trophy" aria-hidden="true">🏆</span>
         </article>
-      </section>
 
-      <div class="match-result-versus" aria-hidden="true">VS</div>
+        <article class="match-result-player-card match-result-saboteur-card" data-result-saboteur-card>
+          <span class="match-result-player-status" data-result-saboteur-ribbon>Runner-Up</span>
 
-      <section class="match-result-hero match-result-saboteur-panel">
-        <div class="match-result-role-title">
-          <div>
-            <h2 data-result-saboteur-headline>Saboteur Loses!</h2>
-            <p data-result-saboteur-subtitle>Timer reached zero</p>
-            <small data-result-saboteur-player-line>Santosh Shedbalkar - Player 2</small>
-          </div>
-
-          <span class="match-result-role-title-image match-result-role-title-image-red" aria-hidden="true">
-            <img src="/assets/homepage/saboteur.png" alt="" />
-          </span>
-        </div>
-
-        <article class="match-result-player-card match-result-runner-card">
-          <span class="match-result-ribbon" data-result-saboteur-ribbon>Runner-Up</span>
           <span class="match-result-role-icon match-result-role-icon-red" aria-hidden="true">
             <img src="/assets/homepage/saboteur.png" alt="" />
           </span>
+
           <div>
-            <strong>Saboteur</strong>
-            <p data-result-saboteur-name>Santosh Shedbalkar</p>
-            <em>Player 2</em>
+            <small>Saboteur</small>
+            <h2 data-result-saboteur-headline>Saboteur Loses</h2>
+            <p data-result-saboteur-name>Player 2</p>
+            <em data-result-saboteur-player-line>Player 2</em>
           </div>
-          <span class="match-result-skull" aria-hidden="true">☠</span>
         </article>
       </section>
 
-      <section class="match-result-summary-panel">
-        <h2>Courier Summary</h2>
+      <section class="match-result-summary-grid">
+        <article class="match-result-summary-card match-result-summary-card-blue">
+          <h2>Courier Summary</h2>
 
-        <div class="match-result-summary-column">
-          <div class="match-result-stat-row"><span>◷</span><p>Time Remaining</p><strong data-result-time-remaining>00:12</strong></div>
-          <div class="match-result-stat-row"><span>✚</span><p>Delivery Progress</p><strong data-result-delivery-progress>100%</strong></div>
-          <div class="match-result-stat-row"><span>♥</span><p>Lives Remaining</p><strong data-result-lives>♥ ♥ ♥</strong></div>
-          <div class="match-result-stat-row"><span>◈</span><p>Abilities Used</p><strong data-result-abilities-used>3</strong></div>
-          <div class="match-result-stat-row"><span>⌁</span><p>Total Distance Travelled</p><strong data-result-distance>4.23 km</strong></div>
-          <div class="match-result-stat-row"><span>↝</span><p>Routes Changed</p><strong data-result-routes-changed>5</strong></div>
-        </div>
+          <div class="match-result-stat-row"><span>TR</span><p>Time Remaining</p><strong data-result-time-remaining>00:12</strong></div>
+          <div class="match-result-stat-row"><span>DP</span><p>Delivery Progress</p><strong data-result-delivery-progress>100%</strong></div>
+          <div class="match-result-stat-row"><span>LV</span><p>Lives Remaining</p><strong data-result-lives>3</strong></div>
+          <div class="match-result-stat-row"><span>AB</span><p>Abilities Used</p><strong data-result-abilities-used>3</strong></div>
+          <div class="match-result-stat-row"><span>KM</span><p>Total Distance</p><strong data-result-distance>4.23 km</strong></div>
+          <div class="match-result-stat-row"><span>RC</span><p>Routes Changed</p><strong data-result-routes-changed>5</strong></div>
+        </article>
+
+        <article class="match-result-summary-card match-result-summary-card-red">
+          <h2>Saboteur Summary</h2>
+
+          <div class="match-result-stat-row"><span>HA</span><p>Hurdles Activated</p><strong data-result-hurdles-activated>9</strong></div>
+          <div class="match-result-stat-row"><span>EN</span><p>Obstacle Energy Used</p><strong data-result-energy-used>120 / 200</strong></div>
+          <div class="match-result-stat-row"><span>SD</span><p>Successful Delays</p><strong data-result-successful-delays>6</strong></div>
+          <div class="match-result-stat-row"><span>MH</span><p>Most Used Hurdle</p><strong data-result-most-used-hurdle>Traffic Light</strong></div>
+          <div class="match-result-stat-row"><span>LT</span><p>Longest Hurdle Time</p><strong data-result-longest-hurdle>00:18</strong></div>
+          <div class="match-result-stat-row"><span>PA</span><p>Prediction Accuracy</p><strong data-result-prediction>68%</strong></div>
+        </article>
+
+        <article class="match-result-summary-card match-result-summary-card-orange">
+          <h2>Hurdles Used</h2>
+
+          <div class="match-result-hurdle-row"><span>TL</span><p>Traffic Light</p><strong data-result-traffic-light-count>3</strong></div>
+          <div class="match-result-hurdle-row"><span>RB</span><p>Road Block</p><strong data-result-road-block-count>2</strong></div>
+          <div class="match-result-hurdle-row"><span>CZ</span><p>Construction</p><strong data-result-construction-count>2</strong></div>
+          <div class="match-result-hurdle-row"><span>TJ</span><p>Traffic Jam</p><strong data-result-traffic-jam-count>1</strong></div>
+          <div class="match-result-hurdle-row"><span>CG</span><p>Closed Gate</p><strong data-result-closed-gate-count>1</strong></div>
+          <div class="match-result-hurdle-row"><span>WD</span><p>Wrong Direction</p><strong data-result-wrong-direction-count>0</strong></div>
+        </article>
       </section>
-
-      <section class="match-result-saboteur-summary-panel">
-        <h2>Saboteur Summary</h2>
-
-        <div class="match-result-summary-column">
-          <div class="match-result-stat-row match-result-red-row"><span>▥</span><p>Hurdles Activated</p><strong data-result-hurdles-activated>9</strong></div>
-          <div class="match-result-stat-row match-result-red-row"><span>ϟ</span><p>Obstacle Energy Used</p><strong data-result-energy-used>120 / 200</strong></div>
-          <div class="match-result-stat-row match-result-red-row"><span>✦</span><p>Successful Delays</p><strong data-result-successful-delays>6</strong></div>
-          <div class="match-result-stat-row match-result-red-row"><span>▥</span><p>Most Used Hurdle</p><strong data-result-most-used-hurdle>Traffic Light</strong></div>
-          <div class="match-result-stat-row match-result-red-row"><span>◷</span><p>Longest Active Hurdle Time</p><strong data-result-longest-hurdle>00:18</strong></div>
-          <div class="match-result-stat-row match-result-red-row"><span>◎</span><p>Prediction Accuracy</p><strong data-result-prediction>68%</strong></div>
-        </div>
-      </section>
-
-      <aside class="match-result-hurdle-panel">
-        <h2>Top Hurdles Used</h2>
-        <div class="match-result-hurdle-row"><span>▥</span><p>Traffic Light</p><strong data-result-traffic-light-count>3</strong></div>
-        <div class="match-result-hurdle-row"><span>▤</span><p>Road Block</p><strong data-result-road-block-count>2</strong></div>
-        <div class="match-result-hurdle-row"><span>△</span><p>Construction</p><strong data-result-construction-count>2</strong></div>
-        <div class="match-result-hurdle-row"><span>▨</span><p>Traffic Jam</p><strong data-result-traffic-jam-count>1</strong></div>
-        <div class="match-result-hurdle-row"><span>⊞</span><p>Closed Gate</p><strong data-result-closed-gate-count>1</strong></div>
-        <div class="match-result-hurdle-row"><span>↝</span><p>Wrong Direction</p><strong data-result-wrong-direction-count>0</strong></div>
-      </aside>
     </main>
 
     <div class="match-result-loading" data-page-loading hidden></div>
     <div class="match-result-error" data-page-error hidden></div>
 
     <footer class="match-result-actions">
-      <button class="match-result-action-primary" type="button" data-play-again-button>↻ Play Again</button>
-      <button class="match-result-action-neutral" type="button" data-home-button>☰ Main Menu</button>
-      <button class="match-result-action-danger" type="button" data-exit-button>⇥ Forget Session</button>
+      <button class="match-result-action-primary" type="button" data-play-again-button>Play Again</button>
+      <button class="match-result-action-neutral" type="button" data-home-button>Main Menu</button>
+      <button class="match-result-action-danger" type="button" data-exit-button>Forget Session</button>
     </footer>
   </div>
 </section>

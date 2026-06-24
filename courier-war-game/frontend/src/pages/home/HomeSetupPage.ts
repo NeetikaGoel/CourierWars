@@ -28,8 +28,9 @@ export interface HomeSetupPageProfile {
     email?: string | null;
     isGuest?: boolean;
     createdAt?: string;
+    updatedAt?: string;
   };
-  stats?: HomeSetupPageProfileStats;
+  stats?: HomeSetupPageProfileStats | null;
 }
 
 export interface HomeSetupPageProfileApi {
@@ -139,7 +140,7 @@ function safeStats(profile: HomeSetupPageProfile): Required<HomeSetupPageProfile
     saboteurLosses,
     fastestDeliveryMs: stats.fastestDeliveryMs ?? null,
     bestSaboteurDelayMs: stats.bestSaboteurDelayMs ?? null,
-    preferredRole: stats.preferredRole ?? "courier",
+    preferredRole: stats.preferredRole ?? "any",
     lastPlayedRole: stats.lastPlayedRole ?? null,
   };
 }
@@ -148,7 +149,7 @@ function renderProfile(root: HTMLElement, profile: HomeSetupPageProfile): void {
   const user = profile.user ?? {};
   const stats = safeStats(profile);
   const name = user.name || user.username || "Player";
-  const shownRole = stats.lastPlayedRole || stats.preferredRole || "courier";
+  const shownRole = stats.lastPlayedRole || stats.preferredRole || "any";
   const winRate = stats.totalMatches > 0 ? (stats.totalWins / stats.totalMatches) * 100 : 0;
 
   setText(root, "[data-home-profile-name]", name);
@@ -175,44 +176,15 @@ function renderProfile(root: HTMLElement, profile: HomeSetupPageProfile): void {
   }
 }
 
-function renderFallbackProfile(root: HTMLElement): void {
-  renderProfile(root, {
-    user: {
-      name: "Neetika Goel",
-      username: "neetika",
-      isGuest: false,
-      createdAt: "2026-05-01T00:00:00.000Z",
-    },
-    stats: {
-      totalMatches: 48,
-      totalWins: 27,
-      totalLosses: 21,
-      courierMatches: 27,
-      courierWins: 16,
-      courierLosses: 11,
-      saboteurMatches: 21,
-      saboteurWins: 11,
-      saboteurLosses: 10,
-      fastestDeliveryMs: 138000,
-      bestSaboteurDelayMs: 292000,
-      preferredRole: "courier",
-      lastPlayedRole: "courier",
-    },
-  });
-}
-
 function assignedRoleFromResponseGet(response: HomeSetupPageMatchCreateResponse, selectedRole: string): string {
-  // this uses backend assigned role when available
   if (response.assignedRole) {
     return response.assignedRole;
   }
 
-  // this gives a playable fallback when user selected any
   if (selectedRole === "any") {
     return "courier";
   }
 
-  // this keeps selected role for courier or saboteur
   return selectedRole;
 }
 
@@ -224,7 +196,6 @@ function goToWaitingOrLoading(
   selectedDifficulty: string,
   status: number | undefined
 ): void {
-  // this sends player to waiting page when backend says match is waiting
   if (status === FrontendMatchStatusValue.Waiting && deps.actions.goToMatchWaiting) {
     deps.actions.goToMatchWaiting(matchId, {
       assignedRole,
@@ -238,13 +209,11 @@ function goToWaitingOrLoading(
     return;
   }
 
-  // this sends player directly to loading when match is ready or active
   if (deps.actions.goToMatchLoading) {
     deps.actions.goToMatchLoading(matchId);
     return;
   }
 
-  // this is a fallback until all route handlers are connected
   pageErrorShow(document.body, "Match page route is not connected yet");
 }
 
@@ -302,31 +271,18 @@ export async function mountHomeSetupPage(root: HTMLElement, deps: HomeSetupPageD
       startButton?.setAttribute("disabled", "true");
       pageLoadingSet(root, true, "Creating match...");
 
-      // this branch keeps the page working before real match api is connected
-      if (!deps.matchApi) {
-        await new Promise((resolve) => window.setTimeout(resolve, 650));
-
-        const prototypeMatchId = "prototype-match";
-        const prototypeAssignedRole = selectedRole === "any" ? "courier" : selectedRole;
-
-        goToWaitingOrLoading(
-          deps,
-          prototypeMatchId,
-          prototypeAssignedRole,
-          selectedRole,
-          selectedDifficulty,
-          FrontendMatchStatusValue.Waiting
-        );
-        return;
-      }
-
-      // this calls real or fake match create api
-      const response = await deps.matchApi.create({
-        difficulty: selectedDifficulty,
-        rolePreference: selectedRole,
-        mapVersion: HOME_MAP_VERSION,
-        mapGenerationVersion: HOME_MAP_GENERATION_VERSION,
-      });
+      const response = deps.matchApi
+        ? await deps.matchApi.create({
+            difficulty: selectedDifficulty,
+            rolePreference: selectedRole,
+            mapVersion: HOME_MAP_VERSION,
+            mapGenerationVersion: HOME_MAP_GENERATION_VERSION,
+          })
+        : {
+            matchId: "prototype-match",
+            status: FrontendMatchStatusValue.Waiting,
+            assignedRole: selectedRole === "any" ? "courier" : selectedRole,
+          };
 
       const matchId = String(response.matchId ?? "");
 
@@ -380,15 +336,14 @@ export async function mountHomeSetupPage(root: HTMLElement, deps: HomeSetupPageD
     button.addEventListener("click", showPrototypeMessage);
   });
 
-  renderFallbackProfile(root);
-
   if (deps.profileApi) {
     try {
-      const profile = await deps.profileApi.getProfile();
-      renderProfile(root, profile);
+      renderProfile(root, await deps.profileApi.getProfile());
     } catch {
-      renderFallbackProfile(root);
+      deps.actions.goToLanding();
     }
+  } else {
+    deps.actions.goToLanding();
   }
 
   return () => {

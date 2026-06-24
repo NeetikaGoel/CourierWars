@@ -886,16 +886,6 @@
   font-size: clamp(9px, 0.74vw, 13px);
 }
 
-.match-game-player-card .home-setup-xp-row b {
-  width: 18px;
-  height: 18px;
-  font-size: 0.58rem;
-}
-
-.match-game-player-card .home-setup-xp-row em {
-  font-size: clamp(6.5px, 0.5vw, 9px);
-}
-
 .match-game-draw-button {
   min-height: 54px;
   border-color: rgba(255, 80, 205, 0.46);
@@ -1081,6 +1071,6 @@
 }
 
 .match-game-page-courier .match-game-player-card .home-setup-player-info strong,
-.match-game-page-courier .match-game-player-card .home-setup-xp-row em {
+.match-game-page-courier .match-game-player-card .home-setup-session-button {
   white-space: nowrap;
 }

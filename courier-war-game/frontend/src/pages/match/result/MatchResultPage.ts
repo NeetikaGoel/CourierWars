@@ -46,10 +46,10 @@ export interface MatchResultPageDependencies {
     exitMatch?: () => void;
   };
   sessionType?: "guest" | "registered";
+  currentPlayerName?: string;
 }
 
 function textSet(root: HTMLElement, selector: string, value: string): void {
-  // this updates a field only when the template has it
   const element = root.querySelector<HTMLElement>(selector);
 
   if (element) {
@@ -58,7 +58,6 @@ function textSet(root: HTMLElement, selector: string, value: string): void {
 }
 
 function numberGet(value: unknown, fallbackValue: number): number {
-  // this keeps result rendering safe while backend response is still changing
   if (typeof value === "number" && Number.isFinite(value)) {
     return value;
   }
@@ -67,7 +66,6 @@ function numberGet(value: unknown, fallbackValue: number): number {
 }
 
 function stringGet(value: unknown, fallbackValue: string): string {
-  // this keeps result rendering safe while backend response is still changing
   if (typeof value === "string" && value.length > 0) {
     return value;
   }
@@ -76,7 +74,6 @@ function stringGet(value: unknown, fallbackValue: string): string {
 }
 
 function timeTextGet(milliseconds: number): string {
-  // this converts milliseconds into mm:ss
   const totalSeconds = Math.max(0, Math.ceil(milliseconds / 1000));
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
@@ -84,19 +81,7 @@ function timeTextGet(milliseconds: number): string {
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 }
 
-function livesTextGet(lives: number): string {
-  // this renders hearts for courier remaining lives
-  const safeLives = Math.max(0, Math.min(3, Math.round(lives)));
-
-  if (safeLives === 0) {
-    return "0";
-  }
-
-  return Array.from({ length: safeLives }, () => "♥").join(" ");
-}
-
 function reasonTextGet(endReason: string): string {
-  // this turns backend reason codes into readable result copy
   if (endReason === "delivered") {
     return "Package delivered successfully";
   }
@@ -120,8 +105,7 @@ function reasonTextGet(endReason: string): string {
   return endReason || "Match completed";
 }
 
-function pageThemeApply(root: HTMLElement, winnerRole: string): void {
-  // this switches result styling for normal win or draw
+function themeApply(root: HTMLElement, winnerRole: string): void {
   const page = root.querySelector<HTMLElement>("[data-match-result-page]");
 
   if (!page) {
@@ -134,7 +118,6 @@ function pageThemeApply(root: HTMLElement, winnerRole: string): void {
 }
 
 function resultRender(root: HTMLElement, matchId: string | number, result: MatchResultData): void {
-  // this reads safe values from backend result payload
   const winnerRole = stringGet(result.winnerRole, "courier");
   const endReason = stringGet(result.endReason, "delivered");
   const matchTimeMs = numberGet(result.matchTimeMs, 300000);
@@ -152,41 +135,48 @@ function resultRender(root: HTMLElement, matchId: string | number, result: Match
   const routesChanged = numberGet(result.routesChanged, 5);
   const longestHurdleMs = numberGet(result.longestActiveHurdleMs, 18000);
   const mostUsedHurdle = stringGet(result.mostUsedHurdle, "Traffic Light");
+  const courierName = stringGet(result.courierName, "Courier Player");
+  const saboteurName = stringGet(result.saboteurName, "Saboteur Player");
+  const reasonText = reasonTextGet(endReason);
 
-  pageThemeApply(root, winnerRole);
+  themeApply(root, winnerRole);
 
   textSet(root, "[data-result-match-id]", `CW-${String(result.matchId ?? matchId).toUpperCase()}`);
   textSet(root, "[data-result-match-time]", timeTextGet(matchTimeMs));
-
-  textSet(root, "[data-result-courier-name]", stringGet(result.courierName, "Neetika Goel"));
-  textSet(root, "[data-result-saboteur-name]", stringGet(result.saboteurName, "Santosh Shedbalkar"));
+  textSet(root, "[data-result-courier-name]", courierName);
+  textSet(root, "[data-result-saboteur-name]", saboteurName);
+  textSet(root, "[data-result-courier-player-line]", `${courierName} - Player 1`);
+  textSet(root, "[data-result-saboteur-player-line]", `${saboteurName} - Player 2`);
 
   if (winnerRole === "draw") {
+    textSet(root, "[data-result-outcome-label]", "Draw");
+    textSet(root, "[data-result-outcome-title]", "Match Drawn");
+    textSet(root, "[data-result-outcome-reason]", reasonText);
     textSet(root, "[data-result-courier-headline]", "Courier Draws");
     textSet(root, "[data-result-saboteur-headline]", "Saboteur Draws");
-    textSet(root, "[data-result-courier-subtitle]", reasonTextGet(endReason));
-    textSet(root, "[data-result-saboteur-subtitle]", reasonTextGet(endReason));
     textSet(root, "[data-result-courier-ribbon]", "Draw");
     textSet(root, "[data-result-saboteur-ribbon]", "Draw");
   } else if (winnerRole === "saboteur") {
-    textSet(root, "[data-result-courier-headline]", "Courier Loses!");
-    textSet(root, "[data-result-saboteur-headline]", "Saboteur Wins!");
-    textSet(root, "[data-result-courier-subtitle]", reasonTextGet(endReason));
-    textSet(root, "[data-result-saboteur-subtitle]", "Delivery stopped successfully");
+    textSet(root, "[data-result-outcome-label]", "Victory");
+    textSet(root, "[data-result-outcome-title]", "Saboteur Wins");
+    textSet(root, "[data-result-outcome-reason]", reasonText);
+    textSet(root, "[data-result-courier-headline]", "Courier Loses");
+    textSet(root, "[data-result-saboteur-headline]", "Saboteur Wins");
     textSet(root, "[data-result-courier-ribbon]", "Runner-Up");
     textSet(root, "[data-result-saboteur-ribbon]", "Winner");
   } else {
-    textSet(root, "[data-result-courier-headline]", "Courier Wins!");
-    textSet(root, "[data-result-saboteur-headline]", "Saboteur Loses!");
-    textSet(root, "[data-result-courier-subtitle]", reasonTextGet(endReason));
-    textSet(root, "[data-result-saboteur-subtitle]", "Delivery completed before timeout");
+    textSet(root, "[data-result-outcome-label]", "Victory");
+    textSet(root, "[data-result-outcome-title]", "Courier Wins");
+    textSet(root, "[data-result-outcome-reason]", reasonText);
+    textSet(root, "[data-result-courier-headline]", "Courier Wins");
+    textSet(root, "[data-result-saboteur-headline]", "Saboteur Loses");
     textSet(root, "[data-result-courier-ribbon]", "Winner");
     textSet(root, "[data-result-saboteur-ribbon]", "Runner-Up");
   }
 
   textSet(root, "[data-result-time-remaining]", timeTextGet(timeRemainingMs));
   textSet(root, "[data-result-delivery-progress]", `${Math.round(deliveryProgress)}%`);
-  textSet(root, "[data-result-lives]", livesTextGet(lives));
+  textSet(root, "[data-result-lives]", String(Math.max(0, Math.min(3, Math.round(lives)))));
   textSet(root, "[data-result-abilities-used]", String(Math.round(abilitiesUsed)));
   textSet(root, "[data-result-distance]", `${distanceTravelled.toFixed(2)} km`);
   textSet(root, "[data-result-routes-changed]", String(Math.round(routesChanged)));
@@ -213,8 +203,11 @@ export async function mountMatchResultPage(root: HTMLElement, deps: MatchResultP
   const homeButtonList = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-home-button]"));
   const exitButton = root.querySelector<HTMLButtonElement>("[data-exit-button]");
 
+  textSet(root, "[data-current-profile-name]", deps.currentPlayerName ?? "Player");
+  textSet(root, "[data-current-profile-status]", deps.sessionType === "guest" ? "GUEST ONLINE" : "ONLINE");
+
   if (exitButton) {
-    exitButton.textContent = deps.sessionType === "registered" ? "⇥ Logout" : "⇥ Forget Session";
+    exitButton.textContent = deps.sessionType === "registered" ? "Logout" : "Forget Session";
   }
 
   try {

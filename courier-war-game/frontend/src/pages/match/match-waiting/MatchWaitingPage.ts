@@ -200,7 +200,7 @@ export async function mountMatchWaitingPage(root: HTMLElement, deps: MatchWaitin
     root.querySelectorAll<HTMLButtonElement>("[data-waiting-stats-nav], [data-waiting-features-nav], [data-waiting-settings-nav]")
   );
 
-  setText(root, "[data-waiting-profile-name]", deps.launchData.playerName ?? "Neetika Goel");
+  setText(root, "[data-waiting-profile-name]", deps.launchData.playerName ?? "Player");
   setRoleCard(root, selfRole, true);
   setRoleCard(root, opponentRole, false);
   setText(root, "[data-waiting-estimated-time]", formatClock(estimatedWaitSeconds));

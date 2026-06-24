@@ -55,9 +55,9 @@
         </span>
 
         <span class="home-setup-player-info">
-          <strong data-loading-profile-name>Neetika Goel</strong>
-          <small><i class="home-setup-online-dot"></i><span>ONLINE</span></small>
-          <span class="home-setup-xp-row"><b>12</b><span><i></i></span><em>2,450 / 5,000 XP</em></span>
+          <strong data-loading-profile-name data-current-profile-name>Player</strong>
+          <small><i class="home-setup-online-dot"></i><span data-loading-profile-status data-current-profile-status>ONLINE</span></small>
+          <button class="home-setup-session-button" type="button" data-session-end-button>Logout</button>
         </span>
       </section>
     </header>
@@ -70,22 +70,22 @@
       </section>
 
       <section class="match-loading-stage" aria-label="Map generation progress">
-        <aside class="match-loading-side-card match-loading-side-card-blue">
+        <aside class="match-loading-side-card match-loading-side-card-blue" data-loading-self-role-card>
           <h2>Your Role</h2>
-          <img src="/assets/homepage/courier.png" alt="" aria-hidden="true" />
-          <strong>Courier</strong>
-          <p>Deliver the package before time runs out. Use skills and find the safest route.</p>
+          <img data-loading-self-role-image src="/assets/homepage/courier.png" alt="" aria-hidden="true" />
+          <strong data-loading-self-role-title>Courier</strong>
+          <p data-loading-self-role-copy>Deliver the package before time runs out. Use skills and find the safest route.</p>
         </aside>
 
         <div class="match-loading-city-frame" aria-hidden="true">
           <img src="/assets/match-loading/map.png" alt="" />
         </div>
 
-        <aside class="match-loading-side-card match-loading-side-card-red">
+        <aside class="match-loading-side-card match-loading-side-card-red" data-loading-opponent-role-card>
           <h2>Opponent Role</h2>
-          <img src="/assets/homepage/saboteur.png" alt="" aria-hidden="true" />
-          <strong>Saboteur</strong>
-          <p>Predict your moves and place hurdles to delay and stop the delivery.</p>
+          <img data-loading-opponent-role-image src="/assets/homepage/saboteur.png" alt="" aria-hidden="true" />
+          <strong data-loading-opponent-role-title>Saboteur</strong>
+          <p data-loading-opponent-role-copy>Predict your moves and place hurdles to delay and stop the delivery.</p>
         </aside>
       </section>
 
@@ -100,35 +100,39 @@
         </div>
 
         <p>Estimated Time: <span data-loading-estimated-time>00:08</span></p>
+
+        <button class="match-flow-action-button match-flow-action-button-red match-loading-cancel-button" type="button" data-loading-cancel-button>
+          Cancel Search
+        </button>
       </section>
 
       <section class="match-loading-steps" aria-label="Map generation steps">
         <article class="match-loading-step match-loading-step-active" data-loading-step="0">
-          <span>▧</span>
+          <span>01</span>
           <strong>Initiating</strong>
           <p>System Check</p>
         </article>
 
         <article class="match-loading-step" data-loading-step="1">
-          <span>▣</span>
+          <span>02</span>
           <strong>Creating City</strong>
           <p>Building Blocks</p>
         </article>
 
         <article class="match-loading-step" data-loading-step="2">
-          <span>◇</span>
+          <span>03</span>
           <strong>Placement</strong>
           <p>Routes & Zones</p>
         </article>
 
         <article class="match-loading-step" data-loading-step="3">
-          <span>⬡</span>
+          <span>04</span>
           <strong>Adding Details</strong>
           <p>Props & Obstacles</p>
         </article>
 
         <article class="match-loading-step" data-loading-step="4">
-          <span>⬢</span>
+          <span>05</span>
           <strong>Finalizing</strong>
           <p>Optimizing Map</p>
         </article>
