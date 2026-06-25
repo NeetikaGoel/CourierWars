@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 require_once __DIR__ . '/../cache/CacheServerClient.php';
@@ -33,7 +34,7 @@ class MapBootstrapService
             $mapKey = CacheServerKeyFactory::mapBootstrapItemKey(MapGenerationConfig::MAP_VERSION, $index);
 
             //here too hehe
-            $stored=$this->_cacheServerClient->cacheSet(
+            $stored = $this->_cacheServerClient->cacheSet(
                 $mapKey,
                 $mapSnapshot,
                 CacheServerTtlConfig::bootstrapMapTtlSeconds()
@@ -96,7 +97,7 @@ class MapBootstrapService
     //this stores active match map in cache
     public function activeMatchMapStore(int $matchId, array $mapSnapshot, int $timerTotalMs): void
     {
-        $stored=$this->_cacheServerClient->cacheSet(
+        $stored = $this->_cacheServerClient->cacheSet(
             CacheServerKeyFactory::matchMapKey($matchId),
             $mapSnapshot,
             CacheServerTtlConfig::activeMatchMapTtlSeconds($timerTotalMs)

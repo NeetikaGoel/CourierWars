@@ -491,4 +491,4 @@ function goToHome(): void {
   );
 }
 
-goToHome();
+goToAuthLoading();
