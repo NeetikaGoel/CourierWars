@@ -53,10 +53,10 @@
         <span class="home-setup-player-avatar" aria-hidden="true"><img src="/assets/login/ghost.png" alt="" /></span>
         <span class="home-setup-player-info">
           <strong data-disconnected-profile-name data-current-profile-name>Player</strong>
-<small>
-  <i class="fa-solid fa-signal"></i>
-  <span data-current-profile-status>ONLINE</span>
-</small>
+          <small>
+            <i class="fa-solid fa-signal"></i>
+            <span data-current-profile-status>ONLINE</span>
+          </small>
           <button class="home-setup-session-button" type="button" data-session-end-button>Logout</button>
         </span>
       </section>
@@ -65,44 +65,44 @@
     <main class="match-flow-main match-disconnected-main">
       <section class="match-flow-title match-disconnected-title">
         <div class="match-disconnected-alert" aria-hidden="true">!</div>
-        <h1>Match Disconnected</h1>
-        <p>We’re sorry, your match was disconnected.<br />The connection to the game server was lost.</p>
+        <h1>Match Ended</h1>
+        <p>The backend has closed this match.<br />Opening the official result screen next.</p>
       </section>
 
       <section class="match-disconnected-reasons match-flow-panel">
-        <h2>Possible Reasons</h2>
+        <h2>Result Source</h2>
 
         <article>
-          <span>↯</span>
-          <strong>Network Issue</strong>
-          <p>Lost connection to the game server.</p>
+          <span>▣</span>
+          <strong>Backend State</strong>
+          <p>The winner and reason are read from the match result API.</p>
         </article>
 
         <article>
-          <span>▤</span>
-          <strong>Cache Unavailable</strong>
-          <p>Match state is missing or cache server is unreachable.</p>
+          <span>◷</span>
+          <strong>Final Timer</strong>
+          <p>The remaining time is preserved from backend match state.</p>
         </article>
 
         <article>
           <span>◇</span>
-          <strong>Match Cancelled</strong>
-          <p>This match is no longer active.</p>
+          <strong>Forfeit Handling</strong>
+          <p>If a player left, the opponent wins through backend authority.</p>
         </article>
       </section>
 
       <section class="match-disconnected-next match-flow-panel">
         <div>
           <strong>What Happens Next?</strong>
-          <p>You will be returned to the Home screen. No progress or stats were affected.</p>
+          <p>You will be taken to the Result screen for the official match outcome.</p>
         </div>
 
-        <span aria-hidden="true">⌂</span>
+        <span aria-hidden="true">›</span>
       </section>
 
       <section class="match-disconnected-countdown">
-        <strong>Returning To Home Screen In</strong>
-        <em data-disconnected-countdown>08</em>
+        <strong>Opening Result Screen In</strong>
+        <em data-disconnected-countdown>05</em>
 
         <div class="match-flow-progress-track">
           <span class="match-flow-progress-fill" data-disconnected-progress-fill></span>
@@ -110,8 +110,8 @@
       </section>
 
       <section class="match-disconnected-actions">
-        <button class="match-flow-action-button" type="button" data-home-button>Return To Home Now</button>
-        <button class="match-flow-action-button match-flow-action-button-red" type="button" data-retry-button>Retry Match</button>
+        <button class="match-flow-action-button" type="button" data-home-button>Return To Home</button>
+        <button class="match-flow-action-button match-flow-action-button-red" type="button" data-result-button>View Result Now</button>
       </section>
 
       <div class="match-flow-error" data-page-error hidden></div>

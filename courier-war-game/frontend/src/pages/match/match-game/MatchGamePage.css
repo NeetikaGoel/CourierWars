@@ -1074,3 +1074,83 @@
 .match-game-page-courier .match-game-player-card .home-setup-session-button {
   white-space: nowrap;
 }
+
+.match-game-draw-modal {
+  position: absolute;
+  inset: 0;
+  z-index: 95;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.62);
+  backdrop-filter: blur(5px);
+}
+
+.match-game-draw-modal[hidden] {
+  display: none;
+}
+
+.match-game-draw-modal-card {
+  width: min(460px, 92vw);
+  padding: 1.4rem;
+  border: 1px solid rgba(255, 80, 205, 0.58);
+  background:
+    linear-gradient(180deg, rgba(23, 8, 24, 0.96), rgba(3, 7, 13, 0.96)),
+    radial-gradient(circle at 50% 0, rgba(255, 80, 205, 0.16), transparent 58%);
+  color: var(--home-white);
+  text-align: center;
+  box-shadow: 0 0 34px rgba(255, 80, 205, 0.22);
+}
+
+.match-game-draw-modal-card small {
+  color: #ffd5f4;
+  font-family: var(--home-font-display);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.match-game-draw-modal-card h2 {
+  margin: 0.55rem 0 0.45rem;
+  color: #ffffff;
+  font-family: var(--home-font-display);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.match-game-draw-modal-card p {
+  margin: 0;
+  color: rgba(235, 242, 248, 0.74);
+  line-height: 1.45;
+}
+
+.match-game-draw-modal-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+  margin-top: 1.2rem;
+}
+
+.match-game-draw-modal-actions button {
+  min-height: 46px;
+  border: 1px solid rgba(235, 242, 248, 0.28);
+  color: var(--home-white);
+  font-family: var(--home-font-display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.match-game-draw-modal-reject {
+  background: rgba(235, 242, 248, 0.08);
+}
+
+.match-game-draw-modal-accept {
+  border-color: rgba(255, 80, 205, 0.72) !important;
+  background: rgba(255, 80, 205, 0.18);
+  color: #ffd5f4 !important;
+}
+
+.match-game-draw-modal-actions button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}

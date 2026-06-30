@@ -1,4 +1,4 @@
-// Imports Phaser types used by keyboard input and tween movement
+// Imports Phaser types used by keyboard input
 import Phaser from "phaser";
 
 // Imports Courier movement configuration
@@ -6,12 +6,6 @@ import { courierMovementConfig } from "../../config/CourierMovementConfig";
 
 // Imports direction resolver helper
 import { directionDeltaFromNameGet } from "../../utility/DirectionDeltaResolver";
-
-// Imports tile key converter helper
-import { cityTileKeyFromPointGet } from "../../utility/CityTileKeyConverter";
-
-// Imports isometric tile center helper
-import { isometricTileCenterWorldPointGet } from "../../iso/IsometricCoordinateCalculator";
 
 // Imports coordinate tile point type
 import type { CoordinateTilePoint } from "../../types/CoordinateType";
@@ -25,16 +19,7 @@ import { DirectionName, type DirectionName as DirectionNameValue } from "../../t
 // Imports match runtime state shape
 import type { MatchPrototypeStateShape } from "../../types/MatchRuntimeStateType";
 
-// Imports Courier movement rules
-import {
-  courierMovementTileDurationMsGet,
-  courierMovementTileEnterCheck,
-  courierMovementTileLifeLossHazardCheck,
-  courierMovementTileStopCheck,
-  courierMovementTileStopDurationMsGet,
-} from "../rules/CourierMovementRules";
-
-// Defines minimal transform target required for Courier movement tween
+// Defines minimal transform target kept for compatibility with scene setup
 export interface CourierMovementTweenTarget {
   // Stores current world x position
   x: number;
@@ -43,8 +28,23 @@ export interface CourierMovementTweenTarget {
   y: number;
 }
 
+// Defines backend movement request emitted by controller
+export interface CourierMovementBackendRequest {
+  // Stores current backend-known courier tile
+  from: CoordinateTilePoint;
+
+  // Stores requested target tile
+  to: CoordinateTilePoint;
+
+  // Stores requested movement direction
+  direction: DirectionNameValue;
+}
+
 // Defines optional callbacks emitted by Courier movement controller
 export interface CourierMovementInputControllerCallback {
+  // Runs before local movement is accepted, backend is final authority
+  courierMovementRequested?: (request: CourierMovementBackendRequest) => Promise<boolean>;
+
   // Runs when Courier movement starts
   courierMovementStarted?: (cityTile: CityTile) => void;
 
@@ -53,19 +53,11 @@ export interface CourierMovementInputControllerCallback {
 
   // Runs when Courier tries to move into blocked tile
   courierMovementBlocked?: (cityTile: CityTile | undefined) => void;
-
-  // Runs when Courier stops because of tile effect
-  courierMovementStopped?: (cityTile: CityTile, stopDurationMs: number) => void;
-
-  // Runs when Courier loses life from a hazard
-  courierLifeLost?: (cityTile: CityTile, livesCurrent: number) => void;
-
-  courierDeliveryReached?: (cityTile: CityTile) => void;
 }
 
 // Handles held arrow key Courier movement
 export class CourierMovementInputController {
-  // Stores Phaser scene used for keyboard and tween systems
+  // Stores Phaser scene used for keyboard input
   private readonly scene: Phaser.Scene;
 
   // Stores generated city map
@@ -74,27 +66,21 @@ export class CourierMovementInputController {
   // Stores mutable prototype match state
   private readonly matchPrototypeState: MatchPrototypeStateShape;
 
-  // Stores Courier display object or compatible tween target
-  private readonly courierTweenTarget: CourierMovementTweenTarget;
-
   // Stores optional movement callbacks
   private readonly callback: CourierMovementInputControllerCallback;
 
   // Stores Phaser cursor keys
   private cursorKeys?: Phaser.Types.Input.Keyboard.CursorKeys;
 
-  // Stores whether Courier is currently moving or stopped
+  // Stores whether Courier is currently waiting for backend movement response
   private courierMovementActive = false;
-
-  // Stores queued direction to use after current movement completes
-  private courierDirectionQueued: DirectionNameValue = DirectionName.None;
 
   // Creates Courier movement input controller
   constructor(
     scene: Phaser.Scene,
     cityMapGenerated: CityMapGenerated,
     matchPrototypeState: MatchPrototypeStateShape,
-    courierTweenTarget: CourierMovementTweenTarget,
+    _courierTweenTarget: CourierMovementTweenTarget,
     callback: CourierMovementInputControllerCallback = {}
   ) {
     // Stores Phaser scene reference
@@ -105,9 +91,6 @@ export class CourierMovementInputController {
 
     // Stores prototype match state reference
     this.matchPrototypeState = matchPrototypeState;
-
-    // Stores Courier tween target reference
-    this.courierTweenTarget = courierTweenTarget;
 
     // Stores optional callbacks
     this.callback = callback;
@@ -133,26 +116,23 @@ export class CourierMovementInputController {
     // Stores held direction from keyboard
     const directionNameHeld = this.courierMovementHeldDirectionGet();
 
-    // Stores queued direction for next tile movement
-    this.courierDirectionQueued = directionNameHeld;
-
-    // Stops when Courier is already moving or waiting
+    // Stops when Courier is already waiting for backend
     if (this.courierMovementActive) {
-      // Ends update until current movement completes
+      // Ends update until current request completes
       return;
     }
 
     // Starts movement when held movement is enabled
     if (courierMovementConfig.input.heldArrowMovementEnabled) {
-      // Tries to start movement from held direction
-      this.courierMovementStartTry(directionNameHeld);
+      // Tries to request movement from held direction
+      void this.courierMovementStartTry(directionNameHeld);
 
       // Ends held movement update
       return;
     }
 
     // Starts movement from just pressed direction when held movement is disabled
-    this.courierMovementStartTry(this.courierMovementJustPressedDirectionGet());
+    void this.courierMovementStartTry(this.courierMovementJustPressedDirectionGet());
   }
 
   // Gets currently held arrow direction
@@ -228,18 +208,27 @@ export class CourierMovementInputController {
   }
 
   // Tries to start movement in a direction
-  courierMovementStartTry(directionName: DirectionNameValue): void {
+  async courierMovementStartTry(directionName: DirectionNameValue): Promise<void> {
     // Stops when no direction is active
     if (directionName === DirectionName.None) {
       // Ends movement start
       return;
     }
 
-    // Stops when Courier is already moving
+    // Stops when Courier is already moving or waiting
     if (this.courierMovementActive) {
       // Ends movement start
       return;
     }
+
+    // Stores current tile point
+    const tilePointFrom = {
+      // Stores current x coordinate
+      x: this.matchPrototypeState.courier.tilePoint.x,
+
+      // Stores current y coordinate
+      y: this.matchPrototypeState.courier.tilePoint.y,
+    };
 
     // Stores movement delta
     const directionDelta = directionDeltaFromNameGet(directionName);
@@ -247,26 +236,17 @@ export class CourierMovementInputController {
     // Stores next tile point
     const tilePointNext = {
       // Stores next tile x coordinate
-      x: this.matchPrototypeState.courier.tilePoint.x + directionDelta.x,
+      x: tilePointFrom.x + directionDelta.x,
 
       // Stores next tile y coordinate
-      y: this.matchPrototypeState.courier.tilePoint.y + directionDelta.y,
+      y: tilePointFrom.y + directionDelta.y,
     };
 
     // Gets next city tile
     const cityTileNext = this.courierMovementTileGet(tilePointNext);
 
-    // Stores movement context
-    const movementContext = {
-      // Stores target city tile
-      cityTile: cityTileNext,
-
-      // Stores current match runtime state
-      matchPrototypeState: this.matchPrototypeState,
-    };
-
-    // Rejects blocked movement
-    if (!courierMovementTileEnterCheck(movementContext)) {
+    // Rejects impossible map movement locally before backend request
+    if (!cityTileNext || !cityTileNext.walkable) {
       // Emits blocked movement callback
       this.callback.courierMovementBlocked?.(cityTileNext);
 
@@ -274,200 +254,30 @@ export class CourierMovementInputController {
       return;
     }
 
-    // Moves Courier to next tile
-    this.courierMovementTileMove(cityTileNext!, directionName);
-  }
-
-  // Moves Courier to one tile
-  courierMovementTileMove(cityTileTarget: CityTile, directionName: DirectionNameValue): void {
-    // Marks movement as active
+    // Marks movement as pending while backend validates
     this.courierMovementActive = true;
 
-    // Updates Courier direction in match state
-    this.matchPrototypeState.courier.directionName = directionName;
-
-    // Stores target tile point
-    const tilePointTarget = {
-      // Stores target x coordinate
-      x: cityTileTarget.x,
-
-      // Stores target y coordinate
-      y: cityTileTarget.y,
-    };
-
-    // Stores target world point
-    const worldPointTarget = isometricTileCenterWorldPointGet(tilePointTarget);
-
-    // Stores movement duration
-    const durationMs = courierMovementTileDurationMsGet({
-      // Stores target tile
-      cityTile: cityTileTarget,
-
-      // Stores current match runtime state
-      matchPrototypeState: this.matchPrototypeState,
-    });
-
     // Emits movement started callback
-    this.callback.courierMovementStarted?.(cityTileTarget);
+    this.callback.courierMovementStarted?.(cityTileNext);
 
-    // Starts Phaser tween for Courier movement
-    this.scene.tweens.add({
-      // Stores tween target
-      targets: this.courierTweenTarget,
-
-      // Stores destination x coordinate
-      x: worldPointTarget.x,
-
-      // Stores destination y coordinate
-      y: worldPointTarget.y,
-
-      // Stores movement duration
-      duration: durationMs,
-
-      // Stores tween easing name
-      ease: "Power2",
-
-      // Handles tween completion
-      onComplete: () => {
-        // Finalizes movement after tween
-        this.courierMovementCompleteHandle(cityTileTarget, directionName);
-      },
-    });
-  }
-
-  // Handles movement completion after Courier reaches tile
-  courierMovementCompleteHandle(cityTileTarget: CityTile, directionName: DirectionNameValue): void {
-    // Stores previous zone id
-    const zoneIdPrevious = this.matchPrototypeState.courier.zoneIdCurrent;
-
-    // Updates previous zone when zone changes
-    if (zoneIdPrevious !== cityTileTarget.zoneId) {
-      // Stores previous zone id
-      this.matchPrototypeState.courier.zoneIdPrevious = zoneIdPrevious;
-    }
-
-    // Updates Courier tile point
-    this.matchPrototypeState.courier.tilePoint = {
-      // Stores target x coordinate
-      x: cityTileTarget.x,
-
-      // Stores target y coordinate
-      y: cityTileTarget.y,
-    };
-
-    // Updates Courier current zone id
-    this.matchPrototypeState.courier.zoneIdCurrent = cityTileTarget.zoneId;
-
-    // Updates Courier direction
-    this.matchPrototypeState.courier.directionName = directionName;
-
-    // Stores visited tile key
-    const visitedTileKey = cityTileKeyFromPointGet(this.matchPrototypeState.courier.tilePoint);
-
-    // Marks target tile as visited
-    this.matchPrototypeState.courierVisitedTileKeySet.add(visitedTileKey);
-
-    // Applies life loss hazard when needed
-    this.courierMovementLifeLossApply(cityTileTarget);
-
-    // Stores stop duration after tile movement
-    const stopDurationMs = this.courierMovementStopDurationGet(cityTileTarget);
-
-    // Emits movement completed callback
-    this.callback.courierMovementCompleted?.(cityTileTarget);
-
-    if (cityTileTarget.delivery) {
-      this.callback.courierDeliveryReached?.(cityTileTarget);
-      this.courierMovementActive = false;
-      return;
-    }
-
-    // Starts stop wait when tile requires it
-    if (stopDurationMs > 0) {
-      // Emits stopped callback
-      this.callback.courierMovementStopped?.(cityTileTarget, stopDurationMs);
-
-      // Waits before allowing next movement
-      this.scene.time.delayedCall(stopDurationMs, () => {
-        // Releases movement after stop effect
-        this.courierMovementReleaseAfterStop();
+    try {
+      // Sends movement request to backend authority
+      const accepted = await this.callback.courierMovementRequested?.({
+        from: tilePointFrom,
+        to: tilePointNext,
+        direction: directionName,
       });
 
-      // Ends completion handling while stop is active
-      return;
+      // Emits completed only after backend accepted
+      if (accepted) {
+        this.callback.courierMovementCompleted?.(cityTileNext);
+      } else {
+        this.callback.courierMovementBlocked?.(cityTileNext);
+      }
+    } finally {
+      // Releases movement lock after backend completes
+      this.courierMovementActive = false;
     }
-
-    // Releases movement immediately
-    this.courierMovementActive = false;
-  }
-
-  // Applies life loss when target tile contains active hazard
-  private courierMovementLifeLossApply(cityTileTarget: CityTile): void {
-    // Stores whether tile has life loss hazard
-    const lifeLossHazard = courierMovementTileLifeLossHazardCheck({
-      // Stores target tile
-      cityTile: cityTileTarget,
-
-      // Stores current match runtime state
-      matchPrototypeState: this.matchPrototypeState,
-    });
-
-    // Stops when there is no hazard
-    if (!lifeLossHazard) {
-      // Ends life loss handling
-      return;
-    }
-
-    // Reduces Courier lives but prevents negative value
-    this.matchPrototypeState.courier.livesCurrent = Math.max(
-      0,
-      this.matchPrototypeState.courier.livesCurrent - 1
-    );
-
-    // Emits life lost callback
-    this.callback.courierLifeLost?.(cityTileTarget, this.matchPrototypeState.courier.livesCurrent);
-  }
-
-  // Gets stop duration for target tile
-  private courierMovementStopDurationGet(cityTileTarget: CityTile): number {
-    // Stores whether tile should stop Courier
-    const stopRequired = courierMovementTileStopCheck({
-      // Stores target tile
-      cityTile: cityTileTarget,
-
-      // Stores current match runtime state
-      matchPrototypeState: this.matchPrototypeState,
-    });
-
-    // Returns zero when stop is not required
-    if (!stopRequired) {
-      // Returns no stop duration
-      return 0;
-    }
-
-    // Returns configured stop duration for tile effect
-    return courierMovementTileStopDurationMsGet({
-      // Stores target tile
-      cityTile: cityTileTarget,
-
-      // Stores current match runtime state
-      matchPrototypeState: this.matchPrototypeState,
-    });
-  }
-
-  // Releases movement after a stop effect
-  private courierMovementReleaseAfterStop(): void {
-    // Marks movement as inactive
-    this.courierMovementActive = false;
-
-    // Stops when queued direction changes are disabled
-    if (!courierMovementConfig.input.queuedDirectionChangeEnabled) {
-      // Ends release handling
-      return;
-    }
-
-    // Attempts next held movement when direction is still active
-    this.courierMovementStartTry(this.courierDirectionQueued);
   }
 
   // Gets city tile from generated map

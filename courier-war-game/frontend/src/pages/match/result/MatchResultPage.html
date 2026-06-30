@@ -1,4 +1,4 @@
-<section class="match-result-page" data-match-result-page>
+<section class="match-result-page match-result-page-courier-win" data-match-result-page>
   <div class="match-result-shell">
     <div class="match-result-grid-bg" aria-hidden="true"></div>
     <div class="match-result-vignette" aria-hidden="true"></div>
@@ -24,27 +24,7 @@
 
         <button class="home-setup-nav-item home-setup-nav-item-active" type="button">
           <span class="home-setup-nav-icon" aria-hidden="true"><img src="/assets/navbar/gameplay.png" alt="" /></span>
-          <span>Play</span>
-        </button>
-
-        <button class="home-setup-nav-item" type="button">
-          <span class="home-setup-nav-icon" aria-hidden="true"><img src="/assets/navbar/stats.png" alt="" /></span>
-          <span>Stats</span>
-        </button>
-
-        <button class="home-setup-nav-item" type="button">
-          <span class="home-setup-nav-icon" aria-hidden="true"><img src="/assets/navbar/features.png" alt="" /></span>
-          <span>Features</span>
-        </button>
-
-        <button class="home-setup-nav-item" type="button">
-          <span class="home-setup-nav-icon" aria-hidden="true"><img src="/assets/navbar/features.png" alt="" /></span>
-          <span>How To Play</span>
-        </button>
-
-        <button class="home-setup-nav-item" type="button">
-          <span class="home-setup-nav-icon" aria-hidden="true"><img src="/assets/navbar/support.png" alt="" /></span>
-          <span>Settings</span>
+          <span>Result</span>
         </button>
       </nav>
 
@@ -61,17 +41,18 @@
       </section>
     </header>
 
-    <header class="match-result-header">
-      <span>Match ID: <strong data-result-match-id>CW-0001</strong></span>
-      <h1>Match Result</h1>
-      <span>Match Time: <strong data-result-match-time>05:00</strong></span>
-    </header>
-
     <main class="match-result-main">
-      <section class="match-result-outcome-panel">
-        <strong data-result-outcome-label>Victory</strong>
-        <h2 data-result-outcome-title>Courier Wins</h2>
-        <p data-result-outcome-reason>Package delivered successfully</p>
+      <section class="match-result-hero">
+        <div class="match-result-meta-row">
+          <span>Match <strong data-result-match-id>CW-0001</strong></span>
+          <span>Duration <strong data-result-match-time>05:00</strong></span>
+        </div>
+
+        <article class="match-result-outcome-panel">
+          <small data-result-outcome-label>Victory</small>
+          <h1 data-result-outcome-title>Courier Wins</h1>
+          <p data-result-outcome-reason>Package delivered successfully</p>
+        </article>
       </section>
 
       <section class="match-result-player-grid">
@@ -82,12 +63,16 @@
             <img src="/assets/homepage/courier.png" alt="" />
           </span>
 
-          <div>
+          <div class="match-result-player-copy">
             <small>Courier</small>
             <h2 data-result-courier-headline>Courier Wins</h2>
             <p data-result-courier-name>Player 1</p>
-            <em data-result-courier-player-line>Player 1</em>
+            <em data-result-courier-player-line>Player 1 - Player 1</em>
           </div>
+        </article>
+
+        <article class="match-result-versus-card" aria-hidden="true">
+          <span>VS</span>
         </article>
 
         <article class="match-result-player-card match-result-saboteur-card" data-result-saboteur-card>
@@ -97,11 +82,11 @@
             <img src="/assets/homepage/saboteur.png" alt="" />
           </span>
 
-          <div>
+          <div class="match-result-player-copy">
             <small>Saboteur</small>
             <h2 data-result-saboteur-headline>Saboteur Loses</h2>
             <p data-result-saboteur-name>Player 2</p>
-            <em data-result-saboteur-player-line>Player 2</em>
+            <em data-result-saboteur-player-line>Player 2 - Player 2</em>
           </div>
         </article>
       </section>
@@ -129,7 +114,7 @@
           <div class="match-result-stat-row"><span>PA</span><p>Prediction Accuracy</p><strong data-result-prediction>68%</strong></div>
         </article>
 
-        <article class="match-result-summary-card match-result-summary-card-orange">
+        <article class="match-result-summary-card match-result-summary-card-gold">
           <h2>Hurdles Used</h2>
 
           <div class="match-result-hurdle-row"><span>TL</span><p>Traffic Light</p><strong data-result-traffic-light-count>3</strong></div>
@@ -146,9 +131,9 @@
     <div class="match-result-error" data-page-error hidden></div>
 
     <footer class="match-result-actions">
-      <button class="match-result-action-primary" type="button" data-play-again-button>Play Again</button>
-      <button class="match-result-action-neutral" type="button" data-home-button>Main Menu</button>
-      <button class="match-result-action-danger" type="button" data-exit-button>Forget Session</button>
+      <button class="match-result-action match-result-action-primary" type="button" data-play-again-button>Play Again</button>
+      <button class="match-result-action match-result-action-neutral" type="button" data-home-button>Main Menu</button>
+      <button class="match-result-action match-result-action-danger" type="button" data-exit-button>Forget Session</button>
     </footer>
   </div>
 </section>

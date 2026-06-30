@@ -16,15 +16,11 @@ import type { MatchPrototypeStateShape } from "../../types/MatchRuntimeStateType
 // Imports Saboteur hurdle values and result types
 import {
   SaboteurHurdleType,
-  type SaboteurHurdleActivationRequest,
   type SaboteurHurdlePlacementResult,
 } from "../../types/SaboteurHurdleType";
 
 // Imports placement validation rule
-import {
-  saboteurPlacementCheck,
-  saboteurPlacementTargetTileListGet,
-} from "../rules/SaboteurPlacementRules";
+import { saboteurPlacementCheck } from "../rules/SaboteurPlacementRules";
 
 // Imports active hurdle state store
 import { ActiveHurdleStateStore } from "../runtime/ActiveHurdleStateStore";
@@ -37,6 +33,9 @@ import { PointerTileInputResolver } from "./PointerTileInputResolver";
 
 // Defines optional callbacks emitted by Saboteur placement controller
 export interface SaboteurPlacementInputControllerCallback {
+  // Runs before placement is applied, backend is final authority
+  saboteurPlacementRequested?: (cityTile: CityTile, hurdleType: SaboteurHurdleType, requestedDurationMs: number) => Promise<boolean>;
+
   // Runs when selected hurdle type changes
   saboteurHurdleSelected?: (hurdleType: SaboteurHurdleType) => void;
 
@@ -95,19 +94,22 @@ export class SaboteurPlacementInputController {
   private hurdleKeyMovingBarrier?: Phaser.Input.Keyboard.Key;
 
   // Stores key for security checkpoint
-    private hurdleKeySecurityCheckpoint?: Phaser.Input.Keyboard.Key;
-    
-    // Stores whether pointer press started for possible placement
-    private placementPointerPressActive = false;
-  
-    // Stores pointer x coordinate when press started
-    private placementPointerStartX = 0;
-  
-    // Stores pointer y coordinate when press started
-    private placementPointerStartY = 0;
-  
-    // Stores maximum movement allowed to still count as a click
-    private readonly placementPointerClickDistanceMaxPixels = 5;
+  private hurdleKeySecurityCheckpoint?: Phaser.Input.Keyboard.Key;
+
+  // Stores whether pointer press started for possible placement
+  private placementPointerPressActive = false;
+
+  // Stores pointer x coordinate when press started
+  private placementPointerStartX = 0;
+
+  // Stores pointer y coordinate when press started
+  private placementPointerStartY = 0;
+
+  // Stores maximum movement allowed to still count as a click
+  private readonly placementPointerClickDistanceMaxPixels = 5;
+
+  // Stores whether placement request is currently waiting for backend
+  private placementRequestPending = false;
 
   // Creates Saboteur placement input controller
   constructor(
@@ -131,10 +133,10 @@ export class SaboteurPlacementInputController {
     // Stores pointer tile resolver reference
     this.pointerTileInputResolver = pointerTileInputResolver;
 
-    // Stores traffic signal state store reference
+    // Stores traffic signal store reference
     this.trafficSignalStateStore = trafficSignalStateStore;
 
-    // Stores active hurdle state store reference
+    // Stores active hurdle store reference
     this.activeHurdleStateStore = activeHurdleStateStore;
 
     // Stores optional callbacks
@@ -259,7 +261,7 @@ export class SaboteurPlacementInputController {
       const cityTile = this.pointerTileInputResolver.pointerTileFromPointerGet(pointer);
 
       // Handles tile click
-      this.saboteurPlacementTileClickHandle(cityTile);
+      void this.saboteurPlacementTileClickHandle(cityTile);
     });
 
     // Clears placement press when pointer leaves canvas
@@ -342,9 +344,15 @@ export class SaboteurPlacementInputController {
   }
 
   // Handles Saboteur tile click
-  saboteurPlacementTileClickHandle(cityTile: CityTile | undefined): void {
+  async saboteurPlacementTileClickHandle(cityTile: CityTile | undefined): Promise<void> {
+    // Stops duplicate placement request while backend is pending
+    if (this.placementRequestPending) {
+      // Ends duplicate click
+      return;
+    }
+
     // Tries to activate selected hurdle
-    const placementResult = this.saboteurPlacementActivationTry(cityTile);
+    const placementResult = await this.saboteurPlacementActivationTry(cityTile);
 
     // Emits rejection callback when placement fails
     if (!placementResult.valid) {
@@ -354,14 +362,14 @@ export class SaboteurPlacementInputController {
   }
 
   // Tries to activate selected hurdle on tile
-  saboteurPlacementActivationTry(cityTile: CityTile | undefined): SaboteurHurdlePlacementResult {
+  async saboteurPlacementActivationTry(cityTile: CityTile | undefined): Promise<SaboteurHurdlePlacementResult> {
     // Synchronizes match state from runtime stores before validation
     this.saboteurPlacementRuntimeStateSync();
 
     // Stores selected hurdle type
     const hurdleType = this.matchPrototypeState.saboteur.hurdleTypeSelected;
 
-    // Validates placement
+    // Validates placement locally before backend request
     const placementResult = saboteurPlacementCheck({
       // Stores generated city map
       cityMapGenerated: this.cityMapGenerated,
@@ -379,7 +387,7 @@ export class SaboteurPlacementInputController {
       matchPrototypeState: this.matchPrototypeState,
 
       // Stores current time
-      currentTimeMs: this.scene.time.now,
+      currentTimeMs: Date.now(),
     });
 
     // Returns failure when placement is invalid
@@ -391,92 +399,53 @@ export class SaboteurPlacementInputController {
       return placementResult;
     }
 
-    // Confirms valid placement
-    this.saboteurPlacementConfirm(cityTile!, hurdleType);
+    // Confirms placement through backend
+    const accepted = await this.saboteurPlacementConfirm(cityTile!, hurdleType);
+
+    if (!accepted) {
+      return {
+        valid: false,
+        message: "Backend rejected hurdle placement",
+      };
+    }
 
     // Returns valid placement result
     return placementResult;
   }
 
-  // Confirms and applies valid Saboteur placement
-  // Confirms and applies valid Saboteur placement
-  saboteurPlacementConfirm(cityTile: CityTile, hurdleType: SaboteurHurdleType): void {
+  // Confirms and applies valid Saboteur placement through backend
+  async saboteurPlacementConfirm(cityTile: CityTile, hurdleType: SaboteurHurdleType): Promise<boolean> {
     // Stores hurdle config
     const hurdleConfig = saboteurHurdleConfig.hurdle[hurdleType];
 
     // Stores activation duration
     const durationMs = hurdleConfig.durationMsDefault;
 
-    // Stores current scene time
-    const currentTimeMs = this.scene.time.now;
+    // Marks placement request pending
+    this.placementRequestPending = true;
 
-    // Activates red traffic signal when selected
-    if (hurdleType === SaboteurHurdleType.RedTrafficLight && cityTile.trafficSignalId) {
-      this.trafficSignalStateStore.trafficSignalRedActivate(
-        cityTile.trafficSignalId,
-        currentTimeMs,
-        durationMs
-      );
+    try {
+      // Sends placement request to backend authority
+      const accepted = await this.callback.saboteurPlacementRequested?.(cityTile, hurdleType, durationMs);
 
-      this.activeHurdleStateStore.activeHurdleActivate(
-        {
-          hurdleType,
-          tilePoint: {
-            x: cityTile.x,
-            y: cityTile.y,
-          },
-          currentTimeMs,
-          requestedDurationMs: durationMs,
-        },
-        durationMs,
-        cityTile.trafficSignalId
-      );
-    }
-
-    // Activates non signal hurdles across every target tile in the road section
-    if (hurdleType !== SaboteurHurdleType.RedTrafficLight) {
-      const targetTileList = saboteurPlacementTargetTileListGet(
-        this.cityMapGenerated,
-        cityTile,
-        hurdleType
-      );
-
-      for (const targetTile of targetTileList) {
-        const activationRequest: SaboteurHurdleActivationRequest = {
-          hurdleType,
-          tilePoint: {
-            x: targetTile.x,
-            y: targetTile.y,
-          },
-          currentTimeMs,
-          requestedDurationMs: durationMs,
-        };
-
-        this.activeHurdleStateStore.activeHurdleActivate(activationRequest, durationMs);
+      if (!accepted) {
+        return false;
       }
+
+      // Stores selected tile point after backend accepted
+      this.matchPrototypeState.tileInteraction.tilePointSelected = {
+        x: cityTile.x,
+        y: cityTile.y,
+      };
+
+      // Emits activation callback
+      this.callback.saboteurPlacementActivated?.(cityTile, hurdleType);
+
+      return true;
+    } finally {
+      // Releases placement request pending flag
+      this.placementRequestPending = false;
     }
-
-    // Reduces Saboteur energy only once for one placement action
-    this.matchPrototypeState.saboteur.energyCurrent = Math.max(
-      0,
-      this.matchPrototypeState.saboteur.energyCurrent - hurdleConfig.energyCost
-    );
-
-    // Stores cooldown end time only once for one placement action
-    this.matchPrototypeState.saboteur.hurdleCooldownUntilMsByType[hurdleType] =
-      currentTimeMs + hurdleConfig.cooldownMs;
-
-    // Synchronizes match state after activation
-    this.saboteurPlacementRuntimeStateSync();
-
-    // Stores selected tile point
-    this.matchPrototypeState.tileInteraction.tilePointSelected = {
-      x: cityTile.x,
-      y: cityTile.y,
-    };
-
-    // Emits activation callback
-    this.callback.saboteurPlacementActivated?.(cityTile, hurdleType);
   }
 
   // Synchronizes match state references from runtime stores

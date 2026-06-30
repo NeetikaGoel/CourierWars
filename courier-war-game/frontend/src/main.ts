@@ -8,12 +8,12 @@ import { mountMatchWaitingPage, type MatchWaitingPageToLoadingData } from "./pag
 import { mountMatchLoadingPage } from "./pages/match/match-loading/MatchLoadingPage";
 import { mountMatchGamePage } from "./pages/match/match-game/MatchGamePage";
 import { mountMatchDisconnectedPage } from "./pages/match/match-disconnected/MatchDisconnectedPage";
-import { mountMatchResultPage, type MatchResultData } from "./pages/match/result/MatchResultPage";
-import { FrontendMatchStatusValue } from "./constants/FrontendMatchStatusValue";
-import { mapApi } from "./common/api/MapApi";
+import { mountMatchResultPage } from "./pages/match/result/MatchResultPage";
 import { authApi } from "./common/api/AuthApi";
 import { profileApi } from "./common/api/ProfileApi";
+import { matchApi as backendMatchApi } from "./common/api/MatchApi";
 import { PhaserMatchGameController } from "./game/v7/scene/PhaserMatchGameController";
+import type { ApiClientRequestOptions } from "./common/api/ApiClient";
 
 const appRootElement = document.querySelector<HTMLDivElement>("#app");
 
@@ -23,20 +23,32 @@ if (appRootElement === null) {
 
 const appRoot: HTMLDivElement = appRootElement;
 
-type PrototypeRole = "courier" | "saboteur";
-type PrototypeResultMode = "courierDelivered" | "saboteurTimeout" | "drawAgreement";
+type PlayableRole = "courier" | "saboteur";
 type CurrentProfile = Awaited<ReturnType<typeof profileApi.getProfile>>;
 type SessionType = "guest" | "registered";
 
-const MATCH_TIMER_TOTAL_MS = 300000;
+interface MatchSetupRouteData {
+  assignedRole: string;
+  opponentRole?: string;
+  rolePreference: string;
+  difficulty: string;
+  mapId: string;
+  mapName: string;
+  mapVersion: string;
+  mapGenerationVersion: string;
+  stateVersion?: number;
+}
+
+const HOME_MAP_VERSION = "v1";
+const HOME_MAP_GENERATION_VERSION = "city_map_generation_v7";
+const HOME_MAP_ID = "neo-city";
+const HOME_MAP_NAME = "Neo City";
 
 let currentCleanup: (() => void) | null = null;
 let currentProfile: CurrentProfile | null = null;
-let currentMatchAssignedRole: PrototypeRole = "courier";
+let currentMatchAssignedRole: PlayableRole = "courier";
 let currentMatchDifficulty = "medium";
-let currentMatchStartedAtMs = Date.now();
-let currentMatchStateVersion = 1;
-let currentResultMode: PrototypeResultMode | null = null;
+let currentMatchSetupData: MatchWaitingPageToLoadingData | null = null;
 
 async function pageMount(mountFunction: () => Promise<() => void>): Promise<void> {
   currentCleanup?.();
@@ -51,24 +63,20 @@ function currentSessionTypeGet(): SessionType {
   return currentProfile?.user.isGuest ? "guest" : "registered";
 }
 
-function oppositeRoleGet(role: PrototypeRole): PrototypeRole {
+function oppositeRoleGet(role: PlayableRole): PlayableRole {
   return role === "courier" ? "saboteur" : "courier";
 }
 
-function currentParticipantNamesGet(): { courierName: string; saboteurName: string } {
-  const playerName = currentPlayerNameGet();
+function playableRoleFromValueGet(value: string | undefined): PlayableRole {
+  return value === "saboteur" ? "saboteur" : "courier";
+}
 
-  if (currentMatchAssignedRole === "saboteur") {
-    return {
-      courierName: "Opponent",
-      saboteurName: playerName,
-    };
+function optionalPlayableRoleFromValueGet(value: string | undefined): PlayableRole | null {
+  if (value === "courier" || value === "saboteur") {
+    return value;
   }
 
-  return {
-    courierName: playerName,
-    saboteurName: "Opponent",
-  };
+  return null;
 }
 
 function textSet(selector: string, value: string): void {
@@ -104,9 +112,46 @@ function profileHeaderHydrate(): void {
   textSet("[data-current-profile-status]", currentSessionTypeGet() === "guest" ? "GUEST ONLINE" : "ONLINE");
 }
 
+function setupDataNormalize(matchId: string | number, setupData: MatchSetupRouteData): MatchWaitingPageToLoadingData {
+  const assignedRole = playableRoleFromValueGet(setupData.assignedRole);
+  const opponentRole = optionalPlayableRoleFromValueGet(setupData.opponentRole) ?? oppositeRoleGet(assignedRole);
+
+  return {
+    matchId: String(matchId),
+    assignedRole,
+    opponentRole,
+    rolePreference: setupData.rolePreference,
+    difficulty: setupData.difficulty,
+    mapId: setupData.mapId,
+    mapName: setupData.mapName,
+    mapVersion: setupData.mapVersion,
+    mapGenerationVersion: setupData.mapGenerationVersion,
+    stateVersion: setupData.stateVersion ?? 0,
+  };
+}
+
+function matchWaitingFallbackDataGet(
+  matchId: string | number,
+  assignedRole: PlayableRole,
+  opponentRole: PlayableRole
+): MatchWaitingPageToLoadingData {
+  return {
+    matchId: String(matchId),
+    assignedRole,
+    opponentRole,
+    rolePreference: currentMatchSetupData?.rolePreference ?? assignedRole,
+    difficulty: currentMatchSetupData?.difficulty ?? currentMatchDifficulty,
+    mapId: currentMatchSetupData?.mapId ?? HOME_MAP_ID,
+    mapName: currentMatchSetupData?.mapName ?? HOME_MAP_NAME,
+    mapVersion: currentMatchSetupData?.mapVersion ?? HOME_MAP_VERSION,
+    mapGenerationVersion: currentMatchSetupData?.mapGenerationVersion ?? HOME_MAP_GENERATION_VERSION,
+    stateVersion: currentMatchSetupData?.stateVersion ?? 0,
+  };
+}
+
 const trackedProfileApi = {
-  getProfile: async (): Promise<CurrentProfile> => {
-    currentProfile = await profileApi.getProfile();
+  getProfile: async (options: ApiClientRequestOptions = {}): Promise<CurrentProfile> => {
+    currentProfile = await profileApi.getProfile(options);
 
     return currentProfile;
   },
@@ -115,7 +160,7 @@ const trackedProfileApi = {
 const trackedAuthApi = {
   login: async (payload: { identifier: string; password: string }): Promise<void> => {
     await authApi.login(payload);
-    currentProfile = await profileApi.getProfile();
+    currentProfile = await trackedProfileApi.getProfile();
   },
 
   register: async (payload: {
@@ -126,12 +171,12 @@ const trackedAuthApi = {
     preferredRole: string;
   }): Promise<void> => {
     await authApi.register(payload);
-    currentProfile = await profileApi.getProfile();
+    currentProfile = await trackedProfileApi.getProfile();
   },
 
   guest: async (payload: { name?: string }): Promise<void> => {
     await authApi.guest(payload);
-    currentProfile = await profileApi.getProfile();
+    currentProfile = await trackedProfileApi.getProfile();
   },
 
   refresh: async (): Promise<void> => {
@@ -149,111 +194,33 @@ const trackedAuthApi = {
   },
 };
 
-function matchTimerRemainingMsGet(): number {
-  const elapsedMs = Date.now() - currentMatchStartedAtMs;
+const trackedMatchApi = {
+  ...backendMatchApi,
 
-  return Math.max(0, MATCH_TIMER_TOTAL_MS - elapsedMs);
-}
-
-function deliveryProgressGet(timerRemainingMs: number): number {
-  const elapsedRatio = 1 - timerRemainingMs / MATCH_TIMER_TOTAL_MS;
-
-  return Math.max(0, Math.min(96, Math.round(18 + elapsedRatio * 78)));
-}
-
-function currentMatchStatusGet(timerRemainingMs: number): number {
-  if (currentResultMode === "drawAgreement") {
-    return FrontendMatchStatusValue.Draw;
-  }
-
-  if (timerRemainingMs <= 0) {
-    currentResultMode = "saboteurTimeout";
-    return FrontendMatchStatusValue.Completed;
-  }
-
-  return FrontendMatchStatusValue.Active;
-}
-
-const MatchApi = {
   create: async (payload: {
     difficulty: string;
     rolePreference: string;
     mapVersion: string;
     mapGenerationVersion: string;
   }) => {
-    currentMatchAssignedRole = payload.rolePreference === "saboteur" ? "saboteur" : "courier";
-    currentMatchDifficulty = payload.difficulty;
-    currentMatchStateVersion = 1;
-    currentResultMode = null;
+    const response = await backendMatchApi.create(payload);
 
-    return {
-      matchId: "1",
-      status: FrontendMatchStatusValue.Waiting,
-      assignedRole: currentMatchAssignedRole,
-    };
-  },
-};
+    currentMatchAssignedRole = playableRoleFromValueGet(response.assignedRole);
+    currentMatchDifficulty = response.difficulty || payload.difficulty;
 
-const mapPreviewMatchApi = {
-  getMatchMap: async (_matchId: string | number): Promise<unknown> => {
-    return mapApi.previewMapGet({ seed: 20260531 });
-  },
+    currentMatchSetupData = setupDataNormalize(response.matchId, {
+      assignedRole: response.assignedRole,
+      opponentRole: response.opponentRole,
+      rolePreference: payload.rolePreference,
+      difficulty: response.difficulty || payload.difficulty,
+      mapId: HOME_MAP_ID,
+      mapName: HOME_MAP_NAME,
+      mapVersion: response.mapVersion || payload.mapVersion,
+      mapGenerationVersion: response.mapGenerationVersion || payload.mapGenerationVersion,
+      stateVersion: response.stateVersion ?? 0,
+    });
 
-  getMatchState: async (matchId: string | number, _knownVersion: number) => {
-    const timerRemainingMs = matchTimerRemainingMsGet();
-    const status = currentMatchStatusGet(timerRemainingMs);
-
-    return {
-      matchId,
-      status,
-      assignedRole: currentMatchAssignedRole,
-      stateVersion: currentMatchStateVersion++,
-      timerRemainingMs,
-      difficulty: currentMatchDifficulty,
-      deliveryProgressPct: status === FrontendMatchStatusValue.Completed ? 100 : deliveryProgressGet(timerRemainingMs),
-      courierLivesRemaining: 3,
-      obstacleEnergyRemaining: 72,
-      obstacleEnergySpent: 120,
-      energyMax: 100,
-      activeHurdleCount: 3,
-      playerName: currentPlayerNameGet(),
-    };
-  },
-
-  getResult: async (matchId: string | number): Promise<MatchResultData> => {
-    const participantNames = currentParticipantNamesGet();
-
-    return {
-      matchId,
-      winnerRole: currentResultMode === "drawAgreement" ? "draw" : "courier",
-      endReason: currentResultMode === "drawAgreement" ? "drawAgreement" : "delivered",
-      difficulty: currentMatchDifficulty,
-      matchTimeMs: MATCH_TIMER_TOTAL_MS,
-      timeRemainingMs: Math.max(12000, matchTimerRemainingMsGet()),
-      courierLivesRemaining: 3,
-      deliveryProgressPct: currentResultMode === "drawAgreement" ? deliveryProgressGet(matchTimerRemainingMsGet()) : 100,
-      obstacleEnergySpent: 120,
-      obstacleEnergyRemaining: 72,
-      obstacleEnergyMax: 200,
-      hurdlesActivated: 9,
-      successfulDelays: 6,
-      mostUsedHurdle: "Traffic Light",
-      longestActiveHurdleMs: 18000,
-      predictionAccuracyPct: 68,
-      abilitiesUsed: 3,
-      distanceTravelledKm: 4.23,
-      routesChanged: 5,
-      courierName: participantNames.courierName,
-      saboteurName: participantNames.saboteurName,
-      hurdleCounts: {
-        redTrafficLight: 3,
-        roadBlock: 2,
-        construction: 2,
-        trafficJam: 1,
-        closedGate: 1,
-        wrongDirectionSign: 0,
-      },
-    };
+    return response;
   },
 };
 
@@ -268,6 +235,7 @@ async function sessionEndAndGoLanding(): Promise<void> {
     // ignore auth cleanup failure and still return to landing
   } finally {
     currentProfile = null;
+    currentMatchSetupData = null;
     goToLanding();
   }
 }
@@ -295,35 +263,22 @@ function goToAuthLoading(): void {
   );
 }
 
-function goToMatchWaiting(
-  matchId: string,
-  setupData: {
-    assignedRole: string;
-    rolePreference: string;
-    difficulty: string;
-    mapId: string;
-    mapName: string;
-    mapVersion: string;
-    mapGenerationVersion: string;
-  }
-): void {
-  currentMatchAssignedRole = setupData.assignedRole === "saboteur" ? "saboteur" : "courier";
-  currentMatchDifficulty = setupData.difficulty;
-  currentResultMode = null;
+function goToMatchWaiting(matchId: string, setupData: MatchSetupRouteData): void {
+  const waitingData = setupDataNormalize(matchId, setupData);
+
+  currentMatchSetupData = waitingData;
+  currentMatchAssignedRole = waitingData.assignedRole;
+  currentMatchDifficulty = waitingData.difficulty;
 
   void pageMount(async () => {
     const cleanup = await mountMatchWaitingPage(appRoot, {
       launchData: {
-        matchId,
-        assignedRole: setupData.assignedRole,
-        rolePreference: setupData.rolePreference,
-        difficulty: setupData.difficulty,
-        mapId: setupData.mapId,
-        mapName: setupData.mapName,
-        mapVersion: setupData.mapVersion,
-        mapGenerationVersion: setupData.mapGenerationVersion,
-        estimatedWaitSeconds: 3,
+        ...waitingData,
+        estimatedWaitSeconds: 30,
         playerName: currentPlayerNameGet(),
+      },
+      matchApi: {
+        getState: backendMatchApi.getState,
       },
       actions: {
         goToHome,
@@ -341,37 +296,35 @@ function goToMatchWaiting(
   });
 }
 
-function goToMatchLoading(loadingData: MatchWaitingPageToLoadingData | string): void {
-  const matchId = typeof loadingData === "string" ? loadingData : loadingData.matchId;
-  const opponentRole = typeof loadingData === "string" ? oppositeRoleGet(currentMatchAssignedRole) : loadingData.opponentRole;
+function goToMatchLoading(loadingData: MatchWaitingPageToLoadingData | string | number): void {
+  const matchId = typeof loadingData === "object" ? loadingData.matchId : loadingData;
 
-  if (typeof loadingData !== "string") {
+  if (typeof loadingData === "object") {
+    currentMatchSetupData = loadingData;
     currentMatchAssignedRole = loadingData.assignedRole;
     currentMatchDifficulty = loadingData.difficulty;
   }
+
+  const assignedRole = currentMatchSetupData?.assignedRole ?? currentMatchAssignedRole;
+  const opponentRole = currentMatchSetupData?.opponentRole ?? oppositeRoleGet(assignedRole);
 
   void pageMount(async () => {
     const cleanup = await mountMatchLoadingPage(appRoot, {
       matchId,
       launchData: {
-        assignedRole: currentMatchAssignedRole,
+        assignedRole,
         opponentRole,
         playerName: currentPlayerNameGet(),
         sessionType: currentSessionTypeGet(),
       },
-      matchApi: mapPreviewMatchApi,
+      matchApi: backendMatchApi,
       actions: {
         cancelSearch: goToHome,
         goToMatchWaiting: (waitingMatchId) => {
-          goToMatchWaiting(String(waitingMatchId), {
-            assignedRole: currentMatchAssignedRole,
-            rolePreference: currentMatchAssignedRole,
-            difficulty: currentMatchDifficulty,
-            mapId: "neo-city",
-            mapName: "Neo City",
-            mapVersion: "v1",
-            mapGenerationVersion: "city_map_generation_v7",
-          });
+          const waitingData = matchWaitingFallbackDataGet(waitingMatchId, assignedRole, opponentRole);
+
+          currentMatchSetupData = waitingData;
+          goToMatchWaiting(String(waitingMatchId), waitingData);
         },
         goToMatchGame,
         goToDisconnected: goToMatchDisconnected,
@@ -389,17 +342,13 @@ function goToMatchLoading(loadingData: MatchWaitingPageToLoadingData | string): 
 }
 
 function goToMatchGame(matchId: string | number, mapPayload: unknown, matchState: unknown): void {
-  currentMatchStartedAtMs = Date.now();
-  currentMatchStateVersion = 1;
-  currentResultMode = null;
-
   void pageMount(async () => {
     const cleanup = await mountMatchGamePage(appRoot, {
       matchId,
       mapPayload,
       initialMatchState: matchState,
       pollIntervalMs: 500,
-      matchApi: mapPreviewMatchApi,
+      matchApi: backendMatchApi,
       gameController: new PhaserMatchGameController(),
       actions: {
         goToResult: goToMatchResult,
@@ -409,31 +358,20 @@ function goToMatchGame(matchId: string | number, mapPayload: unknown, matchState
 
     textSet("[data-match-player-name]", currentPlayerNameGet());
 
-    const drawButtonList = Array.from(appRoot.querySelectorAll<HTMLButtonElement>("[data-match-draw-button]"));
-
-    const onDrawClick = (): void => {
-      currentResultMode = "drawAgreement";
-      goToMatchResult(matchId);
-    };
-
-    drawButtonList.forEach((button) => button.addEventListener("click", onDrawClick));
+    const sessionCleanup = sessionButtonWire();
 
     return () => {
-      drawButtonList.forEach((button) => button.removeEventListener("click", onDrawClick));
+      sessionCleanup();
       cleanup();
     };
   });
 }
 
 function goToMatchResult(matchId: string | number): void {
-  if (currentResultMode === null) {
-    currentResultMode = "courierDelivered";
-  }
-
   void pageMount(async () => {
     const cleanup = await mountMatchResultPage(appRoot, {
       matchId,
-      matchApi: mapPreviewMatchApi,
+      matchApi: backendMatchApi,
       sessionType: currentSessionTypeGet(),
       currentPlayerName: currentPlayerNameGet(),
       actions: {
@@ -460,10 +398,8 @@ function goToMatchDisconnected(matchId: string | number): void {
     const cleanup = await mountMatchDisconnectedPage(appRoot, {
       matchId,
       actions: {
-        retryMatch: (retryMatchId) => {
-          goToMatchLoading(String(retryMatchId));
-        },
-        goToHome: goToHome,
+        goToResult: goToMatchResult,
+        goToHome,
       },
     });
 
@@ -524,7 +460,7 @@ function goToHome(): void {
   void pageMount(async () => {
     const cleanup = await mountHomeSetupPage(appRoot, {
       profileApi: trackedProfileApi,
-      matchApi: MatchApi,
+      matchApi: trackedMatchApi,
       actions: {
         goToLanding,
         goToMatchWaiting,

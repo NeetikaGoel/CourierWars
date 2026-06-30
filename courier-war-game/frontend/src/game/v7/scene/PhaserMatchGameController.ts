@@ -4,8 +4,9 @@ import Phaser from "phaser";
 import { phaserGameConfig } from "../config/PhaserGameConfig";
 import { debugDisplayConfig } from "../config/DebugDisplayConfig";
 import { MatchGameScene } from "./MatchGameScene";
-import type { MatchGameSceneLaunchData } from "./SceneLaunchDataType";
+import type { MatchGameSceneLaunchData, MatchGameSceneMatchApi } from "./SceneLaunchDataType";
 import type { BackendCityMapPayload } from "../types/BackendCityMapPayloadType";
+import type { BackendMatchStateResponse } from "../../../common/apiType/MatchApiType";
 
 export interface PhaserMatchGameControllerStartPayload {
   // this is the html element where Phaser canvas should mount
@@ -23,7 +24,16 @@ export interface PhaserMatchGameControllerStartPayload {
   // this stores initial backend match state
   matchState: unknown;
 
-  // this runs when courier reaches delivery tile in local prototype flow
+  // this stores backend gameplay api
+  matchApi: MatchGameSceneMatchApi;
+
+  // this runs when backend accepts a state from a Phaser action
+  onStateAccepted?: (matchState: BackendMatchStateResponse) => void;
+
+  // this runs when backend rejects a Phaser action
+  onActionRejected?: (message: string) => void;
+
+  // this runs when courier reaches delivery tile
   onCourierDelivered?: (matchId?: string | number) => void;
 }
 
@@ -62,6 +72,9 @@ export class PhaserMatchGameController {
       matchId: payload.matchId,
       matchState: payload.matchState,
       assignedRole: this.assignedRoleFromMatchStateGet(payload.matchState),
+      matchApi: payload.matchApi,
+      onStateAccepted: payload.onStateAccepted,
+      onActionRejected: payload.onActionRejected,
       onCourierDelivered: payload.onCourierDelivered,
     };
 
@@ -85,6 +98,11 @@ export class PhaserMatchGameController {
   applyState(matchState: unknown): void {
     // this forwards backend polling state to scene
     this.matchGameScene?.matchStateApply(matchState);
+  }
+
+  selectSaboteurHurdle(hurdleType: string): void {
+    // this lets page hurdle cards update Phaser selected hurdle
+    this.matchGameScene?.saboteurHurdleSelect(hurdleType);
   }
 
   stop(): void {

@@ -22,6 +22,12 @@ export class ActiveHurdleStateStore {
   // Stores incrementing number for unique hurdle ids
   private activeHurdleIdCounter = 0;
 
+  // Replaces active hurdle lookup from backend state
+  activeHurdleByIdSet(activeHurdleById: ActiveHurdleByIdMap): void {
+    // Stores backend-authoritative active hurdles
+    this.activeHurdleById = { ...activeHurdleById };
+  }
+
   // Activates a new hurdle and returns created runtime hurdle
   activeHurdleActivate(
     activationRequest: SaboteurHurdleActivationRequest,

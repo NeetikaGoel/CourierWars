@@ -1,42 +1,54 @@
-// this file connects frontend auth pages to backend auth apis
-
-import { apiJsonPost } from "./ApiClient";
-import type { AuthResponse, GuestRequest, LoginRequest, LogoutResponse, RegisterRequest } from "../apiType/AuthApiType";
+import { ApiClientError, apiJsonPost } from "./ApiClient";
+import type {
+  AuthResponse,
+  GuestRequest,
+  LoginRequest,
+  LogoutResponse,
+  RegisterRequest,
+} from "../apiType/AuthApiType";
 
 const CSRF_COOKIE_NAME = "cw_csrf_token";
+const SESSION_HINT_COOKIE_NAME = "cw_user_id";
+const NO_SAVED_SESSION_STATUS = 401;
+const NO_SAVED_SESSION_CODE = "UNAUTHORIZED";
 
-function cookieExists(cookieName: string): boolean {
+const cookieExists = (cookieName: string): boolean => {
   return document.cookie
-    .split("; ")
+    .split(";")
+    .map((cookiePart) => cookiePart.trim())
     .some((cookiePart) => cookiePart.startsWith(`${cookieName}=`));
-}
+};
+
+const savedSessionHintExists = (): boolean => {
+  return cookieExists(CSRF_COOKIE_NAME) && cookieExists(SESSION_HINT_COOKIE_NAME);
+};
 
 export const authApi = {
-  login: async (payload: LoginRequest): Promise<void> => {
-    await apiJsonPost<AuthResponse, LoginRequest>("/auth/login", payload);
-  },
+  register: (request: RegisterRequest): Promise<AuthResponse> =>
+    apiJsonPost<AuthResponse, RegisterRequest>("/auth/register", request, { authRetry: false }),
 
-  register: async (payload: RegisterRequest): Promise<void> => {
-    await apiJsonPost<AuthResponse, RegisterRequest>("/auth/register", payload);
-  },
+  login: (request: LoginRequest): Promise<AuthResponse> =>
+    apiJsonPost<AuthResponse, LoginRequest>("/auth/login", request, { authRetry: false }),
 
-  guest: async (payload: GuestRequest): Promise<void> => {
-    await apiJsonPost<AuthResponse, GuestRequest>("/auth/guest", payload);
-  },
+  guest: (request: GuestRequest): Promise<AuthResponse> =>
+    apiJsonPost<AuthResponse, GuestRequest>("/auth/guest", request, { authRetry: false }),
 
-  refresh: async (): Promise<void> => {
-    if (!cookieExists(CSRF_COOKIE_NAME)) {
-      throw new Error("no saved session");
+  refresh: async (): Promise<AuthResponse> => {
+    if (!savedSessionHintExists()) {
+      throw new ApiClientError(
+        "no saved session",
+        NO_SAVED_SESSION_CODE,
+        undefined,
+        NO_SAVED_SESSION_STATUS
+      );
     }
 
-    await apiJsonPost<AuthResponse, Record<string, never>>("/auth/refresh", {});
+    return apiJsonPost<AuthResponse, Record<string, never>>("/auth/refresh", {}, { authRetry: false });
   },
 
-  logout: async (): Promise<void> => {
-    await apiJsonPost<LogoutResponse, Record<string, never>>("/auth/logout", {});
-  },
+  logout: (): Promise<LogoutResponse> =>
+    apiJsonPost<LogoutResponse, Record<string, never>>("/auth/logout", {}, { authRetry: false }),
 
-  forgetGuest: async (): Promise<void> => {
-    await apiJsonPost<LogoutResponse, Record<string, never>>("/auth/guest/forget", {});
-  },
+  forgetGuest: (): Promise<LogoutResponse> =>
+    apiJsonPost<LogoutResponse, Record<string, never>>("/auth/guest/forget", {}, { authRetry: false }),
 };

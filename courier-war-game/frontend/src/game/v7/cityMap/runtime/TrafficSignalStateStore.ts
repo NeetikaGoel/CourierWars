@@ -17,6 +17,12 @@ export class TrafficSignalStateStore {
     this.trafficSignalStateInitialize(trafficSignalList);
   }
 
+  // Replaces traffic signal lookup from backend state
+  trafficSignalStateByIdSet(trafficSignalStateById: TrafficSignalRuntimeStateByIdMap): void {
+    // Stores backend-authoritative traffic signal runtime state
+    this.trafficSignalStateById = { ...trafficSignalStateById };
+  }
+
   // Initializes all traffic signals as green
   trafficSignalStateInitialize(trafficSignalList: TrafficSignalGenerated[]): void {
     // Clears previous traffic signal states

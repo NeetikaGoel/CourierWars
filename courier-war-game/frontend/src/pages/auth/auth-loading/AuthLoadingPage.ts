@@ -1,68 +1,67 @@
 import "./AuthLoadingPage.css";
 import authLoadingPageHtml from "./AuthLoadingPage.html?raw";
+import { ApiClientError } from "../../../common/api/ApiClient";
 
-export interface AuthLoadingPageAuthApi {
-  refresh: () => Promise<void>;
+type AuthLoadingStepName = "tokens" | "profile" | "userData" | "gameData";
+type AuthLoadingStepStatus = "waiting" | "active" | "complete" | "error";
+type AuthLoadingSessionSource = "access" | "refresh" | "none";
+
+export interface AuthLoadingAuthApi {
+  refresh: () => Promise<unknown>;
 }
 
-export interface AuthLoadingPageProfileApi {
-  getProfile: () => Promise<unknown>;
-}
-
-export interface AuthLoadingPageActions {
-  goToHome: () => void;
-  goToLanding: () => void;
+export interface AuthLoadingProfileApi {
+  getProfile: (options?: { authRetry?: boolean }) => Promise<unknown>;
 }
 
 export interface AuthLoadingPageDependencies {
-  authApi: AuthLoadingPageAuthApi;
-  profileApi: AuthLoadingPageProfileApi;
-  actions: AuthLoadingPageActions;
+  authApi: AuthLoadingAuthApi;
+  profileApi: AuthLoadingProfileApi;
+  actions: {
+    goToHome: () => void;
+    goToLanding: () => void;
+  };
 }
 
-type AuthLoadingStepName = "tokens" | "profile" | "userData" | "gameData";
-type AuthLoadingStepStatus = "idle" | "active" | "complete" | "error";
+const AUTH_LOADING_STEP_COMPLETE_PAUSE_MS = 450;
+const AUTH_LOADING_NO_SESSION_PAUSE_MS = 650;
 
-const AUTH_LOADING_STEP_ACTIVE_MS = 760;
-const AUTH_LOADING_STEP_COMPLETE_PAUSE_MS = 360;
-const AUTH_LOADING_NO_SESSION_VISIBLE_MS = 1600;
-const AUTH_LOADING_HOME_VISIBLE_MS = 1000;
+const EXPECTED_NO_SESSION_STATUS_CODES = new Set([401, 403]);
 
-function sleep(ms: number, timeoutList: number[]): Promise<void> {
-  return new Promise((resolve) => {
-    const timeoutId = window.setTimeout(resolve, ms);
-    timeoutList.push(timeoutId);
-  });
-}
+const EXPECTED_NO_SESSION_ERROR_CODES = new Set([
+  "UNAUTHORIZED",
+  "FORBIDDEN",
+  "CSRF_TOKEN_REQUIRED",
+  "CSRF_TOKEN_INVALID",
+]);
 
-function isExpectedNoSessionError(errorObject: unknown): boolean {
-  const message = errorObject instanceof Error ? errorObject.message.toLowerCase() : String(errorObject).toLowerCase();
-
-  return (
-    message.includes("unauthorized") ||
-    message.includes("no valid") ||
-    message.includes("no refresh") ||
-    message.includes("missing") ||
-    message.includes("expired") ||
-    message.includes("no saved") ||
-    message.includes("not found")
-  );
-}
+const EXPECTED_NO_SESSION_MESSAGE_PARTS = [
+  "no saved session",
+  "no access token",
+  "no refresh token",
+  "refresh token",
+  "csrf",
+  "unauthorized",
+  "forbidden",
+];
 
 export async function mountAuthLoadingPage(root: HTMLElement, deps: AuthLoadingPageDependencies): Promise<() => void> {
   root.innerHTML = authLoadingPageHtml;
 
-  let disposed = false;
+  let isDestroyed = false;
   const timeoutList: number[] = [];
 
-  const titleElement = root.querySelector<HTMLElement>("[data-auth-loading-title]");
-  const messageElement = root.querySelector<HTMLElement>("[data-auth-loading-message]");
-  const errorBox = root.querySelector<HTMLElement>("[data-auth-loading-error]");
-  const errorMessage = root.querySelector<HTMLElement>("[data-auth-loading-error-message]");
-  const retryButton = root.querySelector<HTMLButtonElement>("[data-auth-loading-retry]");
-  const continueButton = root.querySelector<HTMLButtonElement>("[data-auth-loading-continue]");
+  const sleep = (durationMs: number): Promise<void> => {
+    return new Promise((resolve) => {
+      const timeoutId = window.setTimeout(resolve, durationMs);
+      timeoutList.push(timeoutId);
+    });
+  };
 
-  const setText = (title: string, message: string): void => {
+  const textSet = (title: string, message: string): void => {
+    const titleElement = root.querySelector<HTMLElement>("[data-auth-loading-title]");
+    const messageElement = root.querySelector<HTMLElement>("[data-auth-loading-message]");
+
     if (titleElement) {
       titleElement.textContent = title;
     }
@@ -72,259 +71,189 @@ export async function mountAuthLoadingPage(root: HTMLElement, deps: AuthLoadingP
     }
   };
 
-  const setStepStatus = (stepName: AuthLoadingStepName, status: AuthLoadingStepStatus): void => {
-    const stepElements = Array.from(root.querySelectorAll<HTMLElement>(`[data-auth-step="${stepName}"]`));
-    const statusElements = Array.from(root.querySelectorAll<HTMLElement>(`[data-auth-step-status="${stepName}"]`));
+  const stepStatusSet = (stepName: AuthLoadingStepName, status: AuthLoadingStepStatus): void => {
+    const stepElement = root.querySelector<HTMLElement>(`[data-auth-step="${stepName}"]`);
+    const statusElement = root.querySelector<HTMLElement>(`[data-auth-step-status="${stepName}"]`);
 
-    stepElements.forEach((step) => {
-      step.classList.remove("auth-loading-step-active");
-      step.classList.remove("auth-loading-step-complete");
-      step.classList.remove("auth-loading-step-error");
-
-      if (status === "active") {
-        step.classList.add("auth-loading-step-active");
-      }
-
-      if (status === "complete") {
-        step.classList.add("auth-loading-step-complete");
-      }
-
-      if (status === "error") {
-        step.classList.add("auth-loading-step-error");
-      }
-    });
-
-    statusElements.forEach((statusElement) => {
-      if (status === "idle") {
-        statusElement.textContent = "○";
-      }
-
-      if (status === "active") {
-        statusElement.textContent = "●";
-      }
-
-      if (status === "complete") {
-        statusElement.textContent = "✓";
-      }
-
-      if (status === "error") {
-        statusElement.textContent = "!";
-      }
-    });
-  };
-
-  const resetSteps = (): void => {
-    setStepStatus("tokens", "idle");
-    setStepStatus("profile", "idle");
-    setStepStatus("userData", "idle");
-    setStepStatus("gameData", "idle");
-  };
-
-  const hideError = (): void => {
-    if (errorBox) {
-      errorBox.hidden = true;
-    }
-  };
-
-  const showFatalError = (message: string): void => {
-    setText("Session Check Failed", "Something went wrong while checking your saved session.");
-
-    if (errorMessage) {
-      errorMessage.textContent = message;
-    }
-
-    if (errorBox) {
-      errorBox.hidden = false;
-    }
-  };
-
-  const activateStep = async (stepName: AuthLoadingStepName, title: string, message: string): Promise<void> => {
-    if (disposed) {
+    if (!stepElement || !statusElement) {
       return;
     }
 
-    setText(title, message);
-    setStepStatus(stepName, "active");
+    stepElement.classList.remove(
+      "auth-loading-step-active",
+      "auth-loading-step-complete",
+      "auth-loading-step-error"
+    );
 
-    await sleep(AUTH_LOADING_STEP_ACTIVE_MS, timeoutList);
-  };
-
-  const completeStep = async (stepName: AuthLoadingStepName): Promise<void> => {
-    if (disposed) {
+    if (status === "active") {
+      stepElement.classList.add("auth-loading-step-active");
+      statusElement.textContent = "...";
       return;
     }
 
-    setStepStatus(stepName, "complete");
-
-    await sleep(AUTH_LOADING_STEP_COMPLETE_PAUSE_MS, timeoutList);
-  };
-
-  const failStep = async (stepName: AuthLoadingStepName): Promise<void> => {
-    if (disposed) {
+    if (status === "complete") {
+      stepElement.classList.add("auth-loading-step-complete");
+      statusElement.textContent = "✓";
       return;
     }
 
-    setStepStatus(stepName, "error");
+    if (status === "error") {
+      stepElement.classList.add("auth-loading-step-error");
+      statusElement.textContent = "!";
+      return;
+    }
 
-    await sleep(AUTH_LOADING_STEP_COMPLETE_PAUSE_MS, timeoutList);
+    statusElement.textContent = ".";
   };
 
-  const runSuccessFlow = async (): Promise<void> => {
-    await activateStep("profile", "Loading Profile...", "Your session is valid. Loading your profile.");
-    await completeStep("profile");
+  const stepsReset = (): void => {
+    stepStatusSet("tokens", "waiting");
+    stepStatusSet("profile", "waiting");
+    stepStatusSet("userData", "waiting");
+    stepStatusSet("gameData", "waiting");
 
-    await activateStep("userData", "Fetching User Data...", "Loading stats, preferences, and player information.");
-    await completeStep("userData");
+    textSet(
+      "Validating Tokens",
+      "Checking whether a saved access token or refresh token can restore your session."
+    );
+  };
 
-    await activateStep("gameData", "Preparing Game Data...", "Preparing your home dashboard.");
-    await completeStep("gameData");
+  const stepComplete = async (stepName: AuthLoadingStepName): Promise<void> => {
+    stepStatusSet(stepName, "complete");
+    await sleep(AUTH_LOADING_STEP_COMPLETE_PAUSE_MS);
+  };
 
-    setText("Session Ready", "Everything is ready. Taking you to your dashboard.");
+  const expectedNoSessionErrorCheck = (error: unknown): boolean => {
+    if (error instanceof ApiClientError) {
+      if (typeof error.status === "number" && EXPECTED_NO_SESSION_STATUS_CODES.has(error.status)) {
+        return true;
+      }
 
-    await sleep(AUTH_LOADING_HOME_VISIBLE_MS, timeoutList);
+      if (typeof error.code === "string" && EXPECTED_NO_SESSION_ERROR_CODES.has(error.code)) {
+        return true;
+      }
+    }
 
-    if (!disposed) {
+    if (error instanceof Error) {
+      const normalizedMessage = error.message.toLowerCase();
+
+      return EXPECTED_NO_SESSION_MESSAGE_PARTS.some((messagePart) =>
+        normalizedMessage.includes(messagePart)
+      );
+    }
+
+    return false;
+  };
+
+  const directAccessSessionCheck = async (): Promise<AuthLoadingSessionSource> => {
+    stepStatusSet("tokens", "active");
+    textSet("Checking Saved Session", "Trying saved access token first.");
+
+    await deps.profileApi.getProfile({ authRetry: false });
+
+    textSet("Access Token Valid", "Signed in using the saved access token.");
+    await stepComplete("tokens");
+
+    return "access";
+  };
+
+  const refreshSessionCheck = async (): Promise<AuthLoadingSessionSource> => {
+    stepStatusSet("tokens", "active");
+    textSet("Refreshing Session", "Saved access token was not usable. Trying refresh token now.");
+
+    await deps.authApi.refresh();
+    await deps.profileApi.getProfile({ authRetry: false });
+
+    textSet("Session Refreshed", "Refresh token issued a new access token.");
+    await stepComplete("tokens");
+
+    return "refresh";
+  };
+
+  const sessionSourceGet = async (): Promise<AuthLoadingSessionSource> => {
+    try {
+      return await directAccessSessionCheck();
+    } catch (error) {
+      if (!expectedNoSessionErrorCheck(error)) {
+        throw error;
+      }
+    }
+
+    try {
+      return await refreshSessionCheck();
+    } catch (error) {
+      if (expectedNoSessionErrorCheck(error)) {
+        return "none";
+      }
+
+      throw error;
+    }
+  };
+
+  const successfulSessionComplete = async (sessionSource: Exclude<AuthLoadingSessionSource, "none">): Promise<void> => {
+    const profileMessage = sessionSource === "access"
+      ? "Loading profile from saved access-token session."
+      : "Loading profile from refreshed session.";
+
+    stepStatusSet("profile", "active");
+    textSet("Loading Profile", profileMessage);
+    await stepComplete("profile");
+
+    stepStatusSet("userData", "active");
+    textSet("Fetching User Data", "Loading stats, role preference, and progress data.");
+    await stepComplete("userData");
+
+    stepStatusSet("gameData", "active");
+    textSet("Preparing Game Data", "Preparing dashboard, match setup, and game entry.");
+    await stepComplete("gameData");
+
+    if (!isDestroyed) {
+      textSet("Ready", "Opening home.");
       deps.actions.goToHome();
     }
   };
 
-  const runNoSessionFlow = async (): Promise<void> => {
-    await activateStep("profile", "Loading Profile...", "No active saved profile was found.");
-    await failStep("profile");
+  const noSessionComplete = async (message: string): Promise<void> => {
+    stepStatusSet("tokens", "error");
+    stepStatusSet("profile", "waiting");
+    stepStatusSet("userData", "waiting");
+    stepStatusSet("gameData", "waiting");
 
-    await activateStep("userData", "Fetching User Data...", "Saved user data is not available for this browser session.");
-    await failStep("userData");
+    textSet("No Saved Session", message);
 
-    await activateStep("gameData", "Preparing Game Data...", "Game dashboard cannot be prepared without a saved session.");
-    await failStep("gameData");
+    await sleep(AUTH_LOADING_NO_SESSION_PAUSE_MS);
 
-    setText("No Saved Session", "Taking you to the start screen.");
-
-    await sleep(AUTH_LOADING_NO_SESSION_VISIBLE_MS, timeoutList);
-
-    if (!disposed) {
+    if (!isDestroyed) {
       deps.actions.goToLanding();
     }
   };
 
-  const checkProfileDirectly = async (): Promise<boolean> => {
-    await activateStep("tokens", "Validating Tokens...", "Checking saved access token and session metadata.");
+  const sessionCheckRun = async (): Promise<void> => {
+    stepsReset();
 
     try {
-      await deps.profileApi.getProfile();
+      const sessionSource = await sessionSourceGet();
 
-      if (disposed) {
-        return false;
+      if (sessionSource === "none") {
+        await noSessionComplete("No access token or refresh session was usable.");
+        return;
       }
 
-      await completeStep("tokens");
-
-      return true;
+      await successfulSessionComplete(sessionSource);
     } catch {
-      if (disposed) {
-        return false;
-      }
-
-      return false;
+      await noSessionComplete("Session check failed. Please sign in again.");
     }
   };
 
-  const checkRefreshThenProfile = async (): Promise<boolean> => {
-    setText("Refreshing Session...", "Access token may have expired. Trying refresh token now.");
-    setStepStatus("tokens", "active");
-
-    await sleep(AUTH_LOADING_STEP_ACTIVE_MS, timeoutList);
-
-    await deps.authApi.refresh();
-
-    if (disposed) {
-      return false;
-    }
-
-    await completeStep("tokens");
-
-    await deps.profileApi.getProfile();
-
-    if (disposed) {
-      return false;
-    }
-
-    return true;
-  };
-
-  const checkSession = async (): Promise<void> => {
-    hideError();
-    resetSteps();
-
-    setText("Checking Session...", "Verifying your login session and preparing your experience.");
-
-    const directProfileSuccess = await checkProfileDirectly();
-
-    if (disposed) {
-      return;
-    }
-
-    if (directProfileSuccess) {
-      await runSuccessFlow();
-      return;
-    }
-
-    try {
-      const refreshProfileSuccess = await checkRefreshThenProfile();
-
-      if (disposed) {
-        return;
-      }
-
-      if (refreshProfileSuccess) {
-        await runSuccessFlow();
-        return;
-      }
-
-      setStepStatus("tokens", "complete");
-      await runNoSessionFlow();
-    } catch (refreshError) {
-      if (disposed) {
-        return;
-      }
-
-      if (isExpectedNoSessionError(refreshError)) {
-        setStepStatus("tokens", "complete");
-        await runNoSessionFlow();
-        return;
-      }
-
-      setStepStatus("tokens", "error");
-      setStepStatus("profile", "error");
-      setStepStatus("userData", "error");
-      setStepStatus("gameData", "error");
-
-      const errorText = refreshError instanceof Error ? refreshError.message : "Unable to check saved session.";
-      showFatalError(errorText);
-    }
-  };
-
-  const onRetry = (): void => {
-    void checkSession();
-  };
-
-  const onContinue = (): void => {
-    deps.actions.goToLanding();
-  };
-
-  retryButton?.addEventListener("click", onRetry);
-  continueButton?.addEventListener("click", onContinue);
-
-  void checkSession();
+  void sessionCheckRun();
 
   return () => {
-    disposed = true;
+    isDestroyed = true;
 
     for (const timeoutId of timeoutList) {
       window.clearTimeout(timeoutId);
     }
 
-    retryButton?.removeEventListener("click", onRetry);
-    continueButton?.removeEventListener("click", onContinue);
+    timeoutList.length = 0;
   };
 }

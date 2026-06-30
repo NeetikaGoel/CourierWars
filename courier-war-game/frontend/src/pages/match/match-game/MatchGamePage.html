@@ -268,6 +268,30 @@
       </section>
     </footer>
 
+    <section class="match-game-draw-modal" data-draw-offer-modal role="dialog" aria-modal="true" aria-label="Draw offer" hidden>
+      <div class="match-game-draw-modal-card">
+        <small>Draw Offer</small>
+        <h2><span data-draw-offer-name>Opponent</span> offered a draw</h2>
+        <p>If you accept, the match ends immediately and both players go to the result screen as a draw.</p>
+
+        <div class="match-game-draw-modal-actions">
+          <button class="match-game-draw-modal-reject" type="button" data-draw-offer-reject>Reject</button>
+          <button class="match-game-draw-modal-accept" type="button" data-draw-offer-accept>Accept Draw</button>
+        </div>
+      </div>
+    </section>
+    <section class="match-game-draw-modal" data-draw-confirm-modal role="dialog" aria-modal="true" aria-label="Confirm draw offer" hidden>
+      <div class="match-game-draw-modal-card">
+        <small>Confirm Draw Offer</small>
+        <h2>Send draw offer?</h2>
+        <p>The other player will receive a draw request. If they accept, the match ends immediately and both players go to the result screen as a draw.</p>
+
+        <div class="match-game-draw-modal-actions">
+          <button class="match-game-draw-modal-reject" type="button" data-draw-confirm-cancel>Cancel</button>
+          <button class="match-game-draw-modal-accept" type="button" data-draw-confirm-send>Send Offer</button>
+        </div>
+      </div>
+    </section>
     <div class="match-game-error" data-page-error hidden></div>
   </div>
 </section>

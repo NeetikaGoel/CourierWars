@@ -5,12 +5,12 @@ import { pageErrorShow } from "../../shared/PageErrorBox";
 export interface MatchDisconnectedPageDependencies {
   matchId: string | number;
   actions: {
-    retryMatch: (matchId: string | number) => void;
+    goToResult: (matchId: string | number) => void;
     goToHome: () => void;
   };
 }
 
-const DISCONNECTED_RETURN_SECONDS = 8;
+const DISCONNECTED_RESULT_SECONDS = 5;
 
 function setText(root: HTMLElement, selector: string, value: string): void {
   const element = root.querySelector<HTMLElement>(selector);
@@ -31,15 +31,15 @@ function setProgress(root: HTMLElement, progress: number): void {
 export async function mountMatchDisconnectedPage(root: HTMLElement, deps: MatchDisconnectedPageDependencies): Promise<() => void> {
   root.innerHTML = matchDisconnectedPageHtml;
 
-  const retryButton = root.querySelector<HTMLButtonElement>("[data-retry-button]");
+  const resultButton = root.querySelector<HTMLButtonElement>("[data-result-button]");
   const homeButtonList = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-home-button]"));
   const inactiveNavButtonList = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-disconnected-inactive-nav]"));
 
   let disposed = false;
-  let secondsRemaining = DISCONNECTED_RETURN_SECONDS;
+  let secondsRemaining = DISCONNECTED_RESULT_SECONDS;
 
-  const onRetry = (): void => {
-    deps.actions.retryMatch(deps.matchId);
+  const onResult = (): void => {
+    deps.actions.goToResult(deps.matchId);
   };
 
   const onHome = (): void => {
@@ -47,10 +47,10 @@ export async function mountMatchDisconnectedPage(root: HTMLElement, deps: MatchD
   };
 
   const onInactiveNav = (): void => {
-    pageErrorShow(root, "This section is not available in the prototype yet");
+    pageErrorShow(root, "This section is not available yet");
   };
 
-  retryButton?.addEventListener("click", onRetry);
+  resultButton?.addEventListener("click", onResult);
   homeButtonList.forEach((button) => button.addEventListener("click", onHome));
   inactiveNavButtonList.forEach((button) => button.addEventListener("click", onInactiveNav));
 
@@ -65,18 +65,18 @@ export async function mountMatchDisconnectedPage(root: HTMLElement, deps: MatchD
     secondsRemaining -= 1;
 
     setText(root, "[data-disconnected-countdown]", String(Math.max(0, secondsRemaining)).padStart(2, "0"));
-    setProgress(root, (secondsRemaining / DISCONNECTED_RETURN_SECONDS) * 100);
+    setProgress(root, (secondsRemaining / DISCONNECTED_RESULT_SECONDS) * 100);
 
     if (secondsRemaining <= 0) {
       window.clearInterval(intervalId);
-      deps.actions.goToHome();
+      deps.actions.goToResult(deps.matchId);
     }
   }, 1000);
 
   return () => {
     disposed = true;
     window.clearInterval(intervalId);
-    retryButton?.removeEventListener("click", onRetry);
+    resultButton?.removeEventListener("click", onResult);
     homeButtonList.forEach((button) => button.removeEventListener("click", onHome));
     inactiveNavButtonList.forEach((button) => button.removeEventListener("click", onInactiveNav));
   };

@@ -2,19 +2,45 @@
 
 import type { BackendCityMapPayload } from "../../game/v7/types/BackendCityMapPayloadType.ts";
 
+// this is used only by preview map api
 export interface MapPreviewRequest {
-  // this seed lets us request the same generated map again during development
+  // backend can default this when frontend does not send it
   seed?: number;
 }
 
+// /maps/preview returns the full readable generated map payload
 export type MapPreviewResponse = BackendCityMapPayload;
 
-export type MapCurrentResponse = BackendCityMapPayload;
+// /maps/current returns metadata, not full map tiles
+export interface MapCurrentMetadata {
+  mapId?: string;
+  mapName?: string;
+  mapVersion?: string;
+  mapGenerationVersion?: string;
+  widthTiles?: number;
+  heightTiles?: number;
+  zoneColumns?: number;
+  zoneRows?: number;
+  tileSize?: {
+    widthPixels?: number;
+    heightPixels?: number;
+  };
+}
+
+// this matches backend MapGenerationService::currentMapMetadataGet()
+export interface MapCurrentResponse {
+  map?: MapCurrentMetadata;
+  featureCountRanges?: Record<string, Record<string, number>>;
+  preview?: {
+    seedDefault?: number;
+    endpoint?: string;
+  };
+}
 
 export interface MapApi {
-  // this calls direct backend generation for the first milestone
+  // development/demo preview endpoint
   previewMapGet: (request?: MapPreviewRequest) => Promise<MapPreviewResponse>;
 
-  // this will call cache backed current map in the next milestone
+  // current backend map metadata endpoint
   currentMapGet: () => Promise<MapCurrentResponse>;
 }
