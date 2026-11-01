@@ -10,25 +10,9 @@ cd "/d/Neetika Folder/Neetika Folder/IGDTUW/Semester 8/SCOPELY/courier war/couri
 
 ## One-time setup
 
-Required tools: Git Bash, PHP 8+, Node.js/npm, MySQL 8+, and the MySQL command-line client. PHP needs `pdo_mysql` enabled. The supplied scripts start the cache service, PHP API, and Vite frontend; they do not start MySQL.
+Install Git for Windows (Git Bash), PHP 8+ with `pdo_mysql`, Node.js/npm, and MySQL 8+ with its command-line client. MySQL must be installed as a Windows service. `start-all.sh` attempts to start a single matching MySQL/MariaDB service when the database is stopped; Windows may require you to start it yourself from **Services** (`Win+R`, enter `services.msc`).
 
-From Windows, start MySQL in **Services** (`Win+R`, enter `services.msc`, then start your MySQL service). In Git Bash, confirm it is reachable:
-
-```bash
-mysqladmin -h 127.0.0.1 -P 3306 -u root -p ping
-```
-
-Apply the schemas once, in this order. Each file creates/uses the `courier_war` database:
-
-```bash
-mysql -u root -p < courier-war-game/backend/schema/create_cw_users.sql
-mysql -u root -p < courier-war-game/backend/schema/create_cw_user_stats.sql
-mysql -u root -p < courier-war-game/backend/schema/create_cw_match_history.sql
-```
-
-The backend reads `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USERNAME`, and `DB_PASSWORD` from the environment. Set these in the same Git Bash window before starting the app if your local MySQL settings differ from the local defaults. Do not put your real password in this file or commit it.
-
-For example, replace the placeholder with your local MySQL password, then start the app from that same window:
+The script uses the database defaults in `courier-war-game/backend/config/DatabaseConfig.php`. If your MySQL login differs, set its values in the Git Bash window before startup; the password is not saved to this guide or the repository:
 
 ```bash
 export DB_HOST=127.0.0.1
@@ -38,23 +22,19 @@ export DB_USERNAME=root
 export DB_PASSWORD='YOUR_MYSQL_PASSWORD'
 ```
 
-Install frontend packages once (or after the lockfile changes):
-
-```bash
-cd courier-war-game/frontend
-npm ci
-cd ../..
-```
+`DB_NAME` must be `courier_war`, because that is the database named by the included schema files. The startup script securely passes the password to the MySQL client using a temporary file and deletes that file when it exits.
 
 ## Start everything
 
-From the repository root in Git Bash, run:
+From the repository root in Git Bash, run this one command:
 
 ```bash
 bash courier-war-game/scripts/start-all.sh
 ```
 
-Keep that Git Bash window open. The script starts the cache on port `8080`, bootstraps a map, starts the PHP API on `8000`, waits for its health endpoint, then starts Vite on `5173`. Open <http://127.0.0.1:5173/> in your browser.
+Keep that Git Bash window open. It prints each step, checks/starts MySQL, safely creates any missing database/tables, starts/checks the cache on port `8080`, bootstraps a map, starts and health-checks the PHP API on `8000`, installs frontend packages if they are missing, then starts Vite on `5173` and opens the game in your browser. Existing tables and data are preserved; the SQL uses `CREATE ... IF NOT EXISTS`. If the browser does not open automatically, visit <http://127.0.0.1:5173/>.
+
+Press **Ctrl+C** to stop the frontend and PHP API. The cache service stays running so another launch can reuse it. MySQL is not stopped by the script.
 
 For a first full game check, use two separate browser sessions (for example, a regular window and an incognito window), sign in as two players, and start a match. The health endpoint alone confirms that PHP responds; it does not confirm MySQL or cache connectivity.
 
@@ -63,7 +43,7 @@ For a first full game check, use two separate browser sessions (for example, a r
 Open a second Git Bash window at the repository root and run:
 
 ```bash
-# MySQL and required PHP extension
+# MySQL and required PHP extension (the CLI prompts for the password)
 mysqladmin -h 127.0.0.1 -P 3306 -u root -p ping
 php -m | grep -i pdo_mysql
 
@@ -119,7 +99,7 @@ cd ..
 
 | Symptom | Check / action |
 | --- | --- |
-| MySQL ping fails | Start the MySQL service in Windows Services. Confirm port `3306`, then retry `mysqladmin` above. |
+| MySQL cannot be reached or started | Start the MySQL service in Windows Services. Confirm port `3306`, then retry `mysqladmin` above. Starting a Windows service may require an Administrator terminal. |
 | Login, registration, or profile fails while health works | Health does not check the database. Confirm all three schemas exist and that the `DB_*` environment values match your MySQL account in the shell that starts the backend. |
 | `start-all.sh` says the cache is not ready | Check port `8080` and `SimpleCachingServer/Project/Backend/logs/cache-server.log`. Start it separately with `cd courier-war-game && bash scripts/start-cache-server.sh`, then retry the cache check. |
 | Cache check returns `401` | The `X-API-Key` does not match the local cache server key. Use the same `CACHE_SERVER_API_KEY` value for both services. |
