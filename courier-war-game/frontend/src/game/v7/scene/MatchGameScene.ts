@@ -20,8 +20,9 @@ import { SaboteurPlacementInputController } from "../cityMap/input/SaboteurPlace
 import { CameraGameController } from "../cityMap/camera/CameraGameController";
 import { CityMapRenderer } from "../cityMap/rendering/CityMapRenderer";
 import { CourierRenderer } from "../cityMap/rendering/CourierRenderer";
-import { DebugTextOverlay } from "../debug/DebugTextOverlay";
+// import { DebugTextOverlay } from "../debug/DebugTextOverlay";
 import type { BackendMatchStateResponse } from "../../../common/apiType/MatchApiType";
+import { matchStateVersionAdvances } from "../../../common/state/MatchStateVersionGate";
 
 function playerRoleFromValueGet(value: string | undefined): PlayerRoleName {
   // this treats saboteur as explicit and defaults every other value to courier
@@ -43,7 +44,9 @@ function assignedRoleFromMatchStateGet(matchState: unknown): string | undefined 
   const stateRecord = matchState as Record<string, unknown>;
 
   // this returns assignedRole only when backend sent a string
-  return typeof stateRecord.assignedRole === "string" ? stateRecord.assignedRole : undefined;
+  return typeof stateRecord.assignedRole === "string"
+    ? stateRecord.assignedRole
+    : undefined;
 }
 
 function matchStateRecordGet(matchState: unknown): BackendMatchStateResponse {
@@ -55,7 +58,10 @@ function matchStateRecordGet(matchState: unknown): BackendMatchStateResponse {
   return matchState as BackendMatchStateResponse;
 }
 
-function backendErrorMessageGet(errorObject: unknown, fallbackMessage: string): string {
+function backendErrorMessageGet(
+  errorObject: unknown,
+  fallbackMessage: string
+): string {
   // this turns backend/client errors into readable page messages
   if (errorObject instanceof Error) {
     return errorObject.message;
@@ -128,11 +134,11 @@ export class MatchGameScene extends Phaser.Scene {
   // this draws courier marker
   private courierRenderer!: CourierRenderer;
 
-  // this draws temporary debug hud
-  private debugTextOverlay!: DebugTextOverlay;
-
   // this stores courier game object used as tween target
-  private courierGameObject!: Phaser.GameObjects.GameObject & { x: number; y: number };
+  private courierGameObject!: Phaser.GameObjects.GameObject & {
+    x: number;
+    y: number;
+  };
 
   // this stores newest backend state version known by the scene
   private knownStateVersion = 0;
@@ -170,13 +176,16 @@ export class MatchGameScene extends Phaser.Scene {
     this.inputControllerSetup();
 
     // this creates debug hud for map testing
-    this.debugSetup();
+    // this.debugSetup();
 
     // this draws full static map and first runtime overlay
     this.cityMapRenderer.cityMapDraw();
 
     // this focuses camera on courier start or backend current tile
-    this.cameraGameController.cameraCourierUpdate(this.matchPrototypeState.courier.tilePoint, true);
+    this.cameraGameController.cameraCourierUpdate(
+      this.matchPrototypeState.courier.tilePoint,
+      true
+    );
   }
 
   update(): void {
@@ -209,47 +218,102 @@ export class MatchGameScene extends Phaser.Scene {
     }
 
     // this updates camera keyboard controls
-    this.cameraGameController.cameraUpdate(this.matchPrototypeState.courier.tilePoint);
+    this.cameraGameController.cameraUpdate(
+      this.matchPrototypeState.courier.tilePoint
+    );
 
     // this redraws runtime overlays every frame
     this.cityMapRenderer.cityMapRuntimeLayerRedraw();
 
     // this updates debug hud values
-    this.debugTextOverlay.debugTextUpdate(currentTimeMs);
+    // this.debugTextOverlay.debugTextUpdate(currentTimeMs);
   }
 
   matchStateApply(matchState: unknown): void {
+    // this keeps stale/out-of-order backend responses from regressing scene state
+    const backendMatchState = matchStateRecordGet(matchState);
+    const incomingStateVersion = backendMatchState.stateVersion;
+    const hasIncomingVersion =
+      typeof incomingStateVersion === "number" &&
+      Number.isSafeInteger(incomingStateVersion);
+
+    if (
+      hasIncomingVersion &&
+      incomingStateVersion < this.knownStateVersion
+    ) {
+      return;
+    }
+
+    const matchStateChanged = matchStateVersionAdvances(
+      incomingStateVersion,
+      this.knownStateVersion
+    );
+
+    if (hasIncomingVersion && !matchStateChanged) {
+      return;
+    }
+
+    const previousCourierTilePoint = {
+      x: this.matchPrototypeState.courier.tilePoint.x,
+      y: this.matchPrototypeState.courier.tilePoint.y,
+    };
+
     // this stores latest backend state for later requests
     this.launchData.matchState = matchState;
 
-    const backendMatchState = matchStateRecordGet(matchState);
-
-    if (typeof backendMatchState.stateVersion === "number") {
-      this.knownStateVersion = backendMatchState.stateVersion;
+    // this only advances the known version
+    if (
+      matchStateChanged
+    ) {
+      this.knownStateVersion = incomingStateVersion;
     }
 
     // this applies backend-authoritative state into local runtime state
-    backendMatchStateApplyToPrototypeState(this.cityMapGenerated, this.matchPrototypeState, backendMatchState);
+    backendMatchStateApplyToPrototypeState(
+      this.cityMapGenerated,
+      this.matchPrototypeState,
+      backendMatchState
+    );
 
     // this copies backend-applied runtime state into local stores
-    this.trafficSignalStateStore.trafficSignalStateByIdSet(this.matchPrototypeState.trafficSignalStateById);
-    this.activeHurdleStateStore.activeHurdleByIdSet(this.matchPrototypeState.activeHurdleById);
-    this.courierTrailStateStore.courierTrailTileKeySetSet(this.matchPrototypeState.courierVisitedTileKeySet);
+    this.trafficSignalStateStore.trafficSignalStateByIdSet(
+      this.matchPrototypeState.trafficSignalStateById
+    );
+    this.activeHurdleStateStore.activeHurdleByIdSet(
+      this.matchPrototypeState.activeHurdleById
+    );
+    this.courierTrailStateStore.courierTrailTileKeySetSet(
+      this.matchPrototypeState.courierVisitedTileKeySet
+    );
 
     // this moves Courier marker to backend-authoritative position
-    this.courierRenderer?.courierMoveToTile(this.matchPrototypeState.courier.tilePoint);
+    this.courierRenderer?.courierMoveToTile(
+      this.matchPrototypeState.courier.tilePoint
+    );
 
-    // this keeps camera and overlays aligned after backend updates
-    this.cameraGameController?.cameraCourierUpdate(this.matchPrototypeState.courier.tilePoint, true);
+    // Keep manual pan/zoom intact unless the Courier's authoritative tile moved.
+    const courierTilePoint = this.matchPrototypeState.courier.tilePoint;
+
+    if (
+      previousCourierTilePoint.x !== courierTilePoint.x ||
+      previousCourierTilePoint.y !== courierTilePoint.y
+    ) {
+      this.cameraGameController?.cameraCourierUpdate(courierTilePoint);
+    }
+
     this.cityMapRenderer?.cityMapRuntimeLayerRedraw();
   }
 
   saboteurHurdleSelect(hurdleType: string): void {
     // this lets page cards update selected Phaser hurdle
-    this.saboteurPlacementInputController?.saboteurPlacementHurdleSelect(hurdleType as never);
+    this.saboteurPlacementInputController?.saboteurPlacementHurdleSelect(
+      hurdleType as never
+    );
   }
 
-  private backendStateAcceptedHandle(matchState: BackendMatchStateResponse): void {
+  private backendStateAcceptedHandle(
+    matchState: BackendMatchStateResponse
+  ): void {
     // this lets page update hud and then send state back into Phaser
     if (this.launchData.onStateAccepted) {
       this.launchData.onStateAccepted(matchState);
@@ -260,15 +324,21 @@ export class MatchGameScene extends Phaser.Scene {
     this.matchStateApply(matchState);
   }
 
-  private actionRejectedHandle(errorObject: unknown, fallbackMessage: string): void {
+  private actionRejectedHandle(
+    errorObject: unknown,
+    fallbackMessage: string
+  ): void {
     // this sends backend rejection to page error box
-    this.launchData.onActionRejected?.(backendErrorMessageGet(errorObject, fallbackMessage));
+    this.launchData.onActionRejected?.(
+      backendErrorMessageGet(errorObject, fallbackMessage)
+    );
   }
 
   private runtimeStateSetup(): void {
     // this prefers explicit assigned role and falls back to role from match state
     const assignedRole =
-      this.launchData.assignedRole ?? assignedRoleFromMatchStateGet(this.launchData.matchState);
+      this.launchData.assignedRole ??
+      assignedRoleFromMatchStateGet(this.launchData.matchState);
 
     // this creates initial local state from backend generated map
     this.matchPrototypeStateOwner = new MatchPrototypeState(
@@ -277,10 +347,13 @@ export class MatchGameScene extends Phaser.Scene {
     );
 
     // this keeps a mutable reference used by renderers and controllers
-    this.matchPrototypeState = this.matchPrototypeStateOwner.matchPrototypeStateGet();
+    this.matchPrototypeState =
+      this.matchPrototypeStateOwner.matchPrototypeStateGet();
 
     // this creates traffic signal state from generated signals
-    this.trafficSignalStateStore = new TrafficSignalStateStore(this.cityMapGenerated.trafficSignalList);
+    this.trafficSignalStateStore = new TrafficSignalStateStore(
+      this.cityMapGenerated.trafficSignalList
+    );
 
     // this creates active hurdle store
     this.activeHurdleStateStore = new ActiveHurdleStateStore();
@@ -289,7 +362,9 @@ export class MatchGameScene extends Phaser.Scene {
     this.courierTrailStateStore = new CourierTrailStateStore();
 
     // this shares the visited tile set with match runtime state
-    this.courierTrailStateStore.courierTrailTileKeySetSet(this.matchPrototypeState.courierVisitedTileKeySet);
+    this.courierTrailStateStore.courierTrailTileKeySetSet(
+      this.matchPrototypeState.courierVisitedTileKeySet
+    );
 
     // this syncs store values into match state
     this.runtimeStateSync();
@@ -297,18 +372,27 @@ export class MatchGameScene extends Phaser.Scene {
 
   private rendererSetup(): void {
     // this creates city map renderer
-    this.cityMapRenderer = new CityMapRenderer(this, this.cityMapGenerated, this.matchPrototypeState);
+    this.cityMapRenderer = new CityMapRenderer(
+      this,
+      this.cityMapGenerated,
+      this.matchPrototypeState
+    );
 
     // this creates courier renderer
     this.courierRenderer = new CourierRenderer(this);
 
     // this creates courier object at backend start tile
-    this.courierGameObject = this.courierRenderer.courierCreate(this.cityMapGenerated.startTilePoint);
+    this.courierGameObject = this.courierRenderer.courierCreate(
+      this.cityMapGenerated.startTilePoint
+    );
   }
 
   private cameraSetup(): void {
     // this creates camera controller
-    this.cameraGameController = new CameraGameController(this, this.cityMapGenerated);
+    this.cameraGameController = new CameraGameController(
+      this,
+      this.cityMapGenerated
+    );
 
     // this applies camera setup
     this.cameraGameController.cameraSetup();
@@ -316,7 +400,10 @@ export class MatchGameScene extends Phaser.Scene {
 
   private inputControllerSetup(): void {
     // this creates pointer tile resolver
-    this.pointerTileInputResolver = new PointerTileInputResolver(this, this.cityMapGenerated);
+    this.pointerTileInputResolver = new PointerTileInputResolver(
+      this,
+      this.cityMapGenerated
+    );
 
     // this creates courier movement controller
     this.courierMovementInputController = new CourierMovementInputController(
@@ -331,29 +418,44 @@ export class MatchGameScene extends Phaser.Scene {
           }
 
           try {
-            const state = await this.launchData.matchApi.courierMove(this.launchData.matchId, {
-              knownStateVersion: this.knownStateVersion,
-              from: request.from,
-              to: request.to,
-              direction: directionNameGet(request.direction),
-            });
+            const state = await this.launchData.matchApi.courierMove(
+              this.launchData.matchId,
+              {
+                knownStateVersion: this.knownStateVersion,
+                from: request.from,
+                to: request.to,
+                direction: directionNameGet(request.direction),
+              }
+            );
 
             this.backendStateAcceptedHandle(state);
 
-            if (state.status === 3 && state.winnerRole === PlayerRole.Courier) {
-              this.launchData.onCourierDelivered?.(this.launchData.matchId);
+            if (
+              !this.launchData.onStateAccepted &&
+              state.status === 3 &&
+              state.winnerRole === PlayerRole.Courier
+            ) {
+              this.launchData.onCourierDelivered?.(
+                this.launchData.matchId
+              );
             }
 
             return true;
           } catch (errorObject) {
-            this.actionRejectedHandle(errorObject, "Courier movement was rejected");
+            this.actionRejectedHandle(
+              errorObject,
+              "Courier movement was rejected"
+            );
             return false;
           }
         },
 
         courierMovementStarted: () => {
           // this keeps camera focused near courier after movement starts
-          this.cameraGameController.cameraCourierUpdate(this.matchPrototypeState.courier.tilePoint, true);
+          this.cameraGameController.cameraCourierUpdate(
+            this.matchPrototypeState.courier.tilePoint,
+            true
+          );
 
           // this redraws overlays immediately
           this.cityMapRenderer.cityMapRuntimeLayerRedraw();
@@ -361,7 +463,10 @@ export class MatchGameScene extends Phaser.Scene {
 
         courierMovementBlocked: () => {
           // this refocuses camera even when movement is blocked
-          this.cameraGameController.cameraCourierUpdate(this.matchPrototypeState.courier.tilePoint, true);
+          this.cameraGameController.cameraCourierUpdate(
+            this.matchPrototypeState.courier.tilePoint,
+            true
+          );
 
           // this redraws overlays immediately
           this.cityMapRenderer.cityMapRuntimeLayerRedraw();
@@ -378,66 +483,82 @@ export class MatchGameScene extends Phaser.Scene {
     );
 
     // this creates saboteur placement controller
-    this.saboteurPlacementInputController = new SaboteurPlacementInputController(
-      this,
-      this.cityMapGenerated,
-      this.matchPrototypeState,
-      this.pointerTileInputResolver,
-      this.trafficSignalStateStore,
-      this.activeHurdleStateStore,
-      {
-        saboteurPlacementRequested: async (cityTile: CityTile, hurdleType, requestedDurationMs) => {
-          if (!this.launchData.matchApi || this.launchData.matchId === undefined) {
-            return false;
-          }
+    this.saboteurPlacementInputController =
+      new SaboteurPlacementInputController(
+        this,
+        this.cityMapGenerated,
+        this.matchPrototypeState,
+        this.pointerTileInputResolver,
+        this.trafficSignalStateStore,
+        this.activeHurdleStateStore,
+        {
+          saboteurPlacementRequested: async (
+            cityTile: CityTile,
+            hurdleType,
+            requestedDurationMs
+          ) => {
+            if (
+              !this.launchData.matchApi ||
+              this.launchData.matchId === undefined
+            ) {
+              return false;
+            }
 
-          try {
-            const state = await this.launchData.matchApi.saboteurHurdle(this.launchData.matchId, {
-              knownStateVersion: this.knownStateVersion,
-              hurdleType,
-              target: {
-                x: cityTile.x,
-                y: cityTile.y,
-              },
-              requestedDurationMs,
-            });
+            try {
+              const state = await this.launchData.matchApi.saboteurHurdle(
+                this.launchData.matchId,
+                {
+                  knownStateVersion: this.knownStateVersion,
+                  hurdleType,
+                  target: {
+                    x: cityTile.x,
+                    y: cityTile.y,
+                  },
+                  requestedDurationMs,
+                }
+              );
 
-            this.backendStateAcceptedHandle(state);
-            return true;
-          } catch (errorObject) {
-            this.actionRejectedHandle(errorObject, "Hurdle placement was rejected");
-            return false;
-          }
-        },
+              this.backendStateAcceptedHandle(state);
+              return true;
+            } catch (errorObject) {
+              this.actionRejectedHandle(
+                errorObject,
+                "Hurdle placement was rejected"
+              );
+              return false;
+            }
+          },
 
-        saboteurHurdleSelected: () => {
-          // this redraws overlays after hurdle selection changes
-          this.cityMapRenderer.cityMapRuntimeLayerRedraw();
-        },
+          saboteurHurdleSelected: () => {
+            // this redraws overlays after hurdle selection changes
+            this.cityMapRenderer.cityMapRuntimeLayerRedraw();
+          },
 
-        saboteurPlacementRejected: (placementResult) => {
-          // this shows local placement rejection before backend call
-          this.launchData.onActionRejected?.(placementResult.message || "Hurdle placement is not valid");
+          saboteurPlacementRejected: (placementResult) => {
+            // this shows local placement rejection before backend call
+            this.launchData.onActionRejected?.(
+              placementResult.message || "Hurdle placement is not valid"
+            );
 
-          // this redraws overlays after invalid placement
-          this.cityMapRenderer.cityMapRuntimeLayerRedraw();
-        },
+            // this redraws overlays after invalid placement
+            this.cityMapRenderer.cityMapRuntimeLayerRedraw();
+          },
 
-        saboteurPlacementActivated: () => {
-          // this redraws overlays after backend accepted hurdle activation
-          this.cityMapRenderer.cityMapRuntimeLayerRedraw();
-        },
-      }
-    );
+          saboteurPlacementActivated: () => {
+            // this redraws overlays after backend accepted hurdle activation
+            this.cityMapRenderer.cityMapRuntimeLayerRedraw();
+          },
+        }
+      );
   }
 
-  private debugSetup(): void {
-    // this creates temporary debug hud for map milestone
-    this.debugTextOverlay = new DebugTextOverlay(this.cityMapGenerated, this.matchPrototypeState);
+  // private debugSetup(): void {
+  //   // this creates temporary debug hud for map milestone
+  //   this.debugTextOverlay = new DebugTextOverlay(this.cityMapGenerated, this.matchPrototypeState);
 
-    // this renders debug hud immediately
-    this.debugTextOverlay.debugTextCreate(Date.now());
-  }
+  //   // this renders debug hud immediately
+  //   this.debugTextOverlay.debugTextCreate(Date.now());
+  // }
 
   private runtimeStateSync(): void {
     // this syncs traffic signal states into match state
@@ -445,9 +566,11 @@ export class MatchGameScene extends Phaser.Scene {
       this.trafficSignalStateStore.trafficSignalStateByIdGet();
 
     // this syncs active hurdles into match state
-    this.matchPrototypeState.activeHurdleById = this.activeHurdleStateStore.activeHurdleByIdGet();
+    this.matchPrototypeState.activeHurdleById =
+      this.activeHurdleStateStore.activeHurdleByIdGet();
 
     // this syncs courier visited tiles into match state
-    this.matchPrototypeState.courierVisitedTileKeySet = this.courierTrailStateStore.courierTrailTileKeySetGet();
+    this.matchPrototypeState.courierVisitedTileKeySet =
+      this.courierTrailStateStore.courierTrailTileKeySetGet();
   }
 }

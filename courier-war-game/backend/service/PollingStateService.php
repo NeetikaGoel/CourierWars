@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../auth/AuthContext.php';
 require_once __DIR__ . '/../config/MatchConfig.php';
+require_once __DIR__ . '/../constants/MatchEndReasonValue.php';
 require_once __DIR__ . '/../constants/MatchStateFieldName.php';
+require_once __DIR__ . '/../constants/MatchStatusValue.php';
 require_once __DIR__ . '/../constants/RoleValue.php';
 require_once __DIR__ . '/MatchStateService.php';
 
@@ -22,12 +24,33 @@ class PollingStateService
         $matchState = $this->_matchStateService->matchStateRequire($matchId); // reads match state from cache
         $assignedRole = $this->_matchStateService->participantRoleRequire($authContext, $matchState); // gets caller role
 
-        $serverVersion = (int)($matchState[MatchStateFieldName::STATE_VERSION] ?? 0); // reads authoritative version
-        $hasChanges = $knownVersion !== $serverVersion; // tells frontend if version changed
-
+        $matchState = $this->timerExpiryFinalizeIfNeeded($matchState); // ends active matches when their timer expires
         $matchState[MatchStateFieldName::TIMER_REMAINING_MS] = $this->timerRemainingMsGet($matchState); // updates timer every poll
 
+        $serverVersion = (int)($matchState[MatchStateFieldName::STATE_VERSION] ?? 0); // reads authoritative version after timeout finalization
+        $hasChanges = $knownVersion !== $serverVersion; // tells frontend if version changed
+
         return $this->frontendStateCreate($matchState, $assignedRole, $hasChanges); // returns projected state
+    }
+
+    private function timerExpiryFinalizeIfNeeded(array $matchState): array
+    {
+        if ((int)($matchState[MatchStateFieldName::STATUS] ?? -1) !== MatchStatusValue::ACTIVE) {
+            return $matchState; // only an active match can expire
+        }
+
+        if ($this->timerRemainingMsGet($matchState) > 0) {
+            return $matchState; // the match timer has not expired
+        }
+
+        $matchState[MatchStateFieldName::STATUS] = MatchStatusValue::COMPLETED; // ends the match
+        $matchState[MatchStateFieldName::WINNER_ROLE] = RoleValue::SABOTEUR; // saboteur wins by timeout
+        $matchState[MatchStateFieldName::END_REASON] = MatchEndReasonValue::TIMER_EXPIRED; // records timeout reason
+        $matchState[MatchStateFieldName::TIMER_REMAINING_MS] = 0; // clamps timer at zero
+        $matchState = $this->_matchStateService->stateVersionIncrement($matchState); // publishes a new terminal state version
+        $this->_matchStateService->matchStateStore($matchState); // persists the terminal state for both players
+
+        return $matchState; // returns finalized state for this poll
     }
 
     private function frontendStateCreate(array $matchState, string $assignedRole, bool $hasChanges): array

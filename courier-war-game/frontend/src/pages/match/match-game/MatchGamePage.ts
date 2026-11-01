@@ -5,6 +5,9 @@ import {
   FrontendMatchStatusValue,
   frontendMatchStatusLabelGet,
 } from "../../../constants/FrontendMatchStatusValue";
+import { MatchStatePoller } from "../../../common/state/MatchStatePoller";
+import { MatchResultNavigationGuard } from "../../../common/state/MatchResultNavigationGuard";
+import { matchStateVersionAdvances } from "../../../common/state/MatchStateVersionGate";
 import type {
   BackendDrawOfferState,
   BackendMatchStateResponse,
@@ -221,8 +224,16 @@ function renderHud(root: HTMLElement, matchId: string | number, matchState: unkn
     [stateRecord.activeHurdleCount, saboteurRecord.activeHurdleCount],
     0
   );
-  const courierName = firstStringGet([stateRecord.courierName, courierRecord.name, courierRecord.username], "Courier");
-  const saboteurName = firstStringGet([stateRecord.saboteurName, saboteurRecord.name, saboteurRecord.username], "Saboteur");
+
+  const courierName = firstStringGet(
+    [stateRecord.courierName, courierRecord.name, courierRecord.username],
+    "Courier"
+  );
+
+  const saboteurName = firstStringGet(
+    [stateRecord.saboteurName, saboteurRecord.name, saboteurRecord.username],
+    "Saboteur"
+  );
 
   setText(root, "[data-match-id]", `#CW-${String(matchId).toUpperCase()}`);
   setText(root, "[data-match-difficulty]", difficulty.toUpperCase());
@@ -250,7 +261,10 @@ function renderHud(root: HTMLElement, matchId: string | number, matchState: unkn
   return stateVersion;
 }
 
-export async function mountMatchGamePage(root: HTMLElement, deps: MatchGamePageDependencies): Promise<() => void> {
+export async function mountMatchGamePage(
+  root: HTMLElement,
+  deps: MatchGamePageDependencies
+): Promise<() => void> {
   root.innerHTML = matchGamePageHtml;
 
   let disposed = false;
@@ -258,11 +272,14 @@ export async function mountMatchGamePage(root: HTMLElement, deps: MatchGamePageD
   let knownVersion = renderHud(root, deps.matchId, deps.initialMatchState);
   let intervalId = 0;
   let drawRequestActive = false;
+  const resultNavigationGuard = new MatchResultNavigationGuard();
 
   const container = root.querySelector<HTMLElement>("[data-phaser-container]");
   const hud = root.querySelector<HTMLElement>("[data-match-hud]");
   const homeButton = root.querySelector<HTMLButtonElement>("[data-match-home-button]");
-  const drawButtonList = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-match-draw-button]"));
+  const drawButtonList = Array.from(
+    root.querySelectorAll<HTMLButtonElement>("[data-match-draw-button]")
+  );
   const drawOfferModal = root.querySelector<HTMLElement>("[data-draw-offer-modal]");
   const drawOfferName = root.querySelector<HTMLElement>("[data-draw-offer-name]");
   const drawOfferAcceptButton = root.querySelector<HTMLButtonElement>("[data-draw-offer-accept]");
@@ -271,8 +288,12 @@ export async function mountMatchGamePage(root: HTMLElement, deps: MatchGamePageD
   const drawConfirmCancelButton = root.querySelector<HTMLButtonElement>("[data-draw-confirm-cancel]");
   const drawConfirmSendButton = root.querySelector<HTMLButtonElement>("[data-draw-confirm-send]");
 
-  const actionButtonList = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-match-action-button]"));
-  const hurdleButtonList = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-match-hurdle-button]"));
+  const actionButtonList = Array.from(
+    root.querySelectorAll<HTMLButtonElement>("[data-match-action-button]")
+  );
+  const hurdleButtonList = Array.from(
+    root.querySelectorAll<HTMLButtonElement>("[data-match-hurdle-button]")
+  );
   const activateHurdleButton = root.querySelector<HTMLButtonElement>("[data-match-activate-hurdle]");
   const selectedHurdleName = root.querySelector<HTMLElement>("[data-selected-hurdle-name]");
   const selectedHurdleSymbol = root.querySelector<HTMLElement>("[data-selected-hurdle-symbol]");
@@ -287,7 +308,9 @@ export async function mountMatchGamePage(root: HTMLElement, deps: MatchGamePageD
     const offeredByRole = drawOfferRoleGet(drawOffer);
     const stateRecord = recordGet(matchState);
     const status = firstNumberGet([stateRecord.status], FrontendMatchStatusValue.Active);
-    const matchEnded = status === FrontendMatchStatusValue.Completed || status === FrontendMatchStatusValue.Draw;
+    const matchEnded =
+      status === FrontendMatchStatusValue.Completed ||
+      status === FrontendMatchStatusValue.Draw;
 
     let buttonText = "Offer Draw";
     let disabled = false;
@@ -421,20 +444,40 @@ export async function mountMatchGamePage(root: HTMLElement, deps: MatchGamePageD
     }
   };
 
-  const stateAccept = (state: BackendMatchStateResponse): void => {
+  const stateAccept = (state: BackendMatchStateResponse): boolean => {
+    const incomingVersion = firstNumberGet([state.stateVersion], 0);
+
+    // Never allow an old/out-of-order response to overwrite newer state.
+    if (incomingVersion < knownVersion) {
+      return false;
+    }
+
+    const matchStateChanged = matchStateVersionAdvances(
+      state.stateVersion,
+      knownVersion
+    );
+
     latestMatchState = state;
     knownVersion = renderHud(root, deps.matchId, state);
     drawButtonStateRender(state);
-    deps.gameController.applyState(state);
+
+    // Timer-only poll responses still refresh the HUD, but must not reset
+    // Phaser's camera or redraw authoritative map state at an unchanged version.
+    if (matchStateChanged) {
+      deps.gameController.applyState(state);
+    }
 
     if (matchStateIsEnded(state)) {
       drawOfferModalHide();
       drawConfirmModalHide();
-      deps.actions.goToResult(deps.matchId);
-      return;
+
+      resultNavigationGuard.startOnce(() => deps.actions.goToResult(deps.matchId));
+
+      return true;
     }
 
     drawOfferModalRender(state);
+    return true;
   };
 
   const onActionButtonClick = async (event: Event): Promise<void> => {
@@ -475,7 +518,10 @@ export async function mountMatchGamePage(root: HTMLElement, deps: MatchGamePageD
     pageErrorClear(root);
 
     hurdleButtonList.forEach((hurdleButton) => {
-      hurdleButton.classList.toggle("match-game-hurdle-card-active", hurdleButton === button);
+      hurdleButton.classList.toggle(
+        "match-game-hurdle-card-active",
+        hurdleButton === button
+      );
     });
 
     if (selectedHurdleName) {
@@ -505,7 +551,10 @@ export async function mountMatchGamePage(root: HTMLElement, deps: MatchGamePageD
   };
 
   const onActivateHurdleClick = (): void => {
-    pageErrorShow(root, "Click a valid future tile on the map to activate the selected hurdle");
+    pageErrorShow(
+      root,
+      "Click a valid future tile on the map to activate the selected hurdle"
+    );
   };
 
   const drawOfferSend = async (): Promise<void> => {
@@ -565,7 +614,9 @@ export async function mountMatchGamePage(root: HTMLElement, deps: MatchGamePageD
       return;
     }
 
-    hurdleDurationValue.textContent = String(Number(hurdleDurationInput.value)).padStart(2, "0");
+    hurdleDurationValue.textContent = String(
+      Number(hurdleDurationInput.value)
+    ).padStart(2, "0");
   };
 
   if (!container || !hud) {
@@ -578,8 +629,12 @@ export async function mountMatchGamePage(root: HTMLElement, deps: MatchGamePageD
 
   homeButton?.addEventListener("click", onHome);
   drawButtonList.forEach((button) => button.addEventListener("click", onDrawClick));
-  actionButtonList.forEach((button) => button.addEventListener("click", onActionButtonClick));
-  hurdleButtonList.forEach((button) => button.addEventListener("click", onHurdleButtonClick));
+  actionButtonList.forEach((button) =>
+    button.addEventListener("click", onActionButtonClick)
+  );
+  hurdleButtonList.forEach((button) =>
+    button.addEventListener("click", onHurdleButtonClick)
+  );
   activateHurdleButton?.addEventListener("click", onActivateHurdleClick);
   hurdleDurationInput?.addEventListener("input", onDurationInput);
   drawOfferAcceptButton?.addEventListener("click", onDrawOfferAcceptClick);
@@ -603,40 +658,66 @@ export async function mountMatchGamePage(root: HTMLElement, deps: MatchGamePageD
     },
   });
 
-  const poll = async (): Promise<void> => {
-    if (disposed) {
-      return;
-    }
-
-    try {
-      const state = await deps.matchApi.getMatchState(deps.matchId, knownVersion);
-
-      if (disposed) {
-        return;
+  const statePoller = new MatchStatePoller(
+    () => deps.matchApi.getMatchState(deps.matchId, knownVersion),
+    (state) => {
+      if (!disposed) {
+        stateAccept(state);
       }
-
-      stateAccept(state);
-    } catch (errorObject) {
-      pageErrorShow(root, errorMessageGet(errorObject, "Match state could not be refreshed"));
+    },
+    (errorObject) => {
+      if (!disposed) {
+        pageErrorShow(
+          root,
+          errorMessageGet(errorObject, "Match state could not be refreshed")
+        );
+      }
     }
-  };
+  );
 
-  intervalId = window.setInterval(() => void poll(), deps.pollIntervalMs);
-  void poll();
+  intervalId = window.setInterval(
+    () => void statePoller.poll(),
+    deps.pollIntervalMs
+  );
+  void statePoller.poll();
 
   return () => {
     disposed = true;
     window.clearInterval(intervalId);
+    statePoller.stop();
+
     homeButton?.removeEventListener("click", onHome);
-    drawButtonList.forEach((button) => button.removeEventListener("click", onDrawClick));
-    actionButtonList.forEach((button) => button.removeEventListener("click", onActionButtonClick));
-    hurdleButtonList.forEach((button) => button.removeEventListener("click", onHurdleButtonClick));
-    activateHurdleButton?.removeEventListener("click", onActivateHurdleClick);
+    drawButtonList.forEach((button) =>
+      button.removeEventListener("click", onDrawClick)
+    );
+    actionButtonList.forEach((button) =>
+      button.removeEventListener("click", onActionButtonClick)
+    );
+    hurdleButtonList.forEach((button) =>
+      button.removeEventListener("click", onHurdleButtonClick)
+    );
+    activateHurdleButton?.removeEventListener(
+      "click",
+      onActivateHurdleClick
+    );
     hurdleDurationInput?.removeEventListener("input", onDurationInput);
-    drawOfferAcceptButton?.removeEventListener("click", onDrawOfferAcceptClick);
-    drawOfferRejectButton?.removeEventListener("click", onDrawOfferRejectClick);
-    drawConfirmCancelButton?.removeEventListener("click", onDrawConfirmCancelClick);
-    drawConfirmSendButton?.removeEventListener("click", onDrawConfirmSendClick);
+    drawOfferAcceptButton?.removeEventListener(
+      "click",
+      onDrawOfferAcceptClick
+    );
+    drawOfferRejectButton?.removeEventListener(
+      "click",
+      onDrawOfferRejectClick
+    );
+    drawConfirmCancelButton?.removeEventListener(
+      "click",
+      onDrawConfirmCancelClick
+    );
+    drawConfirmSendButton?.removeEventListener(
+      "click",
+      onDrawConfirmSendClick
+    );
+
     deps.gameController.stop();
   };
 }
