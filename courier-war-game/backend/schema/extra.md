@@ -62,3 +62,17 @@ total_ability_uses =
   ability_speed_boost_count
 + ability_shield_count
 + ability_reveal_route_count
+
+
+
+MYSQL COMMAND TO CHECK
+
+mysql -u root -p -e "
+USE courier_war;
+SHOW TABLES;
+SELECT 'cw_users' AS table_name, COUNT(*) AS row_count FROM cw_users
+UNION ALL
+SELECT 'cw_user_stats', COUNT(*) FROM cw_user_stats
+UNION ALL
+SELECT 'cw_match_history', COUNT(*) FROM cw_match_history;
+"

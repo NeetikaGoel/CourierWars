@@ -58,3 +58,8 @@ CREATE TABLE IF NOT EXISTS cw_users
   DEFAULT CHARACTER SET utf8mb4
   COLLATE utf8mb4_0900_ai_ci
   COMMENT='Courier War users table for registered and guest users';
+
+
+
+
+--   mysql -u root -p < create_cw_users.sql
