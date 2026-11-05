@@ -446,3 +446,12 @@ FodyWeavers.xsd
 
 # SimpleCachingServer runtime PID files
 SimpleCachingServer/Project/Backend/run/*.pid
+
+# The Visual Studio "Build results" rules above ([Dd]ebug/, [Rr]elease/, ...) also match
+# source folders. Keep source folders named like that tracked.
+!**/src/**/[Dd]ebug/
+!**/src/**/[Rr]elease/
+
+# Composer bin proxies (vendor/bin/phpunit, ...) are matched by **/[Bb]in/* above; keep them tracked.
+!**/vendor/bin/
+!**/vendor/bin/*

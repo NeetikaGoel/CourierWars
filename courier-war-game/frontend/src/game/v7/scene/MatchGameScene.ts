@@ -330,6 +330,9 @@ export class MatchGameScene extends Phaser.Scene {
 
     // this renders debug hud immediately
     this.debugTextOverlay.debugTextCreate(this.time.now);
+
+    // this removes the dom debug panel when the scene stops so it does not outlive the match page
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.debugTextOverlay.debugTextClear());
   }
 
   private runtimeStateSync(): void {
