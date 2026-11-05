@@ -8,7 +8,7 @@ Every change here is followed by a verification and validation step **before you
 
 Checks (run from `Project/Backend/`):
 - **Syntax:** `php -l` on each changed PHP file.
-- **Unit tests:** `vendor/bin/phpunit`. If `vendor/` is missing, run `composer install` first. A new class under test needs a `require_once` in `tests/LoadFiles.php`.
+- **Unit tests:** `vendor/bin/phpunit`. First confirm `scripts/dependencies.sh --check-dev` exits 0. If it doesn't, the test tooling is missing: run `scripts/dependencies.sh` (it needs sudo and a TTY, so ask the user to run it with `!`), and report the tests as not run rather than passed. A new class under test needs a `require_once` in `tests/LoadFiles.php`.
 - **Runtime:** for anything touching the server, routing, controllers, auth or cache behaviour, restart with `scripts/restart.sh`. Then:
   - `GET /v1/admin/cache/health` with the admin `X-API-Key` (keys are in `config/auth.php`) returns 200 `status: ok`.
   - Exercise the changed endpoint(s) with `curl`, including at least one error case. Clean up any test keys afterwards.

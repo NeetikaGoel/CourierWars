@@ -21,5 +21,8 @@ Flow: browser → Vite `:5173` (proxies `/api` → `:8000`) → `backend/public/
 
 Paths in `areas/*.md` are relative to `courier-war-game/` unless stated.
 
+## Gotchas
+- The root `.gitignore` is the Visual Studio template. Its `[Dd]ebug/`, `[Rr]elease/` and `**/[Bb]in/*` rules once hid source folders and `vendor/bin/`, and negations at the end of the file now restore them. After adding a file, check with `git status` that it isn't silently ignored (`git check-ignore -v <path>`).
+
 ## Ignore
 `node_modules/`, `dist/`, POC `public/` asset packs (KayKit, isometricLandscape, kenney tiles), `GameDesignDocument.md` (empty). `courier-war-game/planv1.md` is an older plan — parts are stale.

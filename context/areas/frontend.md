@@ -7,6 +7,7 @@ Paths relative to `courier-war-game/frontend/`. Vite + TypeScript + Phaser 4, no
 - `src/game/v7/` is the Phaser game:
   - `scene/`: `MatchGameScene` and its controller
   - `cityMap/`: `rendering/`, `input/` (courier movement, saboteur hover/placement), `rules/` (movement cost, hurdles, signals, zones), `runtime/` (state stores), `camera/`, `generation/` (TS generator, see map-generation)
+  - `debug/DebugTextOverlay.ts`: a DOM side-panel HUD (role, courier/hovered tile, placement result, signals). It is gated by `config/DebugDisplayConfig.ts` → `sidePanel.visible` (off by default), throttled to about 5 updates/s, and cleared on scene shutdown.
   - other folders: `config/`, `types/`, `iso/` (isometric math), `utility/`
   - notes: `plan.md`, `working.md` (controls and hurdle placement rules)
 
