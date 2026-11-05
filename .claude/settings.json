@@ -7,6 +7,11 @@
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/load-scs-repo-map.sh\"",
             "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "echo 'Project mandate: if this prompt leads to any change, finish with a verification and validation step (re-check each prompt requirement and run the relevant checks listed in CLAUDE.md), then report the evidence before calling the task done.'",
+            "timeout": 5
           }
         ]
       }
