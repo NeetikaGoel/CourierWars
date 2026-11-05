@@ -45,8 +45,12 @@ composer_ok() {
     command -v composer >/dev/null 2>&1
 }
 
+# vendor/ is not committed; it is built from composer.lock by `composer install`
+# every file in composer's classmap must exist and phpunit must start; this catches a partial vendor/
 vendor_ok() {
-    [ -f vendor/bin/phpunit ] && [ -f vendor/autoload.php ]
+    [ -f vendor/bin/phpunit ] && [ -f vendor/autoload.php ] && [ -f vendor/composer/autoload_classmap.php ] || return 1
+    php -r '$m = require "vendor/composer/autoload_classmap.php"; foreach ($m as $f) { if (!is_file($f)) exit(1); }' 2>/dev/null || return 1
+    php vendor/bin/phpunit --version >/dev/null 2>&1
 }
 
 dev_ok() {
@@ -144,7 +148,13 @@ else
         if ! composer_ok && ask "vendor/bin/phpunit is missing. Install composer with: ${INSTALL[*]} ${PKG_COMPOSER[*]} ?"; then
             "${INSTALL[@]}" "${PKG_COMPOSER[@]}" || echo "WARNING: optional install failed, continuing."
         fi
-        if composer_ok && ask "Install PHP packages from composer.lock with: composer install ?"; then
+        if composer_ok && [ -d vendor ]; then
+            # composer install reports "Nothing to install" when its metadata matches the lock,
+            # even if package files are missing, so an incomplete vendor/ needs a clean reinstall
+            if ask "vendor/ exists but PHPUnit does not run. Reinstall with: rm -rf vendor && composer install ?"; then
+                rm -rf vendor && composer install --no-interaction || echo "WARNING: composer install failed, continuing."
+            fi
+        elif composer_ok && ask "Install PHP packages from composer.lock with: composer install ?"; then
             composer install --no-interaction || echo "WARNING: composer install failed, continuing."
         fi
     fi

@@ -22,7 +22,7 @@ Flow: browser → Vite `:5173` (proxies `/api` → `:8000`) → `backend/public/
 Paths in `areas/*.md` are relative to `courier-war-game/` unless stated.
 
 ## Gotchas
-- The root `.gitignore` is the Visual Studio template. Its `[Dd]ebug/`, `[Rr]elease/` and `**/[Bb]in/*` rules once hid source folders and `vendor/bin/`, and negations at the end of the file now restore them. After adding a file, check with `git status` that it isn't silently ignored (`git check-ignore -v <path>`).
+- The root `.gitignore` is the Visual Studio template. Its `[Dd]ebug/`, `[Rr]elease/`, `**/[Bb]in/*` and `[Tt]est[Rr]esult*/` rules once hid source folders and dropped 58 files from the committed PHPUnit `vendor/`. Source folders are restored by negations at the end of the file, and SimpleCachingServer's `vendor/` and `.phpunit.cache/` are no longer committed (`composer install` builds `vendor/` from `composer.lock`). After adding a file, check with `git status` that it isn't silently ignored (`git check-ignore -v <path>`).
 
 ## Ignore
 `node_modules/`, `dist/`, POC `public/` asset packs (KayKit, isometricLandscape, kenney tiles), `GameDesignDocument.md` (empty). `courier-war-game/planv1.md` is an older plan — parts are stale.

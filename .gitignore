@@ -452,6 +452,8 @@ SimpleCachingServer/Project/Backend/run/*.pid
 !**/src/**/[Dd]ebug/
 !**/src/**/[Rr]elease/
 
-# Composer bin proxies (vendor/bin/phpunit, ...) are matched by **/[Bb]in/* above; keep them tracked.
-!**/vendor/bin/
-!**/vendor/bin/*
+# Composer packages are installed from composer.lock (scripts/dependencies.sh runs composer install).
+# They are not committed: the Visual Studio rules above ([Bb]in/, [Tt]est[Rr]esult*/, ...) silently
+# dropped files from PHPUnit when vendor/ was tracked.
+SimpleCachingServer/Project/Backend/vendor/
+SimpleCachingServer/Project/Backend/.phpunit.cache/
