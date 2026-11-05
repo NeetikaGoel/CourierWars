@@ -1,7 +1,8 @@
 # Runtime & scripts
 Paths relative to `courier-war-game/`.
 
-- `scripts/start-all.sh` — the one-shot dev launcher: sets env defaults → `start-cache-server.sh` → checks cache PID file + `kill -0` → polls `:8080/v1/cache/get?key=cw:health:backend-ping` → `php backend/scripts/bootstrap-cache.php 1` (generates 1 map into cache) → `start-backend.sh &` → polls `:8000/api/v1/health` → `start-frontend.sh`. Diagram: `scripts/flow.md`.
+- `scripts/dependencies.sh` — required: php ≥8 + `mysqli` + `allow_url_fopen`, `curl`, node ≥20.19 + npm, `frontend/node_modules` (via `npm ci`); optional: MySQL/MariaDB server. `--check` = silent, exit 0 if required present. Interactive mode prompts y/N per item, installs via dnf/apt-get/pacman/brew (sudo), re-verifies after install; needs a TTY. New dependency ⇒ add a check fn + package names here. Cache-server deps are checked separately by SimpleCachingServer's own `dependencies.sh`.
+- `scripts/start-all.sh` — the one-shot dev launcher: runs `dependencies.sh --check` (falls back to interactive install, aborts on failure) → sets env defaults → `start-cache-server.sh` → checks cache PID file + `kill -0` → polls `:8080/v1/cache/get?key=cw:health:backend-ping` → `php backend/scripts/bootstrap-cache.php 1` (generates 1 map into cache) → `start-backend.sh &` → polls `:8000/api/v1/health` → `start-frontend.sh`. Diagram: `scripts/flow.md`.
 - `scripts/start-cache-server.sh` — just calls `../SimpleCachingServer/Project/Backend/scripts/start.sh` (see that project's map).
 - `scripts/start-backend.sh` — `php -S 127.0.0.1:8000 -t backend/public backend/public/index.php`.
 - `scripts/start-frontend.sh` — `cd frontend && npm run dev` (Vite; `/api` proxied to `:8000` in `frontend/vite.config.ts`).
