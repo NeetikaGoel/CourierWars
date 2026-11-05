@@ -57,18 +57,24 @@ node_modules_ok() {
     [ -x "$FRONTEND_DIR/node_modules/.bin/vite" ]
 }
 
-# optional: MySQL/MariaDB server (register/login/profile need a database)
+# MySQL/MariaDB server installed locally (only needed when DB_HOST is this machine)
 db_server_ok() {
     command -v mysqld >/dev/null 2>&1 || command -v mariadbd >/dev/null 2>&1
 }
 
+# required: database reachable with DatabaseConfig login and schema applied
+# (every sign-in path, including guest, writes to cw_users/cw_user_stats)
+database_ready_ok() {
+    php_ok && mysqli_ok && bash scripts/setup-database.sh --check
+}
+
 required_ok() {
-    php_ok && mysqli_ok && url_fopen_ok && curl_ok && node_ok && npm_ok && node_modules_ok
+    php_ok && mysqli_ok && url_fopen_ok && curl_ok && node_ok && npm_ok && node_modules_ok && database_ready_ok
 }
 
 if [ "$1" = "--check" ]; then
-    required_ok
-    exit $?
+    required_ok && exit 0
+    exit 1
 fi
 
 # ---------- interactive mode ----------
@@ -182,13 +188,23 @@ else
     fi
 fi
 
-# optional dependency: never blocks startup
-if db_server_ok; then
-    echo "OK: MySQL/MariaDB server found (make sure it is running and the schema in backend/schema/ is applied)"
+# database: server installed (when local), running, login works, schema applied
+if database_ready_ok; then
+    echo "OK: database ready ($(php backend/scripts/database-setup.php check 2>/dev/null))"
+elif ! php_ok || ! mysqli_ok; then
+    echo "MISSING: database (required) -> needs php and the mysqli extension first."
+    FAILED=1
 else
-    echo "MISSING (optional): MySQL/MariaDB server - register/login/profile endpoints will fail without a database"
-    if [ ${#INSTALL[@]} -gt 0 ] && ask "Install with: ${INSTALL[*]} ${PKG_DB[*]} ?"; then
-        "${INSTALL[@]}" "${PKG_DB[@]}" || echo "WARNING: optional install failed, continuing."
+    DB_HOST_CONFIGURED="$(php -r 'require "backend/config/DatabaseConfig.php"; echo DatabaseConfig::host();')"
+    case "$DB_HOST_CONFIGURED" in
+        127.0.0.1|localhost|::1)
+            install_required "MySQL/MariaDB server" db_server_ok \
+                "Install MariaDB or MySQL server manually." "${PKG_DB[@]}"
+            ;;
+    esac
+    if [ "$FAILED" -eq 0 ] || db_server_ok; then
+        echo "Database not ready, running ./scripts/setup-database.sh"
+        bash scripts/setup-database.sh || FAILED=1
     fi
 fi
 
