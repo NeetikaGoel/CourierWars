@@ -13,6 +13,7 @@ require_once __DIR__ . '/../constants/TimeValue.php';
 require_once __DIR__ . '/../constants/UserTypeValue.php';
 require_once __DIR__ . '/../database/repository/CwUserRepository.php';
 require_once __DIR__ . '/../database/repository/CwUserStatsRepository.php';
+require_once __DIR__ . '/../database/repository/CwMatchHistoryRepository.php';
 require_once __DIR__ . '/../entity/CwUser.php';
 require_once __DIR__ . '/../http/HttpCookieFactory.php';
 require_once __DIR__ . '/../utility/Clock.php';
@@ -25,16 +26,18 @@ class AuthService
     //all the variables first
     private CwUserRepository $_cwUserRepository;
     private CwUserStatsRepository $_cwUserStatsRepository;
+    private CwMatchHistoryRepository $_cwMatchHistoryRepository;
     private PasswordHasher $_passwordHasher;
     private JwtTokenService $_jwtTokenService;
     private CsrfTokenService $_csrfTokenService;
     private AuthSessionCacheService $_authSessionCacheService;
 
     //then constructor to create auth dependencies
-    public function __construct(?CwUserRepository $cwUserRepository = null, ?CwUserStatsRepository $cwUserStatsRepository = null)
+    public function __construct(?CwUserRepository $cwUserRepository = null, ?CwUserStatsRepository $cwUserStatsRepository = null, ?CwMatchHistoryRepository $cwMatchHistoryRepository = null)
     {
         $this->_cwUserRepository = $cwUserRepository ?? new CwUserRepository();
         $this->_cwUserStatsRepository = $cwUserStatsRepository ?? new CwUserStatsRepository();
+        $this->_cwMatchHistoryRepository = $cwMatchHistoryRepository ?? new CwMatchHistoryRepository();
         $this->_passwordHasher = new PasswordHasher();
         $this->_jwtTokenService = new JwtTokenService();
         $this->_csrfTokenService = new CsrfTokenService();
@@ -140,13 +143,25 @@ class AuthService
         ];
     }
 
-    //now forgetting guest session
+    //now forgetting guest session and deleting the guest's db rows
+    //cw_user_stats rows go with the user row (ON DELETE CASCADE)
+    //a guest who appears in cw_match_history is kept: those rows belong to the opponent's history too
+    //and the foreign keys are ON DELETE RESTRICT, so only the session is revoked in that case
     public function guestForget(AuthContext $authContext): array
     {
+        $userId = $authContext->getUserId();
+        $guestDataDeleted = false;
+
+        //delete first so a db failure leaves the session usable and the request can be retried
+        if (!$this->_cwMatchHistoryRepository->hasCompletedMatchForUser($userId)) {
+            $this->_cwUserRepository->deleteByUserId($userId);
+            $guestDataDeleted = true;
+        }
+
         $this->_authSessionCacheService->sessionRevokeBySessionId($authContext->getSessionId());
 
         return [
-            'data' => ['guestForgotten' => true],
+            'data' => ['guestForgotten' => true, 'guestDataDeleted' => $guestDataDeleted],
             'cookieHeaders' => HttpCookieFactory::clearAuthCookieHeaders(),
         ];
     }

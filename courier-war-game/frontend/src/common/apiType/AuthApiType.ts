@@ -38,4 +38,6 @@ export interface AuthResponse {
 export interface LogoutResponse {
   loggedOut?: boolean;
   guestForgotten?: boolean;
+  // false when the guest appears in match history, so their rows are kept
+  guestDataDeleted?: boolean;
 }
