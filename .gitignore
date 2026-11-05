@@ -443,3 +443,6 @@ FodyWeavers.xsd
 
 # Claude Code personal settings
 .claude/settings.local.json
+
+# SimpleCachingServer runtime PID files
+SimpleCachingServer/Project/Backend/run/*.pid
