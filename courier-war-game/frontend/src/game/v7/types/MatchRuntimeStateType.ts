@@ -51,6 +51,9 @@ export interface SaboteurRuntimeState {
 
   // Stores cooldown end time by hurdle type
   hurdleCooldownUntilMsByType: Partial<Record<SaboteurHurdleType, number>>;
+
+  // Stores backend energy costs in an online match, local config costs are used when missing
+  energyCostByType?: Partial<Record<SaboteurHurdleType, number>>;
 }
 
 // Defines tile interaction runtime state

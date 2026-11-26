@@ -440,3 +440,20 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# Claude Code personal settings
+.claude/settings.local.json
+
+# SimpleCachingServer runtime PID files
+SimpleCachingServer/Project/Backend/run/*.pid
+
+# The Visual Studio "Build results" rules above ([Dd]ebug/, [Rr]elease/, ...) also match
+# source folders. Keep source folders named like that tracked.
+!**/src/**/[Dd]ebug/
+!**/src/**/[Rr]elease/
+
+# Composer packages are installed from composer.lock (scripts/dependencies.sh runs composer install).
+# They are not committed: the Visual Studio rules above ([Bb]in/, [Tt]est[Rr]esult*/, ...) silently
+# dropped files from PHPUnit when vendor/ was tracked.
+SimpleCachingServer/Project/Backend/vendor/
+SimpleCachingServer/Project/Backend/.phpunit.cache/

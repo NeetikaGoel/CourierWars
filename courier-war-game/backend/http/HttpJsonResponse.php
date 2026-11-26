@@ -35,6 +35,9 @@ require_once __DIR__ . '/../constants/HttpHeaders.php';
 class HttpJsonResponse
 {
     //some variables first!!
+    private const GZIP_MIN_BYTES = 2048; // below this compression costs more than it saves
+    private const GZIP_LEVEL = 5; // good ratio without much cpu
+
     private int $_statusCode; // HTTP status code like 200 400 500
     private array $_body; // response body array which will become JSON
     private array $_headers; // normal response headers
@@ -123,7 +126,31 @@ class HttpJsonResponse
             return; // stop the final response
         }
 
-        //finally send json response
+        //finally send json response, compressed when it is big enough to be worth it
+        if ($this->gzipWantedCheck(strlen($json))) {
+            $compressed = gzencode($json, self::GZIP_LEVEL);
+
+            if ($compressed !== false) {
+                header(HttpHeaders::CONTENT_ENCODING . ': ' . HttpHeaders::CONTENT_ENCODING_GZIP);
+                header(HttpHeaders::VARY . ': ' . HttpHeaders::VARY_ACCEPT_ENCODING);
+                echo $compressed;
+
+                return;
+            }
+        }
+
         echo $json;
+    }
+
+    // map payloads are 4 MB of repetitive JSON and shrink about 50x, tiny poll replies are not worth compressing
+    private function gzipWantedCheck(int $byteCount): bool
+    {
+        if ($byteCount < self::GZIP_MIN_BYTES || !function_exists('gzencode') || headers_sent()) {
+            return false;
+        }
+
+        $acceptEncoding = strtolower((string)($_SERVER[HttpHeaders::SERVER_ACCEPT_ENCODING] ?? ''));
+
+        return str_contains($acceptEncoding, HttpHeaders::CONTENT_ENCODING_GZIP);
     }
 }

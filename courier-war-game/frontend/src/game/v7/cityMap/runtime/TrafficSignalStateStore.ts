@@ -139,6 +139,22 @@ export class TrafficSignalStateStore {
   }
 
   // Clears all signal states
+  // Resets every signal to green and turns the given signals red until their local expiry time
+  trafficSignalRedReplace(redUntilMsBySignalId: Record<string, number>): void {
+    for (const trafficSignalState of Object.values(this.trafficSignalStateById)) {
+      const redUntilMs = redUntilMsBySignalId[trafficSignalState.signalId];
+
+      if (redUntilMs === undefined) {
+        this.trafficSignalGreenRestore(trafficSignalState.signalId);
+        continue;
+      }
+
+      trafficSignalState.stateName = TrafficSignalStateName.Red;
+      trafficSignalState.redUntilMs = redUntilMs;
+      trafficSignalState.activatedBySaboteur = true;
+    }
+  }
+
   trafficSignalStateClear(): void {
     // Resets state lookup to empty object
     this.trafficSignalStateById = {};

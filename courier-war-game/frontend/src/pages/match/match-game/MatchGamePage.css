@@ -674,8 +674,8 @@
 
 .match-game-hurdle-dock {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 0.55rem;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  gap: 0.4rem;
 }
 
 .match-game-hurdle-card {
@@ -1073,4 +1073,53 @@
 .match-game-page-courier .match-game-player-card .home-setup-player-info strong,
 .match-game-page-courier .match-game-player-card .home-setup-session-button {
   white-space: nowrap;
+}
+/* hurdle cards the saboteur cannot use right now: on cooldown or not enough energy */
+.match-game-hurdle-card-unavailable {
+  opacity: 0.45;
+}
+
+/* nine cards share the dock, so each card stacks the name over its cost or cooldown */
+.match-game-hurdle-dock .match-game-hurdle-card {
+  position: relative;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    "icon name"
+    "icon meta";
+  column-gap: 0.4rem;
+  row-gap: 0.1rem;
+  padding: 0.42rem 0.45rem;
+}
+
+.match-game-hurdle-dock .match-game-hurdle-card > span {
+  grid-area: icon;
+  width: 28px;
+  height: 28px;
+}
+
+.match-game-hurdle-dock .match-game-hurdle-card strong {
+  grid-area: name;
+  max-width: 100%;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.match-game-hurdle-dock .match-game-hurdle-card em {
+  grid-area: meta;
+  font-size: 0.72rem;
+}
+
+.match-game-hurdle-card kbd {
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  font-size: 9px;
+  color: rgba(235, 242, 248, 0.5);
+}
+
+/* non error feedback such as a valid target tile or a placed hurdle */
+.match-game-error.match-game-error-info {
+  border-color: rgba(24, 221, 255, 0.48);
+  background: rgba(2, 30, 40, 0.82);
+  color: #d7f7ff;
 }

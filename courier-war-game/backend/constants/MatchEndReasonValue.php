@@ -8,10 +8,12 @@ class MatchEndReasonValue
     public const COURIER_LIVES_ZERO = 'courierLivesZero'; // courier lost all lives
     public const FORFEIT = 'forfeit'; // a player gave up/disconnected
     public const DRAW = 'draw'; // match was cancelled by system or cache loss or anything by agreement maybe or whatever
+    public const DRAW_AGREEMENT = 'drawAgreement'; // both players offered a draw
+    public const CANCELLED = 'cancelled'; // waiting player cancelled before an opponent joined
 
     //to get all values at once
     public static function all(): array 
     {
-        return [self::DELIVERED, self::TIMER_EXPIRED, self::COURIER_LIVES_ZERO, self::FORFEIT, self::DRAW]; 
+        return [self::DELIVERED, self::TIMER_EXPIRED, self::COURIER_LIVES_ZERO, self::FORFEIT, self::DRAW, self::DRAW_AGREEMENT, self::CANCELLED]; 
     }
 }

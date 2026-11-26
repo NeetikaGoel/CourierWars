@@ -9,6 +9,7 @@ require_once __DIR__ . '/../http/HttpResponseFactory.php';
 require_once __DIR__ . '/../api/v1/AuthController.php';
 require_once __DIR__ . '/../api/v1/ProfileController.php';
 require_once __DIR__ . '/../api/v1/MapController.php';
+require_once __DIR__ . '/../api/v1/MatchController.php';
 
 //this file is backend public entry point for all API routes
 
@@ -21,6 +22,7 @@ $router = new HttpRouter($responseFactory);
 $authController = new AuthController(null, $responseFactory);
 $profileController = new ProfileController(null, $responseFactory);
 $mapController = new MapController(null, $responseFactory);
+$matchController = new MatchController(null, $responseFactory);
 
 //this route is useful for checking backend is alive
 $router->addRoute('GET', AppConfig::API_BASE_PATH . '/health', function (HttpRequest $request, array $pathParams) use ($responseFactory): HttpJsonResponse {
@@ -50,6 +52,16 @@ $router->addRoute('GET', AppConfig::API_BASE_PATH . '/maps/current', [$mapContro
 
 //this route returns one generated readable map snapshot
 $router->addRoute('GET', AppConfig::API_BASE_PATH . '/maps/preview', [$mapController, 'previewMapGet']);
+
+//match routes, both players poll state and send actions here
+$router->addRoute('POST', AppConfig::API_BASE_PATH . '/matches', [$matchController, 'matchCreate']);
+$router->addRoute('GET', AppConfig::API_BASE_PATH . '/matches/{matchId}/state', [$matchController, 'matchStateGet']);
+$router->addRoute('GET', AppConfig::API_BASE_PATH . '/matches/{matchId}/result', [$matchController, 'matchResultGet']);
+$router->addRoute('POST', AppConfig::API_BASE_PATH . '/matches/{matchId}/ready', [$matchController, 'matchReady']);
+$router->addRoute('POST', AppConfig::API_BASE_PATH . '/matches/{matchId}/moves', [$matchController, 'courierMove']);
+$router->addRoute('POST', AppConfig::API_BASE_PATH . '/matches/{matchId}/hurdles', [$matchController, 'hurdlePlace']);
+$router->addRoute('POST', AppConfig::API_BASE_PATH . '/matches/{matchId}/cancel', [$matchController, 'matchCancel']);
+$router->addRoute('POST', AppConfig::API_BASE_PATH . '/matches/{matchId}/draw', [$matchController, 'drawOffer']);
 
 $response = $router->dispatch($request);
 $response->send();

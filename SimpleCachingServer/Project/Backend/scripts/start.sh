@@ -21,6 +21,15 @@ HOST="127.0.0.1"
 # define port
 PORT="8080"
 
+# make sure dependencies exist, otherwise run the interactive installer; abort if it fails
+if ! ./scripts/dependencies.sh --check; then
+    echo "Missing dependencies, running dependency installer"
+    if ! ./scripts/dependencies.sh; then
+        echo "ERROR: dependencies not satisfied, aborting start"
+        exit 1
+    fi
+fi
+
 # if pid file exists then check if process is running
 if [ -f "$PID_FILE" ]; then
     PID=$(cat "$PID_FILE")
@@ -41,6 +50,14 @@ php server.php >> "$LOG_FILE" 2>&1 &
 
 # save new process id
 echo $! > "$PID_FILE"
+
+# give the server a moment to bind the socket, then confirm it is really alive
+sleep 1
+if ! kill -0 "$(cat "$PID_FILE")" 2>/dev/null; then
+    echo "ERROR: cache server failed to start, see $LOG_FILE"
+    rm -f "$PID_FILE"
+    exit 1
+fi
 
 # show success msg
 echo "Cache server started on http://$HOST:$PORT with PID $(cat "$PID_FILE")"

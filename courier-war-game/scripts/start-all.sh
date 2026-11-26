@@ -2,6 +2,15 @@
 
 cd "$(dirname "$0")/.." || exit 1
 
+# make sure dependencies exist, otherwise run the interactive installer; abort if it fails
+if ! bash scripts/dependencies.sh --check; then
+    echo "Missing dependencies, running dependency installer"
+    if ! bash scripts/dependencies.sh; then
+        echo "ERROR: dependencies not satisfied, aborting start"
+        exit 1
+    fi
+fi
+
 export CACHE_SERVER_URL="${CACHE_SERVER_URL:-http://127.0.0.1:8080}"
 export CACHE_SERVER_API_KEY="${CACHE_SERVER_API_KEY:-NORMALAPIKEY12345678901234567890}"
 export JWT_COOKIE_SECURE="${JWT_COOKIE_SECURE:-false}"

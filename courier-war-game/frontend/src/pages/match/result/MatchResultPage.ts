@@ -102,6 +102,14 @@ function reasonTextGet(endReason: string): string {
     return "Match ended in a draw";
   }
 
+  if (endReason === "forfeit") {
+    return "Opponent left the match";
+  }
+
+  if (endReason === "cancelled") {
+    return "Matchmaking was cancelled";
+  }
+
   return endReason || "Match completed";
 }
 

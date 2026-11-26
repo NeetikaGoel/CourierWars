@@ -46,6 +46,12 @@ class CacheServerKeyFactory
     }
 
     //now also idempotency cache key
+    // compact walkable grid for one map seed, used to validate moves without loading the full map
+    public static function mapGridKey(string $mapVersion, int $mapSeed): string
+    {
+        return self::keyBuild(['map', 'grid', $mapVersion, (string)$mapSeed]);
+    }
+
     public static function idempotencyKey(string $sidHash, string $clientActionId): string
     {
         return self::keyBuild(['idempotency', $sidHash, $clientActionId]);

@@ -8,6 +8,13 @@ class HttpHeaders
     public const CONTENT_TYPE_NORMALIZED = 'content-type'; // lowercase version used internally after header normalization
     public const CONTENT_LENGTH_NORMALIZED = 'content-length'; // lowercase version used internally after header normalization
 
+    public const CONTENT_ENCODING = 'Content-Encoding'; // response header telling the client the body is compressed
+    public const CONTENT_ENCODING_GZIP = 'gzip';
+    public const VARY = 'Vary'; // caches must key compressed and plain bodies apart
+    public const VARY_ACCEPT_ENCODING = 'Accept-Encoding';
+    public const SERVER_ACCEPT_ENCODING = 'HTTP_ACCEPT_ENCODING'; // $_SERVER key of the request Accept-Encoding header
+    public const CACHE_CONTROL = 'Cache-Control';
+    public const ETAG = 'ETag';
     public const SET_COOKIE = 'Set-Cookie'; // response header name used to set/clear browser cookies
 
     public const X_REQUEST_ID = 'X-Request-Id'; // optional request tracing header sent by client

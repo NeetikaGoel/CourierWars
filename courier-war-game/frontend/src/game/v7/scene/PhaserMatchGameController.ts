@@ -23,8 +23,20 @@ export interface PhaserMatchGameControllerStartPayload {
   // this stores initial backend match state
   matchState: unknown;
 
-  // this runs when courier reaches delivery tile in local prototype flow
+  // this runs when courier reaches delivery tile
   onCourierDelivered?: (matchId?: string | number) => void;
+
+  // this runs after each courier tile step in an online match
+  onCourierStep?: (step: { x: number; y: number; lives: number }) => void;
+
+  // this runs when the saboteur confirms a hurdle placement in an online match
+  onHurdleRequested?: (hurdleType: string, tilePointList: { x: number; y: number }[]) => void;
+
+  // this runs when the saboteur selects a hurdle on the keyboard
+  onHurdleSelected?: (hurdleType: string) => void;
+
+  // this runs with feedback about a tile pick or a refused placement
+  onPlacementFeedback?: (message: string, valid: boolean) => void;
 }
 
 export class PhaserMatchGameController {
@@ -63,6 +75,10 @@ export class PhaserMatchGameController {
       matchState: payload.matchState,
       assignedRole: this.assignedRoleFromMatchStateGet(payload.matchState),
       onCourierDelivered: payload.onCourierDelivered,
+      onCourierStep: payload.onCourierStep,
+      onHurdleRequested: payload.onHurdleRequested,
+      onHurdleSelected: payload.onHurdleSelected,
+      onPlacementFeedback: payload.onPlacementFeedback,
     };
 
     // this creates Phaser game without auto starting a scene
@@ -78,13 +94,36 @@ export class PhaserMatchGameController {
     // this adds and starts match scene with backend map payload
     this.game.scene.add(phaserGameConfig.scene.key, MatchGameScene, true, sceneLaunchData);
 
-    // this stores scene instance so polling state can be applied later
-    this.matchGameScene = this.game.scene.getScene(phaserGameConfig.scene.key) as MatchGameScene;
+    // the scene instance does not exist until Phaser boots on the next frame, sceneGet looks it up lazily
+    this.matchGameScene = null;
   }
 
-  applyState(matchState: unknown): void {
+  private sceneGet(): MatchGameScene | null {
+    if (!this.matchGameScene && this.game) {
+      this.matchGameScene = (this.game.scene.getScene(phaserGameConfig.scene.key) as MatchGameScene | null) ?? null;
+    }
+
+    return this.matchGameScene;
+  }
+
+  applyState(matchState: unknown, serverClockOffsetMs = 0): void {
     // this forwards backend polling state to scene
-    this.matchGameScene?.matchStateApply(matchState);
+    this.sceneGet()?.matchStateApply(matchState, serverClockOffsetMs);
+  }
+
+  hurdleSelect(hurdleType: string): void {
+    // this selects a hurdle from the page deck
+    this.sceneGet()?.saboteurHurdleSelect(hurdleType);
+  }
+
+  hurdleActivate(): void {
+    // this places the selected hurdle on the selected tile from the Activate Hurdle button
+    this.sceneGet()?.saboteurHurdleActivate();
+  }
+
+  courierPositionReset(tileX: number, tileY: number): void {
+    // this snaps the courier back after the backend rejected a step
+    this.sceneGet()?.courierPositionReset(tileX, tileY);
   }
 
   stop(): void {

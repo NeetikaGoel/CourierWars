@@ -50,12 +50,12 @@
             <i data-match-energy-fill></i>
           </span>
         </span>
-        <em>+10 in 00:18</em>
+        <em data-match-energy-recovery>+4 / sec</em>
       </section>
 
       <section class="match-game-top-card match-game-saboteur-only match-game-hurdle-count-card">
-        <small>Hurdles Activated</small>
-        <strong><span data-match-hurdle-count>3</span> / 12</strong>
+        <small>Active Hurdles</small>
+        <strong><span data-match-hurdle-count>0</span> / <span data-match-hurdle-count-max>5</span></strong>
       </section>
 
       <section class="home-setup-player-card match-game-player-card">
@@ -108,18 +108,18 @@
 
         <section class="match-game-panel match-game-saboteur-only match-game-danger-panel">
           <h2>Active Hurdles</h2>
-          <div class="match-game-list-row"><strong>Red Traffic Light</strong><span>3s</span></div>
-          <div class="match-game-list-row"><strong>Road Block</strong><span>12s</span></div>
-          <div class="match-game-list-row"><strong>Construction</strong><span>18s</span></div>
+          <div data-match-active-hurdle-list>
+            <p class="match-game-muted">No hurdles active</p>
+          </div>
         </section>
 
         <section class="match-game-panel match-game-saboteur-only">
           <h2>Traffic Signal Status</h2>
           <div class="match-game-obstacle-row">
             <span aria-hidden="true">▥</span>
-            <p><strong>Active Red Light</strong><small>Next signal: 45m</small></p>
+            <p><strong data-match-red-signal-title>No Red Lights</strong><small data-match-red-signal-detail>All signals green</small></p>
           </div>
-          <span class="match-game-meter match-game-meter-red"><i style="width: 52%"></i></span>
+          <span class="match-game-meter match-game-meter-red"><i data-match-red-signal-fill style="width: 0%"></i></span>
         </section>
 
         <section class="match-game-panel match-game-saboteur-only">
@@ -235,32 +235,14 @@
           <div>
             <small>Energy Cost</small>
             <strong>ϟ <span data-hurdle-energy-cost>15</span></strong>
+            <small data-hurdle-cooldown-text>Ready</small>
           </div>
       
           <button type="button" data-match-activate-hurdle>Activate Hurdle</button>
         </article>
       
-        <div class="match-game-hurdle-dock">
-          <button type="button" class="match-game-hurdle-card match-game-hurdle-card-active" data-match-hurdle-button data-hurdle-name="Red Traffic Light" data-hurdle-symbol="▥" data-hurdle-cost="15" data-hurdle-default-duration="4" data-hurdle-description="Block the intersection with a red signal to stop the Courier.">
-            <span aria-hidden="true">▥</span><strong>Red Traffic Light</strong><em>ϟ 15</em>
-          </button>
-      
-          <button type="button" class="match-game-hurdle-card" data-match-hurdle-button data-hurdle-name="Road Block" data-hurdle-symbol="▤" data-hurdle-cost="20" data-hurdle-default-duration="5" data-hurdle-description="Block one future road tile and force the Courier to reroute.">
-            <span aria-hidden="true">▤</span><strong>Road Block</strong><em>ϟ 20</em>
-          </button>
-      
-          <button type="button" class="match-game-hurdle-card" data-match-hurdle-button data-hurdle-name="Construction" data-hurdle-symbol="△" data-hurdle-cost="20" data-hurdle-default-duration="8" data-hurdle-description="Slow Courier movement through a future road section.">
-            <span aria-hidden="true">△</span><strong>Construction</strong><em>ϟ 20</em>
-          </button>
-      
-          <button type="button" class="match-game-hurdle-card" data-match-hurdle-button data-hurdle-name="Traffic Jam" data-hurdle-symbol="▨" data-hurdle-cost="25" data-hurdle-default-duration="6" data-hurdle-description="Create a slow movement zone on an upcoming route.">
-            <span aria-hidden="true">▨</span><strong>Traffic Jam</strong><em>ϟ 25</em>
-          </button>
-      
-          <button type="button" class="match-game-hurdle-card" data-match-hurdle-button data-hurdle-name="Closed Gate" data-hurdle-symbol="⊞" data-hurdle-cost="30" data-hurdle-default-duration="5" data-hurdle-description="Close a shortcut, tunnel, or bridge entrance temporarily.">
-            <span aria-hidden="true">⊞</span><strong>Closed Gate</strong><em>ϟ 30</em>
-          </button>
-        </div>
+        <!-- cards are built by MatchGamePage.ts from the backend hurdle rules -->
+        <div class="match-game-hurdle-dock" data-match-hurdle-dock></div>
       
         <button class="match-game-draw-button match-game-draw-button-small" type="button" data-match-draw-button>
           Offer Draw
