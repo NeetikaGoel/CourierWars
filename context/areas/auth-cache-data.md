@@ -8,7 +8,7 @@ Auth (`auth/`, design notes `auth/auth.md`)
 
 Cache client (`cache/`, notes `cache/cache.md`)
 - `CacheServerClient` — HTTP client for SimpleCachingServer `/v1/cache/{set,get,delete}` with `X-API-Key`. Config in `config/CacheServerConfig.php` (URL default `http://127.0.0.1:8080`, value max 8 MB for map JSON), TTLs in `CacheServerTtlConfig.php`.
-- `CacheServerKeyFactory` — **all keys built here**, prefix `cw:` with `:` separators: auth session, matchmaking waiting, `map:bootstrap:<ver>:list` / item, match state, match map.
+- `CacheServerKeyFactory` — **all keys built here**, prefix `cw:` with `:` separators: auth session, matchmaking waiting (`matchmaking:waiting:<openRole>:<difficulty>` → list of match ids), `map:bootstrap:<ver>:list` / item, `map:grid:<ver>:<seed>` (compact walkable grid `MatchService` validates moves against), match state (`match:<id>:state`, the whole authoritative match), match map.
 - Server-side behaviour (auth, limits, TTL semantics) → `SimpleCachingServer/context/REPO_MAP.md`.
 
 Database (MySQL via `mysqli`)

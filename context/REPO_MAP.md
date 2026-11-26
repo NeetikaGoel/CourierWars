@@ -16,6 +16,7 @@ Flow: browser → Vite `:5173` (proxies `/api` → `:8000`) → `backend/public/
 | Auth (JWT/CSRF/guest), cache keys/client, DB schema/repos | `areas/auth-cache-data.md` |
 | City map generation, seeds, map payload | `areas/map-generation.md` |
 | Pages, API client, Phaser scene, gameplay rules | `areas/frontend.md` |
+| Matchmaking, multiplayer sync, match end | `areas/backend-api.md` (Match API) + `areas/frontend.md` (online match sync) |
 | Prototype versions, assets | `areas/poc.md` |
 | Cache server internals (endpoints, TTL, keys, scripts) | `../SimpleCachingServer/context/REPO_MAP.md` |
 

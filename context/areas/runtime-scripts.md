@@ -13,6 +13,7 @@ Ports: frontend 5173 (Vite default), backend 8000, cache server 8080, MySQL 3306
 Env (defaults set in start scripts / `backend/config/*`): `CACHE_SERVER_URL`, `CACHE_SERVER_API_KEY` (normal key from SimpleCachingServer `config/auth.php`), `JWT_SECRET` (≥32 chars), `JWT_COOKIE_SECURE`, `CSRF_COOKIE_SECURE` (false locally), `DB_HOST`/`DB_PORT`/… (`config/DatabaseConfig.php`, defaults root@127.0.0.1/courier_war).
 
 Gotchas
+- Vite listens on `localhost` only (`[::1]:5173`). A second player on another machine needs `cd frontend && npx vite --host`, which proxies `/api` the same way. Use `http://localhost:5173`; `127.0.0.1:5173` is refused.
 - There is no stop script for backend/frontend; stop the cache server with SimpleCachingServer's `stop.sh`.
 - Cache is in-memory: restarting the cache server drops bootstrap maps and auth sessions — rerun `bootstrap-cache.php`.
 - Every sign-in path (including guest) writes to MySQL, so without a ready DB every auth request returns 500. Logout only marks a session `revokedAtMs`; the key stays in the cache until its TTL ends.
