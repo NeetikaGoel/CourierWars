@@ -7,12 +7,15 @@ require_once __DIR__ . '/../../http/HttpJsonResponse.php';
 require_once __DIR__ . '/../../http/HttpResponseFactory.php';
 require_once __DIR__ . '/../../constants/ApiErrorCode.php';
 require_once __DIR__ . '/../../constants/HttpStatusCode.php';
+require_once __DIR__ . '/../../constants/HttpHeaders.php';
 require_once __DIR__ . '/../../service/MapGenerationService.php';
 
 //this controller handles map metadata and preview map APIs
 //so starting with the class lets see
 class MapController
 {
+    private const SEEDED_MAP_CACHE_CONTROL = 'public, max-age=86400, immutable'; // one day, map urls carry seed and version
+
     //first we need variables which ones????
     //one for map generation and a response one
     private MapGenerationService $_mapGenerationService;
@@ -41,10 +44,18 @@ class MapController
         try {
             $seedRaw = $request->getQueryParam('seed');
             $mapSnapshot = $this->_mapGenerationService->previewMapGenerate($seedRaw);
-            return $this->_responseFactory->success(
+            $response = $this->_responseFactory->success(
                 $mapSnapshot,
                 $request->getRequestId()
             );
+
+            //a seed always generates the same map for one generator version, so the browser can keep it
+            //and the second match on the same seed downloads nothing
+            if ($seedRaw !== null && $seedRaw !== '') {
+                $response->addHeader(HttpHeaders::CACHE_CONTROL, self::SEEDED_MAP_CACHE_CONTROL);
+            }
+
+            return $response;
         } 
         
         //for catching any errors

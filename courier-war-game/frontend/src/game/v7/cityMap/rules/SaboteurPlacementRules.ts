@@ -216,8 +216,10 @@ export function saboteurPlacementEnergyCheck(
   context: SaboteurPlacementCheckContext
 ): SaboteurHurdlePlacementResult {
   const hurdleConfig = saboteurHurdleConfig.hurdle[context.hurdleType];
+  const energyCost =
+    context.matchPrototypeState.saboteur.energyCostByType?.[context.hurdleType] ?? hurdleConfig.energyCost;
 
-  if (context.matchPrototypeState.saboteur.energyCurrent < hurdleConfig.energyCost) {
+  if (context.matchPrototypeState.saboteur.energyCurrent < energyCost) {
     return saboteurPlacementResultInvalidCreate(
       SaboteurHurdlePlacementFailureReason.SaboteurEnergyInsufficient,
       "Saboteur energy is insufficient"

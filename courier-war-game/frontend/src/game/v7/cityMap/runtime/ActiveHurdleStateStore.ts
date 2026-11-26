@@ -185,6 +185,16 @@ export class ActiveHurdleStateStore {
   }
 
   // Clears all active hurdles
+  // Replaces every active hurdle with the authoritative list from the backend
+  activeHurdleStateReplace(activeHurdleList: SaboteurHurdleActive[]): void {
+    // Rebuilds the lookup so expired or rejected local hurdles disappear
+    this.activeHurdleById = {};
+
+    for (const activeHurdle of activeHurdleList) {
+      this.activeHurdleById[activeHurdle.id] = activeHurdle;
+    }
+  }
+
   activeHurdleStateClear(): void {
     // Resets active hurdle lookup
     this.activeHurdleById = {};

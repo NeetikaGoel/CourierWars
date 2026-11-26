@@ -402,6 +402,30 @@ export class CourierMovementInputController {
   }
 
   // Applies life loss when target tile contains active hazard
+  // Moves the Courier straight to a tile, used when the backend rejected a step and the local position is wrong
+  courierMovementReset(tilePoint: CoordinateTilePoint): void {
+    // Stops any tween that is still moving the marker
+    this.scene.tweens.killTweensOf(this.courierTweenTarget);
+
+    // Stores the authoritative tile and its zone
+    const cityTile = this.courierMovementTileGet(tilePoint);
+    this.matchPrototypeState.courier.tilePoint = { x: tilePoint.x, y: tilePoint.y };
+
+    if (cityTile && cityTile.zoneId !== this.matchPrototypeState.courier.zoneIdCurrent) {
+      this.matchPrototypeState.courier.zoneIdPrevious = this.matchPrototypeState.courier.zoneIdCurrent;
+      this.matchPrototypeState.courier.zoneIdCurrent = cityTile.zoneId;
+    }
+
+    // Places the marker on the tile center
+    const worldPoint = isometricTileCenterWorldPointGet(tilePoint);
+    this.courierTweenTarget.x = worldPoint.x;
+    this.courierTweenTarget.y = worldPoint.y;
+
+    // Lets input start a fresh move
+    this.courierMovementActive = false;
+    this.courierDirectionQueued = DirectionName.None;
+  }
+
   private courierMovementLifeLossApply(cityTileTarget: CityTile): void {
     // Stores whether tile has life loss hazard
     const lifeLossHazard = courierMovementTileLifeLossHazardCheck({

@@ -19,6 +19,17 @@ import { CameraGameController } from "../cityMap/camera/CameraGameController";
 import { CityMapRenderer } from "../cityMap/rendering/CityMapRenderer";
 import { CourierRenderer } from "../cityMap/rendering/CourierRenderer";
 import { DebugTextOverlay } from "../debug/DebugTextOverlay";
+import { isometricTileCenterWorldPointGet } from "../iso/IsometricCoordinateCalculator";
+import { cityTileKeyFromPointGet } from "../utility/CityTileKeyConverter";
+import type { CoordinateTilePoint } from "../types/CoordinateType";
+import { SaboteurHurdleType, type SaboteurHurdleActive } from "../types/SaboteurHurdleType";
+import type { MatchSyncCourier, MatchSyncState } from "../../../common/apiType/MatchApiType";
+import { FrontendMatchStatusValue } from "../../../constants/FrontendMatchStatusValue";
+
+// the saboteur replays remote courier tiles faster when several arrive in one poll
+const REMOTE_COURIER_TILE_MS_MAX = 145;
+const REMOTE_COURIER_TILE_MS_MIN = 40;
+const REMOTE_COURIER_CATCH_UP_MS = 450;
 
 function playerRoleFromValueGet(value: string | undefined): PlayerRoleName {
   // this treats saboteur as explicit and defaults every other value to courier
@@ -92,6 +103,28 @@ export class MatchGameScene extends Phaser.Scene {
   // this stores courier game object used as tween target
   private courierGameObject!: Phaser.GameObjects.GameObject & { x: number; y: number };
 
+  // this is true for a local prototype scene, an online scene waits for the backend to start the match
+  private courierMovementEnabled = true;
+
+  // this stops courier input after the delivery tile was reached
+  private courierDelivered = false;
+
+  // this stores the latest backend minus local clock difference
+  private serverClockOffsetMs = 0;
+
+  // these store the newest backend states, they can arrive before init and create have run
+  private latestMatchState: unknown = undefined;
+  private latestFullMatchState: unknown = undefined;
+
+  // this is the last courier step seq the saboteur has drawn
+  private remoteCourierSeq = 0;
+
+  // this stores remote courier tiles still waiting to be animated
+  private remoteCourierTileQueue: CoordinateTilePoint[] = [];
+
+  // this is true while one remote courier tile tween runs
+  private remoteCourierTweenActive = false;
+
   constructor() {
     // this registers the scene using phaser config key
     super(phaserGameConfig.scene.key);
@@ -100,6 +133,13 @@ export class MatchGameScene extends Phaser.Scene {
   init(data: MatchGameSceneLaunchData): void {
     // this stores launch data for create
     this.launchData = data;
+
+    // this makes an online courier wait for the backend active status before moving
+    this.courierMovementEnabled = data.onCourierStep === undefined;
+    this.courierDelivered = false;
+    this.remoteCourierSeq = 0;
+    this.remoteCourierTileQueue = [];
+    this.remoteCourierTweenActive = false;
   }
 
   create(): void {
@@ -129,6 +169,16 @@ export class MatchGameScene extends Phaser.Scene {
 
     // this focuses camera on courier start zone
     this.cameraGameController.cameraCourierUpdate(this.matchPrototypeState.courier.tilePoint, true);
+
+    // this applies the newest backend state, which may have arrived while the scene was booting
+    // the last full state carries hurdles and the courier, a later unchanged poll only adds status and energy
+    const fullState = this.latestFullMatchState ?? this.launchData.matchState;
+    const newestState = this.latestMatchState;
+    this.matchStateApply(fullState, this.serverClockOffsetMs);
+
+    if (newestState && newestState !== fullState) {
+      this.matchStateApply(newestState, this.serverClockOffsetMs);
+    }
   }
 
   update(): void {
@@ -145,7 +195,11 @@ export class MatchGameScene extends Phaser.Scene {
     this.runtimeStateSync();
 
     // this only allows courier movement when current scene role is courier
-    if (this.matchPrototypeState.playerRole === PlayerRole.Courier) {
+    if (
+      this.matchPrototypeState.playerRole === PlayerRole.Courier &&
+      this.courierMovementEnabled &&
+      !this.courierDelivered
+    ) {
       this.courierMovementInputController.courierMovementUpdate();
     }
 
@@ -170,10 +224,214 @@ export class MatchGameScene extends Phaser.Scene {
     this.debugTextOverlay.debugTextUpdate(this.time.now);
   }
 
-  matchStateApply(matchState: unknown): void {
-    // this is intentionally light for the first map render milestone
-    // later this will convert backend polling state into runtime stores
-    this.launchData.matchState = matchState;
+  matchStateApply(matchState: unknown, serverClockOffsetMs = 0): void {
+    // this keeps the latest backend state and clock offset so create can replay a state that arrived early
+    this.latestMatchState = matchState;
+    this.serverClockOffsetMs = serverClockOffsetMs;
+
+    if (matchState && typeof matchState === "object" && (matchState as MatchSyncState).changed) {
+      this.latestFullMatchState = matchState;
+    }
+
+    // this ignores calls that arrive before create or after shutdown
+    if (!this.matchPrototypeState || !matchState || typeof matchState !== "object") {
+      return;
+    }
+
+    const syncState = matchState as MatchSyncState;
+
+    // this lets the courier move only while the backend says the match runs
+    this.courierMovementEnabled = syncState.status === FrontendMatchStatusValue.Active;
+
+    // this keeps saboteur energy current on every poll because it recovers over time
+    if (typeof syncState.obstacleEnergyRemaining === "number") {
+      this.matchPrototypeState.saboteur.energyCurrent = syncState.obstacleEnergyRemaining;
+    }
+
+    // this skips the rest when the backend said nothing else changed
+    if (!syncState.changed) {
+      return;
+    }
+
+    // this converts backend wall clock times into this scene clock
+    const sceneNowMs = this.time.now;
+    const serverNowMs = Date.now() + serverClockOffsetMs;
+    const sceneTimeFromServerGet = (serverTimeMs: number): number => sceneNowMs + (serverTimeMs - serverNowMs);
+
+    if (typeof syncState.energyMax === "number") {
+      this.matchPrototypeState.saboteur.energyMax = syncState.energyMax;
+    }
+
+    // this makes the local placement preview use the backend energy costs
+    if (syncState.hurdleRules) {
+      const energyCostByType: Partial<Record<SaboteurHurdleType, number>> = {};
+
+      for (const [hurdleType, hurdleRule] of Object.entries(syncState.hurdleRules)) {
+        energyCostByType[hurdleType as SaboteurHurdleType] = hurdleRule.energyCost;
+      }
+
+      this.matchPrototypeState.saboteur.energyCostByType = energyCostByType;
+    }
+
+    if (syncState.cooldownUntilMsByType && !Array.isArray(syncState.cooldownUntilMsByType)) {
+      for (const [hurdleType, cooldownUntilMs] of Object.entries(syncState.cooldownUntilMsByType)) {
+        this.matchPrototypeState.saboteur.hurdleCooldownUntilMsByType[hurdleType as SaboteurHurdleType] =
+          sceneTimeFromServerGet(cooldownUntilMs);
+      }
+    }
+
+    if (syncState.hurdles) {
+      this.hurdleStateFromServerApply(syncState, sceneTimeFromServerGet);
+    }
+
+    if (syncState.courier) {
+      this.courierStateFromServerApply(syncState.courier);
+    }
+
+    // this pushes new store objects into match state and redraws overlays now
+    this.runtimeStateSync();
+    this.cityMapRenderer.cityMapRuntimeLayerRedraw();
+  }
+
+  saboteurHurdleSelect(hurdleType: string): void {
+    // this ignores calls before create or with an unknown type
+    if (!this.saboteurPlacementInputController || !Object.values(SaboteurHurdleType).includes(hurdleType as SaboteurHurdleType)) {
+      return;
+    }
+
+    this.saboteurPlacementInputController.saboteurPlacementHurdleSelect(hurdleType as SaboteurHurdleType);
+  }
+
+  saboteurHurdleActivate(): void {
+    if (!this.saboteurPlacementInputController || this.matchPrototypeState.playerRole !== PlayerRole.Saboteur) {
+      return;
+    }
+
+    this.saboteurPlacementInputController.saboteurPlacementSelectedActivate();
+  }
+
+  courierPositionReset(tileX: number, tileY: number): void {
+    // this snaps the local courier back to the tile the backend accepted last
+    this.courierMovementInputController?.courierMovementReset({ x: tileX, y: tileY });
+    this.cityMapRenderer?.cityMapRuntimeLayerRedraw();
+  }
+
+  private hurdleStateFromServerApply(
+    syncState: MatchSyncState,
+    sceneTimeFromServerGet: (serverTimeMs: number) => number
+  ): void {
+    const activeHurdleList: SaboteurHurdleActive[] = [];
+    const redUntilMsBySignalId: Record<string, number> = {};
+
+    for (const hurdle of syncState.hurdles ?? []) {
+      const startedAtMs = sceneTimeFromServerGet(hurdle.startedAtMs);
+      const expiresAtMs = sceneTimeFromServerGet(hurdle.expiresAtMs);
+
+      // this drops hurdles that already ran out while the response was travelling
+      if (expiresAtMs <= this.time.now) {
+        continue;
+      }
+
+      hurdle.tiles.forEach(([tileX, tileY], tileIndex) => {
+        activeHurdleList.push({
+          id: `${hurdle.id}-${tileIndex}`,
+          hurdleType: hurdle.type as SaboteurHurdleType,
+          tilePoint: { x: tileX, y: tileY },
+          startedAtMs,
+          expiresAtMs,
+          trafficSignalId: hurdle.signalId ?? undefined,
+        });
+      });
+
+      if (hurdle.type === SaboteurHurdleType.RedTrafficLight && hurdle.signalId) {
+        redUntilMsBySignalId[hurdle.signalId] = expiresAtMs;
+      }
+    }
+
+    this.activeHurdleStateStore.activeHurdleStateReplace(activeHurdleList);
+    this.trafficSignalStateStore.trafficSignalRedReplace(redUntilMsBySignalId);
+  }
+
+  private courierStateFromServerApply(courier: MatchSyncCourier): void {
+    // this keeps the lowest life count because the courier client may have just lost one locally
+    this.matchPrototypeState.courier.livesCurrent = Math.min(this.matchPrototypeState.courier.livesCurrent, courier.lives);
+
+    // the courier owns its own position, only the saboteur follows the backend
+    if (this.matchPrototypeState.playerRole !== PlayerRole.Saboteur) {
+      return;
+    }
+
+    if (courier.moveSeq <= this.remoteCourierSeq) {
+      return;
+    }
+
+    const newerTileList = courier.trail.filter(([, , stepSeq]) => stepSeq > this.remoteCourierSeq);
+    const trailContinuous = newerTileList.length > 0 && newerTileList[0][2] === this.remoteCourierSeq + 1;
+
+    if (trailContinuous) {
+      this.remoteCourierTileQueue.push(...newerTileList.map(([tileX, tileY]) => ({ x: tileX, y: tileY })));
+    } else {
+      // this happens after a long gap, the saboteur just jumps to the latest tile
+      this.remoteCourierTileQueue = [];
+      this.tweens.killTweensOf(this.courierGameObject);
+      this.remoteCourierTweenActive = false;
+      this.remoteCourierTileArrive({ x: courier.x, y: courier.y });
+      const worldPoint = isometricTileCenterWorldPointGet({ x: courier.x, y: courier.y });
+      this.courierGameObject.x = worldPoint.x;
+      this.courierGameObject.y = worldPoint.y;
+    }
+
+    this.remoteCourierSeq = courier.moveSeq;
+    this.remoteCourierTweenNext();
+  }
+
+  private remoteCourierTweenNext(): void {
+    if (this.remoteCourierTweenActive) {
+      return;
+    }
+
+    const tilePoint = this.remoteCourierTileQueue.shift();
+
+    if (!tilePoint) {
+      return;
+    }
+
+    // this spreads the queued tiles over roughly one poll so the marker keeps moving smoothly
+    const durationMs = Math.max(
+      REMOTE_COURIER_TILE_MS_MIN,
+      Math.min(REMOTE_COURIER_TILE_MS_MAX, REMOTE_COURIER_CATCH_UP_MS / (this.remoteCourierTileQueue.length + 1))
+    );
+    const worldPoint = isometricTileCenterWorldPointGet(tilePoint);
+
+    this.remoteCourierTweenActive = true;
+    this.tweens.add({
+      targets: this.courierGameObject,
+      x: worldPoint.x,
+      y: worldPoint.y,
+      duration: durationMs,
+      ease: "Linear",
+      onComplete: () => {
+        this.remoteCourierTweenActive = false;
+        this.remoteCourierTileArrive(tilePoint);
+        this.remoteCourierTweenNext();
+      },
+    });
+  }
+
+  private remoteCourierTileArrive(tilePoint: CoordinateTilePoint): void {
+    // this keeps saboteur placement rules working with where the courier really is
+    const cityTile = this.cityMapGenerated.tileRows[tilePoint.y]?.[tilePoint.x];
+    const courierState = this.matchPrototypeState.courier;
+
+    courierState.tilePoint = { x: tilePoint.x, y: tilePoint.y };
+
+    if (cityTile && cityTile.zoneId !== courierState.zoneIdCurrent) {
+      courierState.zoneIdPrevious = courierState.zoneIdCurrent;
+      courierState.zoneIdCurrent = cityTile.zoneId;
+    }
+
+    this.courierTrailStateStore.courierTrailTileVisitedByCoordinatesMark(tilePoint.x, tilePoint.y);
+    this.matchPrototypeState.courierVisitedTileKeySet.add(cityTileKeyFromPointGet(tilePoint));
   }
 
   private runtimeStateSetup(): void {
@@ -248,6 +506,13 @@ export class MatchGameScene extends Phaser.Scene {
           // this marks the completed tile as visited
           this.courierTrailStateStore.courierTrailTileVisitedByCoordinatesMark(cityTile.x, cityTile.y);
 
+          // this reports the step so the backend and the saboteur see it
+          this.launchData.onCourierStep?.({
+            x: cityTile.x,
+            y: cityTile.y,
+            lives: this.matchPrototypeState.courier.livesCurrent,
+          });
+
           // this focuses camera on new courier zone
           this.cameraGameController.cameraCourierUpdate(this.matchPrototypeState.courier.tilePoint, true);
 
@@ -274,6 +539,9 @@ export class MatchGameScene extends Phaser.Scene {
         },
 
         courierDeliveryReached: () => {
+          // this stops further courier input while the backend confirms the delivery
+          this.courierDelivered = true;
+
           // this syncs final local state before result routing
           this.runtimeStateSync();
 
@@ -303,15 +571,38 @@ export class MatchGameScene extends Phaser.Scene {
       this.trafficSignalStateStore,
       this.activeHurdleStateStore,
       {
-        saboteurHurdleSelected: () => {
+        saboteurTileSelected: (_cityTile, placementResult) => {
+          // this tells the page whether Activate Hurdle will work on the picked tile
+          this.launchData.onPlacementFeedback?.(
+            placementResult.valid ? "Target tile selected. Press Activate Hurdle or Space." : placementResult.message ?? "Tile not allowed",
+            placementResult.valid
+          );
+          this.cityMapRenderer.cityMapRuntimeLayerRedraw();
+        },
+
+        saboteurHurdleSelected: (hurdleType) => {
+          // this keeps the page deck on the same hurdle as the keyboard
+          this.launchData.onHurdleSelected?.(hurdleType);
+
           // this redraws overlays after hurdle selection changes
           this.cityMapRenderer.cityMapRuntimeLayerRedraw();
         },
 
-        saboteurPlacementRejected: () => {
+        saboteurPlacementRejected: (placementResult) => {
+          // this shows why the local rules refused the placement
+          this.launchData.onPlacementFeedback?.(placementResult.message ?? "Hurdle cannot be placed there", false);
+
           // this redraws overlays after invalid placement
           this.cityMapRenderer.cityMapRuntimeLayerRedraw();
         },
+
+        saboteurPlacementRequested: this.launchData.onHurdleRequested
+          ? (hurdleType, tilePointList) => {
+              // this sends the placement to the backend, the hurdle shows when the next state arrives
+              this.launchData.onHurdleRequested?.(hurdleType, tilePointList);
+              this.cityMapRenderer.cityMapRuntimeLayerRedraw();
+            }
+          : undefined,
 
         saboteurPlacementActivated: () => {
           // this syncs runtime stores after local placement

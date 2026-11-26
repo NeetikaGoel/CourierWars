@@ -6,6 +6,7 @@ import { saboteurHurdleConfig } from "../../config/SaboteurHurdleConfig";
 
 // Imports generated city map and tile types
 import type { CityMapGenerated, CityTile } from "../../types/CityMapType";
+import type { CoordinateTilePoint } from "../../types/CoordinateType";
 
 // Imports player role values
 import { PlayerRole } from "../../types/PlayerRoleType";
@@ -15,6 +16,7 @@ import type { MatchPrototypeStateShape } from "../../types/MatchRuntimeStateType
 
 // Imports Saboteur hurdle values and result types
 import {
+  SaboteurHurdlePlacementFailureReason,
   SaboteurHurdleType,
   type SaboteurHurdleActivationRequest,
   type SaboteurHurdlePlacementResult,
@@ -45,6 +47,12 @@ export interface SaboteurPlacementInputControllerCallback {
 
   // Runs when placement activation succeeds
   saboteurPlacementActivated?: (cityTile: CityTile, hurdleType: SaboteurHurdleType) => void;
+
+  // Runs instead of local activation in an online match, the backend decides and the next state shows the hurdle
+  saboteurPlacementRequested?: (hurdleType: SaboteurHurdleType, tilePointList: CoordinateTilePoint[]) => void;
+
+  // Runs in an online match when a map click picks the target tile for the Activate button
+  saboteurTileSelected?: (cityTile: CityTile, placementResult: SaboteurHurdlePlacementResult) => void;
 }
 
 // Handles Saboteur hurdle selection and placement input
@@ -96,6 +104,10 @@ export class SaboteurPlacementInputController {
 
   // Stores key for security checkpoint
     private hurdleKeySecurityCheckpoint?: Phaser.Input.Keyboard.Key;
+
+    // Activates the selected hurdle on the selected tile in an online match
+    private hurdleKeyActivateSpace?: Phaser.Input.Keyboard.Key;
+    private hurdleKeyActivateEnter?: Phaser.Input.Keyboard.Key;
     
     // Stores whether pointer press started for possible placement
     private placementPointerPressActive = false;
@@ -181,6 +193,10 @@ export class SaboteurPlacementInputController {
 
     // Creates key for security checkpoint
     this.hurdleKeySecurityCheckpoint = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.NINE);
+
+    // Space and Enter place the selected hurdle, the same as the Activate Hurdle button
+    this.hurdleKeyActivateSpace = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE, false);
+    this.hurdleKeyActivateEnter = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER, false);
   }
 
   // Sets up pointer click placement
@@ -326,6 +342,13 @@ export class SaboteurPlacementInputController {
     }
 
     // Selects security checkpoint
+    const activateSpacePressed = this.hurdleKeyActivateSpace && Phaser.Input.Keyboard.JustDown(this.hurdleKeyActivateSpace);
+    const activateEnterPressed = this.hurdleKeyActivateEnter && Phaser.Input.Keyboard.JustDown(this.hurdleKeyActivateEnter);
+
+    if ((activateSpacePressed || activateEnterPressed) && this.callback.saboteurPlacementRequested) {
+      this.saboteurPlacementSelectedActivate();
+    }
+
     if (this.hurdleKeySecurityCheckpoint && Phaser.Input.Keyboard.JustDown(this.hurdleKeySecurityCheckpoint)) {
       // Updates selected hurdle
       this.saboteurPlacementHurdleSelect(SaboteurHurdleType.SecurityCheckpoint);
@@ -343,6 +366,12 @@ export class SaboteurPlacementInputController {
 
   // Handles Saboteur tile click
   saboteurPlacementTileClickHandle(cityTile: CityTile | undefined): void {
+    // In an online match a click only picks the target tile, Activate Hurdle places it
+    if (this.callback.saboteurPlacementRequested) {
+      this.saboteurPlacementTileSelect(cityTile);
+      return;
+    }
+
     // Tries to activate selected hurdle
     const placementResult = this.saboteurPlacementActivationTry(cityTile);
 
@@ -354,6 +383,54 @@ export class SaboteurPlacementInputController {
   }
 
   // Tries to activate selected hurdle on tile
+  // Picks the target tile and reports whether the selected hurdle can go there right now
+  saboteurPlacementTileSelect(cityTile: CityTile | undefined): void {
+    if (!cityTile) {
+      return;
+    }
+
+    this.saboteurPlacementRuntimeStateSync();
+    this.matchPrototypeState.tileInteraction.tilePointSelected = { x: cityTile.x, y: cityTile.y };
+
+    const placementResult = saboteurPlacementCheck({
+      cityMapGenerated: this.cityMapGenerated,
+      cityZoneList: this.cityMapGenerated.zoneList,
+      cityTile,
+      hurdleType: this.matchPrototypeState.saboteur.hurdleTypeSelected,
+      matchPrototypeState: this.matchPrototypeState,
+      currentTimeMs: this.scene.time.now,
+    });
+
+    this.callback.saboteurTileSelected?.(cityTile, placementResult);
+  }
+
+  // Places the selected hurdle on the selected tile, used by the Activate Hurdle button and Space or Enter
+  saboteurPlacementSelectedActivate(): SaboteurHurdlePlacementResult {
+    const tilePointSelected = this.matchPrototypeState.tileInteraction.tilePointSelected;
+    const cityTile = tilePointSelected
+      ? this.cityMapGenerated.tileRows[tilePointSelected.y]?.[tilePointSelected.x]
+      : undefined;
+
+    if (!cityTile) {
+      const placementResult: SaboteurHurdlePlacementResult = {
+        valid: false,
+        failureReason: SaboteurHurdlePlacementFailureReason.TileMissing,
+        message: "Click a road tile on the map first",
+      };
+
+      this.callback.saboteurPlacementRejected?.(placementResult);
+      return placementResult;
+    }
+
+    const placementResult = this.saboteurPlacementActivationTry(cityTile);
+
+    if (!placementResult.valid) {
+      this.callback.saboteurPlacementRejected?.(placementResult);
+    }
+
+    return placementResult;
+  }
+
   saboteurPlacementActivationTry(cityTile: CityTile | undefined): SaboteurHurdlePlacementResult {
     // Synchronizes match state from runtime stores before validation
     this.saboteurPlacementRuntimeStateSync();
@@ -401,6 +478,22 @@ export class SaboteurPlacementInputController {
   // Confirms and applies valid Saboteur placement
   // Confirms and applies valid Saboteur placement
   saboteurPlacementConfirm(cityTile: CityTile, hurdleType: SaboteurHurdleType): void {
+    // Sends the anchor tile first and then the road width tiles so both players block the same tiles
+    if (this.callback.saboteurPlacementRequested) {
+      const targetTileList =
+        hurdleType === SaboteurHurdleType.RedTrafficLight
+          ? [cityTile]
+          : saboteurPlacementTargetTileListGet(this.cityMapGenerated, cityTile, hurdleType);
+      const tilePointList = [cityTile, ...targetTileList.filter((targetTile) => targetTile !== cityTile)].map(
+        (targetTile) => ({ x: targetTile.x, y: targetTile.y })
+      );
+
+      this.matchPrototypeState.tileInteraction.tilePointSelected = { x: cityTile.x, y: cityTile.y };
+      this.callback.saboteurPlacementRequested(hurdleType, tilePointList);
+
+      return;
+    }
+
     // Stores hurdle config
     const hurdleConfig = saboteurHurdleConfig.hurdle[hurdleType];
 
